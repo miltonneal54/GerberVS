@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectInformation>
+  <ProjectName>Test Project</ProjectName>
+  <CurrentIndex>0</CurrentIndex>
+  <BackgroundColor>-16777216</BackgroundColor>
+  <ProjectTransformation>
+    <Inverted>False</Inverted>
+    <ScaleX>0.959264278411865</ScaleX>
+    <ScaleY>0.959264278411865</ScaleY>
+  </ProjectTransformation>
+  <FileInformation>
+    <FileName>104-00094_REV-1.BOT</FileName>
+    <FilePath>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberFiles\104-00094_REV-1.BOT</FilePath>
+    <LayerColor>-9210914</LayerColor>
+    <LayerAlpha>177</LayerAlpha>
+    <LayerVisible>True</LayerVisible>
+    <FileName>104-00094_REV-1.TOP</FileName>
+    <FilePath>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberFiles\104-00094_REV-1.TOP</FilePath>
+    <LayerColor>-32909</LayerColor>
+    <LayerAlpha>177</LayerAlpha>
+    <LayerVisible>True</LayerVisible>
+  </FileInformation>
+</ProjectInformation>
