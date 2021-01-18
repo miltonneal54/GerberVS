@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using System.IO;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
+
 [assembly: CLSCompliant(true)]
 namespace GerberVS
 {
+    /// <summary>
+    /// Gerber process library.
+    /// </summary>
     public class LibGerberVS
     {
-        private RectangleF rect;
+        //private RectangleF rect;
         private const int NumberOfDefaultColors = 18;
         private static int defaultColorIndex = 0;
         private static int[,] defaultColors = {
@@ -37,7 +38,7 @@ namespace GerberVS
 	        {177, 253, 238, 197},
 	        {177, 226, 226, 226} };
 
-        private Color backgroundColor;
+        private static Color backgroundColor;
 
         /// <summary>
         /// Creates a new Gerber Project.
@@ -47,34 +48,38 @@ namespace GerberVS
         {
             GerberProject project = new GerberProject();
             project.Path = Directory.GetCurrentDirectory();
+            project.FileCount = 0;
             project.CurrentIndex = -1;
+            project.ProjectName = String.Empty;
+            project.Path = String.Empty;
             return project;
         }
 
         /// <summary>
-        /// Removes a file from the project at the specified index.
+        /// Removes a layer from the project at the specified index.
         /// </summary>
         /// <param name="project">project containing the file info to remove</param>
         /// <param name="index">index to remove at</param>
         public void UnloadLayer(GerberProject project, int index)
         {
-            int fileCount = project.FileInfo.Count;
+            int count = project.FileCount;
 
             // Move all later layers down to fill the empty slot.
-            for (int i = index; i < fileCount - 1; i++)
+            for (int i = index; i < count - 1; i++)
                 project.FileInfo[i] = project.FileInfo[i + 1];
 
             // Make sure the final spot is clear.
-            project.FileInfo.Remove(project.FileInfo[fileCount - 1]);
+            project.FileInfo.Remove(project.FileInfo[count - 1]);
+            project.FileCount--;
         }
 
         /// <summary>
-        /// Removes all the files in the project.
+        /// Removes all layers from the project.
         /// </summary>
         /// <param name="project">project containing the file list.</param>
         public void UnloadAllLayers(GerberProject project)
         {
-            int fileIndex = project.FileInfo.Count - 1;
+            int fileIndex = project.FileCount - 1;
             // Must count down since UnloadLayer collapses layers down. Otherwise, layers slide past the index,
             for (int index = fileIndex; index >= 0; index--)
             {
@@ -84,7 +89,7 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Changes the order that file layers are rendered.
+        /// Changes the order that layers are rendered.
         /// </summary>
         /// <param name="project">project containing the file list</param>
         /// <param name="oldPosition">from position</param>
@@ -109,7 +114,7 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Opens a layer file and appends it to the project.
+        /// Opens a layer and appends it to the project.
         /// </summary>
         /// <param name="project">project to append file</param>
         /// <param name="fullPathName">file to open</param>
@@ -123,15 +128,15 @@ namespace GerberVS
                 OpenImage(project, fullPathName, reload, -1);
             }
 
-            catch (GerberFileException ex)
+            catch (Exception ex)
             {
-                throw new GerberDLLException(ex.Message);
+                throw new GerberDLLException("", ex);
             }
 
         }
 
         /// <summary>
-        /// Opens a layer file and appends it to the project using the specified color and alpha level.
+        /// Opens a layer and appends it to the project using the specified color and alpha level.
         /// </summary>
         /// <param name="project">project</param>
         /// <param name="fullPathName">file path</param>
@@ -139,25 +144,56 @@ namespace GerberVS
         /// <param name="alpha">alpha level</param>
         public void OpenLayerFromFilenameAndColor(GerberProject project, string fullPathName, Color color, int alpha)
         {
-            int fileIndex = project.FileInfo.Count - 1;
+            bool reload = false;
+            int fileIndex;
             try
             {
-                OpenImage(project, fullPathName, false, -1);
+                OpenImage(project, fullPathName, reload, -1);
+                fileIndex = project.FileCount - 1;
                 project.FileInfo[fileIndex].LayerDirty = false;
-                project.FileInfo[fileIndex].Color = Color.FromArgb(color.R, color.G, color.B);
+                project.FileInfo[fileIndex].Color = Color.FromArgb(color.A, color.R, color.G, color.B);
                 project.FileInfo[fileIndex].Alpha = alpha;
             }
 
-            catch (GerberFileException ex)
+            catch (Exception ex)
             {
-                throw new GerberDLLException(ex.Message);
+                throw new GerberDLLException("", ex);
             }
         }
 
-        public void ReloadFile(GerberProject project, int index)
+        /// <summary>
+        /// Reloads an existing layer within a project.
+        /// </summary>
+        /// <param name="project">project</param>
+        /// <param name="index">project file index</param>
+        public void ReloadLayer(GerberProject project, int index)
         {
-            if (OpenImage(project, project.FileInfo[index].FullPathName, true, index))
+            bool reload = true;
+
+            try
+            {
+                OpenImage(project, project.FileInfo[index].FullPathName, reload, index);
                 project.FileInfo[index].LayerDirty = false;
+            }
+
+            catch (Exception ex)
+            {
+                throw new GerberDLLException("", ex);
+            }
+
+        }
+
+        /// <summary>
+        /// Reloads all existing layers within a project.
+        /// </summary>
+        /// <param name="project"></param>
+        public void ReloadAllLayers(GerberProject project)
+        {
+            for (int i = 0; i < project.FileCount; i++)
+            {
+                if (project.FileInfo[i] != null && !String.IsNullOrEmpty(project.FileInfo[i].FullPathName))
+                    ReloadLayer(project, i);
+            }
         }
 
         /// <summary>
@@ -169,9 +205,8 @@ namespace GerberVS
             double x1 = double.MaxValue, y1 = double.MaxValue, x2 = double.MinValue, y2 = double.MinValue;
             GerberImageInfo imageInfo;
             float minX, minY, maxX, maxY;
-            int fileCount = project.FileInfo.Count;
 
-            for (int i = 0; i < fileCount; i++)
+            for (int i = 0; i < project.FileCount; i++)
             {
                 if ((project.FileInfo[i] != null) && (project.FileInfo[i].IsVisible))
                 {
@@ -189,17 +224,17 @@ namespace GerberVS
                     using (Matrix fullMatrix = new Matrix(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f))
                     {
                         // Don't use mirroring for the scale matrix
-                        double scaleX = project.UserTransform.ScaleX;
-                        double scaleY = project.UserTransform.ScaleY;
-                        if (project.UserTransform.MirrorAroundX)
+                        double scaleX = project.FileInfo[i].UserTransform.ScaleX;
+                        double scaleY = project.FileInfo[i].UserTransform.ScaleY;
+                        if (project.FileInfo[i].UserTransform.MirrorAroundX)
                             scaleY *= -1;
 
-                        if (project.UserTransform.MirrorAroundY)
+                        if (project.FileInfo[i].UserTransform.MirrorAroundY)
                             scaleX *= -1;
 
                         fullMatrix.Scale((float)scaleX, (float)scaleY);
-                        fullMatrix.Rotate((float)project.UserTransform.Rotation);
-                        fullMatrix.Translate((float)project.UserTransform.TranslateX, (float)project.UserTransform.TranslateY);
+                        fullMatrix.Rotate((float)project.FileInfo[i].UserTransform.Rotation);
+                        fullMatrix.Translate((float)project.FileInfo[i].UserTransform.TranslateX, (float)project.FileInfo[i].UserTransform.TranslateY);
                         PointF[] points = new PointF[] { new PointF(minX, minY), new PointF(maxX, maxY) };
                         fullMatrix.TransformPoints(points);
                         // Compare both min and max, since a mirror transform may have made "max" smaller than "min".
@@ -220,11 +255,11 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Translates the rendered image to the centre of the display area.
+        /// Translates the rendered image to the centre of the visible display area.
         /// </summary>
         /// <param name="project">project details</param>
         /// <param name="renderInfo">render information</param>
-        public void TranslateToCentreDisplay(GerberProject project, RenderInformation renderInfo)
+        public void TranslateToCentreDisplay(GerberProject project, GerberRenderInformation renderInfo)
         {
             BoundingBox projectBounds = GetProjectBounds(project);
             if (!projectBounds.IsValid())
@@ -239,21 +274,13 @@ namespace GerberVS
 
             renderInfo.ImageWidth = imageWidth;
             renderInfo.ImageHeight = imageHeight;
-            //renderInfo.Left = -((renderInfo.DisplayWidth - imageWidth) / 2) + left;
-            //renderInfo.Bottom = ((renderInfo.DisplayHeight - imageHeight) / 2) + bottom;
-
             renderInfo.Left = ((renderInfo.DisplayWidth - imageWidth) / 2) - left;
             renderInfo.Bottom = -((renderInfo.DisplayHeight + imageHeight) / 2) - bottom;
             if (imageWidth > renderInfo.DisplayWidth)
-                //renderInfo.Left = left;
                 renderInfo.Left = -left;
 
             if (imageHeight > renderInfo.DisplayHeight)
-                //renderInfo.Bottom = bottom;
                 renderInfo.Bottom = -(imageHeight + bottom);
-
-            renderInfo.ScaleFactorX = 1.0;
-            renderInfo.ScaleFactorY = 1.0;
         }
 
         /// <summary>
@@ -261,9 +288,10 @@ namespace GerberVS
         /// </summary>
         /// <param name="project">project information</param>
         /// <param name="renderInfo">render information</param>
-        public void TranslateToFitDisplay(GerberProject project, RenderInformation renderInfo)
+        public void TranslateToFitDisplay(GerberProject project, GerberRenderInformation renderInfo)
         {
             double width, height;
+
             BoundingBox projectBounds = GetProjectBounds(project);
             if (!projectBounds.IsValid())
                 return;
@@ -286,7 +314,7 @@ namespace GerberVS
         /// </summary>
         /// <param name="filePath">filename containing the layer geometry</param>
         /// <returns>gerber image</returns>
-        public static GerberImage CreateRS274XImageFromFile(string filePath)
+        public GerberImage CreateRS274XImageFromFile(string filePath)
         {
             GerberImage returnImage;
 
@@ -295,68 +323,326 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Draws all the visible layers contained in the project.
+        /// Adds a gerber object to the selection buffer if it lies within the selection region.
+        /// </summary>
+        /// <param name="graphics">surface where the image is rendered</param>
+        /// <param name="selectionInfo">current selection info</param>
+        /// <param name="index">index of the gerber net to test</param>
+        public void ObjectInSelectedRegion(Graphics graphics, SelectionInformation selectionInfo, ref int index)
+        {
+            bool inSelect = false;
+            bool done = false;
+            GerberImage image = selectionInfo.SelectedFileInfo.Image;
+            GerberNet currentNet = image.GerberNetList[index];
+            GraphicsPath path = null;
+            // If a point click, lower left x1 and y1 hold the click co-ordinates
+            // else the 4 points hold the selection rectangle.
+            float x1 = (float)selectionInfo.LowerLeftX, y1 = (float)selectionInfo.LowerLeftY;
+            float x2 = (float)selectionInfo.UpperRightX, y2 = (float)selectionInfo.UpperRightY;
+            float startX, startY, stopX, stopY;
+
+            // Use point selection.
+            if (selectionInfo.SelectionType == GerberSelection.PointClick)
+            {
+                // Check through the step and repeats, if any.
+                for (int rx = 0; rx < currentNet.Level.StepAndRepeat.X; rx++)
+                {
+                    for (int ry = 0; ry < currentNet.Level.StepAndRepeat.Y; ry++)
+                    {
+                        float stepAndRepeatX = rx * (float)currentNet.Level.StepAndRepeat.DistanceX;
+                        float stepAndRepeatY = ry * (float)currentNet.Level.StepAndRepeat.DistanceY;
+                        startX = (float)currentNet.StartX + stepAndRepeatX;
+                        startY = (float)currentNet.StartY + stepAndRepeatY;
+                        stopX = (float)currentNet.StopX + stepAndRepeatX;
+                        stopY = (float)currentNet.StopY + stepAndRepeatY;
+
+                        if (currentNet.BoundingBox != null)
+                        {
+                            if (currentNet.ApertureState == GerberApertureState.Flash)
+                            {
+                                if (currentNet.BoundingBox.Contains(new PointD(x1, y1)))
+                                {
+                                    if (selectionInfo.PolygonAreaStartIndex > -1)
+                                        selectionInfo.RemoveNetFromList(selectionInfo.PolygonAreaStartIndex);
+
+                                    inSelect = true;
+                                }
+                            }
+
+                            else if (currentNet.ApertureState == GerberApertureState.On)
+                            {
+                                switch (currentNet.Interpolation)
+                                {
+                                    case GerberInterpolation.PolygonAreaStart:
+                                        // Don't allow a selection of a poly fill area if already have a selected object.
+                                        if (selectionInfo.Count == 0)
+                                        {
+                                            using (path = new GraphicsPath())
+                                            {
+                                                GerberDraw.FillPolygonAreaPath(path, image.GerberNetList, index, stepAndRepeatX, stepAndRepeatY);
+                                                if (path.IsVisible(new PointF(x1, y1), graphics))
+                                                {
+                                                    inSelect = true;
+                                                    done = true;
+                                                }
+                                            }
+                                        }
+                                        break;
+
+                                    case GerberInterpolation.LinearX10:
+                                    case GerberInterpolation.LinearX1:
+                                    case GerberInterpolation.LinearX01:
+                                    case GerberInterpolation.LinearX001:
+                                        using (path = new GraphicsPath())
+                                        using (Pen pen = new Pen(Color.Black))
+                                        {
+                                            pen.Width = (float)image.ApertureArray[currentNet.Aperture].Parameters[0];
+                                            pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
+                                            if (image.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
+                                                pen.SetLineCap(LineCap.Square, LineCap.Square, DashCap.Flat);
+
+                                            PointF[] points = new PointF[] { new PointF(startX, startY), new PointF(stopX, stopY) };
+                                            path.AddLine(points[0], points[1]);
+                                            if (path.IsOutlineVisible(new PointF(x1, y1), pen, graphics))
+                                            {
+                                                if (selectionInfo.PolygonAreaStartIndex > -1)
+                                                    selectionInfo.RemoveNetFromList(selectionInfo.PolygonAreaStartIndex);
+
+                                                inSelect = true;
+                                                done = true;
+                                            }
+                                        }
+                                        break;
+
+                                    case GerberInterpolation.ClockwiseCircular:
+                                    case GerberInterpolation.CounterClockwiseCircular:
+                                        using (path = new GraphicsPath())
+                                        using (Pen pen = new Pen(Color.Black))
+                                        {
+                                            pen.Width = (float)image.ApertureArray[currentNet.Aperture].Parameters[0];
+                                            pen.StartCap = pen.EndCap = LineCap.Round;
+                                            if (image.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
+                                                pen.StartCap = pen.EndCap = LineCap.Square;
+
+                                            float centerX = (float)currentNet.CircleSegment.CenterX;
+                                            float centerY = (float)currentNet.CircleSegment.CenterY;
+                                            float width = (float)currentNet.CircleSegment.Width;
+                                            float height = (float)currentNet.CircleSegment.Height;
+                                            float startAngle = (float)currentNet.CircleSegment.StartAngle;
+                                            float sweepAngle = (float)currentNet.CircleSegment.SweepAngle;
+                                            RectangleF arcRectangle = new RectangleF(centerX - (width / 2), centerY - (height / 2), width, height);
+                                            path.AddArc(arcRectangle, startAngle, sweepAngle);
+                                            if (path.IsOutlineVisible(new PointF(x1, y1), pen, graphics))
+                                            {
+                                                if (selectionInfo.PolygonAreaStartIndex > -1)
+                                                    selectionInfo.RemoveNetFromList(selectionInfo.PolygonAreaStartIndex);
+
+                                                inSelect = true;
+                                                done = true;
+                                            }
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+
+                        // If we have a hit, then no new to test other step and repeats.
+                        if (done)
+                            break;
+                    }
+
+                    if (done)
+                        break;
+                }
+            }
+
+            else if (selectionInfo.SelectionType == GerberSelection.DragBox)
+            {
+                if (currentNet.BoundingBox != null)
+                {
+                    double left = Math.Min(x1, x2);
+                    double right = Math.Max(x1, x2);
+                    double top = Math.Min(y1, y2);
+                    double bottom = Math.Max(y1, y2);
+
+                    BoundingBox selectionBox = new BoundingBox(left, bottom, right, top);
+                    if (!selectionBox.Contains(currentNet.BoundingBox))
+                        return;
+
+                    if (currentNet.ApertureState == GerberApertureState.On || currentNet.ApertureState == GerberApertureState.Flash)
+                        inSelect = selectionBox.Contains(currentNet.BoundingBox);
+                }
+            }
+
+            if (inSelect)
+            {
+                selectionInfo.SelectedNodeArray.SelectedNetList.Add(currentNet);
+                selectionInfo.SelectedNodeArray.SelectedNetIndex.Add(index);
+                if (currentNet.Interpolation == GerberInterpolation.PolygonAreaStart)
+                {
+                    selectionInfo.PolygonAreaStartIndex = selectionInfo.SelectedNodeArray.SelectedNetList.Count - 1;
+                    // Add all the polygon points.
+                    do
+                    {
+                        index++;
+                        currentNet = image.GerberNetList[index];
+                        selectionInfo.SelectedNodeArray.SelectedNetList.Add(currentNet);
+                    } while (currentNet.Interpolation != GerberInterpolation.PolygonAreaEnd);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates a selection information object for the user selection layer data.
+        /// </summary>
+        /// <param name="fileInfo">file information</param>
+        /// <returns>a new instance of the selection info </returns>
+        public SelectionInformation CreateSelectionLayer(GerberFileInformation fileInfo)
+        {
+            SelectionInformation selectionInfo = new SelectionInformation(fileInfo);
+            selectionInfo.SelectedFileInfo.Image = GerberImage.Copy(fileInfo.Image);
+            return selectionInfo;
+        }
+
+        /// <summary>
+        /// Renders all the visible layers contained within the project.
         /// </summary>
         /// <param name="graphics">surface to render the image</param>
         /// <param name="project">project containing the files to render</param>
         /// <param name="renderInfo">information for positioning, scaling and translating</param>
-        public void RenderAllLayers(Graphics graphics, GerberProject project, RenderInformation renderInfo)
+        public void RenderAllLayers(Graphics graphics, GerberProject project, GerberRenderInformation renderInfo)
         {
             int fileIndex = project.FileInfo.Count - 1;
+
             backgroundColor = project.BackgroundColor;
             graphics.Clear(backgroundColor);
 
             for (int i = fileIndex; i >= 0; i--)
             {
                 if (project.FileInfo[i] != null && project.FileInfo[i].IsVisible)
-                    RenderLayer(graphics, project, renderInfo, i);
+                    RenderLayer(graphics, project.FileInfo[i], renderInfo, project);
             }
         }
 
         /// <summary>
-        /// Draw the user selection layer;
+        /// Renders the user selection layer.
+        /// </summary>
+        /// <param name="graphics">surface to render the image</param>
+        /// <param name="selectionInfo">selection info of nets to render</param>
+        /// <param name="renderInfo">information for positioning, scaling and translating</param>
+        public void RenderSelectionLayer(Graphics graphics, SelectionInformation selectionInfo, GerberRenderInformation renderInfo)
+        {
+            RenderLayer(graphics, selectionInfo, renderInfo);
+        }
+
+        /// <summary>
+        /// Draws all the visible layers contained within the project.
         /// </summary>
         /// <param name="graphics">surface to render the image</param>
         /// <param name="project">project containing the files to render</param>
         /// <param name="renderInfo">information for positioning, scaling and translating</param>
-        /// <param name="selectionInfo">information about the users selection</param>
-        public void RenderSelectionLayer(Graphics graphics, GerberProject project, RenderInformation renderInfo, SelectionInformation selectionInfo)
+        public void RenderAllLayersForVectorOutput(Graphics graphics, GerberProject project, GerberRenderInformation renderInfo)
         {
-            int bmWidth = 0;
-            int bmHeight = 0;
+            int fileIndex = project.FileInfo.Count - 1;
 
-            // Calculate how big to make the bitmap back buffer.
-            if (renderInfo.ImageWidth < renderInfo.DisplayWidth)
-                bmWidth = (int)(renderInfo.DisplayWidth * graphics.DpiX);
+            ScaleAndTranslate(graphics, renderInfo);
+            for (int i = fileIndex; i >= 0; i--)
+            {
+                if (project.FileInfo[i] != null && project.FileInfo[i].IsVisible)
+                {
+                    GraphicsState state = graphics.Save();
+                    graphics.CompositingMode = CompositingMode.SourceCopy;
+                    RenderLayerToTarget(graphics, project.FileInfo[i]);
+                    graphics.Restore(state);
+                }
+            }
+        }
 
-            else
-                bmWidth = (int)(renderInfo.ImageWidth * graphics.DpiX);
+        /// <summary>
+        /// Exports a gerber project to a Png image.
+        /// </summary>
+        /// <param name="filePath">Full path name to write file to</param>
+        /// <param name="project">project info</param>
+        /// <param name="renderInfo">render information</param>
+        public void ProjectToPng(string filePath, GerberProject project, GerberRenderInformation renderInfo, Graphics g)
+        {
+            try
+            {
+                int fileIndex = project.FileInfo.Count - 1;
+                int width = (int)(renderInfo.ImageWidth * g.DpiX);
+                int height = (int)(renderInfo.ImageHeight * g.DpiY);
 
-            if (renderInfo.ImageHeight < renderInfo.DisplayHeight)
-                bmHeight = (int)(renderInfo.DisplayHeight * graphics.DpiY);
+                using (Bitmap bitmap = new Bitmap(width, height))
+                using (Graphics graphics = Graphics.FromImage(bitmap))
+                {
+                    graphics.Clear(Color.Black);
+                    for (int i = fileIndex; i >= 0; i--)
+                    {
+                        if (project.FileInfo[i] != null && project.FileInfo[i].IsVisible)
+                            RenderLayer(graphics, project.FileInfo[i], renderInfo, project);
+                    }
 
-            else
-                bmHeight = (int)(renderInfo.ImageHeight * graphics.DpiY);
+                    bitmap.Save(filePath, ImageFormat.Png);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                throw new GerberExportException(Path.GetFileName(filePath), ex);
+            }
+        }
+
+        internal void RenderLayer(Graphics graphics, GerberFileInformation fileInfo, GerberRenderInformation renderInfo, GerberProject project)
+        {
+            Size bmSize = GetBitmapSize(graphics, renderInfo);
+            // Create a back buffer and draw to it with no alpha level.
+            using (Bitmap bitmap = new Bitmap(bmSize.Width, bmSize.Height, graphics))
+            using (Graphics backBuffer = Graphics.FromImage(bitmap))
+            {
+                backBuffer.CompositingMode = CompositingMode.SourceCopy;
+                ScaleAndTranslate(backBuffer, renderInfo);
+                // For testing :- draws a bounding rectangle.
+                /*BoundingBox bb = GetProjectBounds(project);
+                RectangleF r = new RectangleF((float)bb.Left, (float)bb.Top, (float)(bb.Right - bb.Left), (float)(bb.Top - bb.Bottom));
+                GraphicsPath path = new GraphicsPath();
+                path.AddLine((float)bb.Left, (float)bb.Bottom, (float)bb.Left, (float)(bb.Top));
+                path.AddLine((float)bb.Left, (float)bb.Top, (float)bb.Right, (float)bb.Top);
+                path.AddLine((float)bb.Right, (float)bb.Top, (float)bb.Right, (float)bb.Bottom);
+                path.AddLine((float)bb.Right, (float)bb.Bottom, (float)bb.Left, (float)bb.Bottom);
+                backBuffer.DrawPath(new Pen(Color.FromArgb(117, 200, 0, 0), 0.015f), path);*/
+                RenderLayerToTarget(backBuffer, fileInfo);
+                // Copy the back buffer to the visible surface with alpha transparency level.
+                graphics.CompositingMode = CompositingMode.SourceOver;
+                graphics.DrawImage(bitmap, 0, 0);
+            }
+        }
+
+        /// <summary>
+        /// Draw the user selection layer.
+        /// </summary>
+        /// <param name="graphics">surface to render the image</param>
+        /// <param name="selectionInfo">information about the users selection area</param>
+        /// <param name="renderInfo">information for positioning, scaling and translating</param>
+        internal void RenderLayer(Graphics graphics, SelectionInformation selectionInfo, GerberRenderInformation renderInfo)
+        {
+            Size bmSize = GetBitmapSize(graphics, renderInfo);
 
             // Create a back buffer and draw to it with no alpha level.
-            using (Bitmap bitmap = new Bitmap(bmWidth, bmHeight, graphics))
+            using (Bitmap bitmap = new Bitmap(bmSize.Width, bmSize.Height, graphics))
             using (Graphics backBuffer = Graphics.FromImage(bitmap))
             {
                 backBuffer.CompositingMode = CompositingMode.SourceOver;
                 ScaleAndTranslate(backBuffer, renderInfo);
-                Color foregroundColor = Color.FromArgb(177, Color.White);
-                GerberDraw.DrawImageToTarget(backBuffer, selectionInfo, project.UserTransform, foregroundColor, backgroundColor);
+                RenderLayerToTarget(backBuffer, selectionInfo);
                 // Copy the back buffer to the visible surface with alpha level.
                 graphics.CompositingMode = CompositingMode.SourceOver;
                 graphics.DrawImage(bitmap, 0, 0);
             }
         }
 
-        private static bool OpenImage(GerberProject project, string fullPathName, bool reloading, int index)
+        private static void OpenImage(GerberProject project, string fullPathName, bool reloading, int index)
         {
             GerberImage parsedImage = null;
-            string displayFileName = String.Empty;
-            bool success = false;
 
             int numberOfAttributes = 0;
             List<GerberHIDAttribute> attributesList = null;
@@ -368,36 +654,35 @@ namespace GerberVS
                 parsedImage = Drill.ParseDrillFile(fullPathName, attributesList, numberOfAttributes, reloading);
 
             else
-                throw new GerberFileException("Unknown file format " + fullPathName);
+                throw new GerberFileException("Unknown file type: " + Path.GetFileName(fullPathName));
 
             if (parsedImage != null)
             {
                 if (!reloading)
                 {
                     project.FileInfo.Add(new GerberFileInformation());
-                    AddFileToProject(project, parsedImage, fullPathName, reloading);
+                    project.FileCount++;
+                    index = project.FileCount - 1;
+                    AddFileToProject(project, parsedImage, fullPathName, reloading, index);
                 }
 
                 else
-                {
-                    AddFileToProject(project, parsedImage, fullPathName, reloading);
-                }
+                    AddFileToProject(project, parsedImage, fullPathName, reloading, index);
             }
-
-            return success;
         }
 
-        private static void AddFileToProject(GerberProject project, GerberImage parsedImage, string fullPathName, bool reloading)
+        private static void AddFileToProject(GerberProject project, GerberImage parsedImage, string fullPathName, bool reloading, int index)
         {
-            int fileIndex = project.FileInfo.Count - 1;
             int colorIndex = 0;
-            GerberVerifyError error = GerberVerifyError.ImageOK;
+            GerberVerifyError error = GerberVerifyError.None;
+            GerberFileInformation fileInfo = project.FileInfo[index];
 
             //Debug.WriteLine("Integrity check on image....\n");
-            error = parsedImage.GerberImageVerify();
-            if (error != GerberVerifyError.ImageOK)
+            error = parsedImage.ImageVerify();
+            if (error != GerberVerifyError.None)
             {
-                project.FileInfo.RemoveAt(fileIndex);   // Image has errors, remove it from the file list.
+                project.FileInfo.RemoveAt(index);   // Image has errors, remove it from the file list and throw exception.
+                project.FileCount--;
                 if ((error & GerberVerifyError.MissingNetList) > 0)
                     throw new GerberImageException("Missing image net list.");
 
@@ -405,87 +690,50 @@ namespace GerberVS
                     throw new GerberImageException("Missing format information in file.");
 
                 if ((error & GerberVerifyError.MissingApertures) > 0)
-                    throw new GerberImageException("Missing apertures/drill sizes.");
+                    throw new GerberImageException("Missing aperture/drill sizes.");
 
                 if ((error & GerberVerifyError.MissingImageInfo) > 0)
                     throw new GerberImageException("Missing image information.");
             }
 
-            project.FileInfo[fileIndex].Image = parsedImage;
-            if (reloading) // If reload, just exchange the image and return.
+            fileInfo.Image = parsedImage;
+            if (reloading) // If reloading, just exchange the image and return.
                 return;
 
-            project.FileInfo[fileIndex].FullPathName = fullPathName;
-            project.FileInfo[fileIndex].FileName = Path.GetFileName(fullPathName);
+            fileInfo.FullPathName = fullPathName;
+            fileInfo.FileName = Path.GetFileName(fullPathName);
             colorIndex = defaultColorIndex % NumberOfDefaultColors;
-            project.FileInfo[fileIndex].Color = Color.FromArgb(defaultColors[colorIndex, 1], defaultColors[colorIndex, 2], defaultColors[colorIndex, 3]);
-            project.FileInfo[fileIndex].Alpha = defaultColors[colorIndex, 0];
-            project.FileInfo[fileIndex].IsVisible = true;
+            fileInfo.Color = Color.FromArgb(defaultColors[colorIndex, 0], defaultColors[colorIndex, 1],
+                                                           defaultColors[colorIndex, 2], defaultColors[colorIndex, 3]);
+            fileInfo.Alpha = defaultColors[colorIndex, 0];
+            fileInfo.IsVisible = true;
             defaultColorIndex++;
         }
 
-        private void RenderLayer(Graphics graphics, GerberProject project, RenderInformation renderInfo, int fileIndex)
+        private static void RenderLayerToTarget(Graphics graphics, GerberFileInformation fileInfo)
         {
-            GerberFileInformation fileInfo = project.FileInfo[fileIndex];
-            int bmWidth = 0;
-            int bmHeight = 0;
-
-            // Calculate how big to make the bitmap back buffer.
-            if (renderInfo.ImageWidth < renderInfo.DisplayWidth)
-                bmWidth = (int)(renderInfo.DisplayWidth * graphics.DpiX);
-
-            else
-                bmWidth = (int)(renderInfo.ImageWidth * graphics.DpiX);
-
-            if (renderInfo.ImageHeight < renderInfo.DisplayHeight)
-                bmHeight = (int)(renderInfo.DisplayHeight * graphics.DpiY);
-
-            else
-                bmHeight = (int)(renderInfo.ImageHeight * graphics.DpiY);
-
-            // Create a back buffer and draw to it with no alpha level.
-            using (Bitmap bitmap = new Bitmap(bmWidth, bmHeight, graphics))
-            using (Graphics backBuffer = Graphics.FromImage(bitmap))
-            {
-                backBuffer.CompositingMode = CompositingMode.SourceCopy;
-                ScaleAndTranslate(backBuffer, renderInfo);
-                
-                // For testing.
-                /*BoundingBox bb = GetProjectBounds(project);
-                RectangleF r = new RectangleF((float)bb.Left, (float)bb.Top, (float)(bb.Right - bb.Left), (float)(bb.Top - bb.Bottom));
-                GraphicsPath path = new GraphicsPath();
-                path.AddLine((float)bb.Left, (float)bb.Bottom, (float)bb.Left, (float)(bb.Top));
-                path.AddLine((float)bb.Left, (float)bb.Top, (float)bb.Right, (float)bb.Top);
-                path.AddLine((float)bb.Right, (float)bb.Top, (float)bb.Right, (float)bb.Bottom);
-                path.AddLine((float)bb.Right, (float)bb.Bottom, (float)bb.Left, (float)bb.Bottom);
-                backBuffer.DrawPath(new Pen(Color.FromArgb(117, 200, 0, 0), 0.015f), path); */
-
-                // Add transparency to the rendering color.
-                Color foregroundColor = Color.FromArgb(fileInfo.Alpha, fileInfo.Color);
-                GerberDraw.DrawImageToTarget(backBuffer, fileInfo, project.UserTransform, foregroundColor, backgroundColor);
-
-                // Copy the back buffer to the visible surface with alpha level.
-                graphics.CompositingMode = CompositingMode.SourceOver;
-                graphics.DrawImage(bitmap, 0, 0);
-            }
+            // Add transparency to the rendering color.
+            Color foregroundColor = Color.FromArgb(fileInfo.Alpha, fileInfo.Color);
+            GerberDraw.DrawImageToTarget(graphics, fileInfo, foregroundColor, backgroundColor);
         }
 
-        private static void ScaleAndTranslate(Graphics graphics, RenderInformation renderInfo)
+        private static void RenderLayerToTarget(Graphics graphics, SelectionInformation selectionInfo)
         {
-            if (renderInfo.RenderType == GerberRenderQuality.Default)
-            {
-                graphics.SmoothingMode = SmoothingMode.Default;
-            }
+            // Add transparency to the rendering color.
+            Color foregroundColor = Color.FromArgb(200, Color.White);
+            GerberDraw.DrawImageToTarget(graphics, selectionInfo, foregroundColor, backgroundColor);
+        }
 
-            else if (renderInfo.RenderType == GerberRenderQuality.HighQuality)
-            {
+        private static void ScaleAndTranslate(Graphics graphics, GerberRenderInformation renderInfo)
+        {
+            if (renderInfo.RenderQuality == GerberRenderQuality.Default)
+                graphics.SmoothingMode = SmoothingMode.Default;
+
+            else if (renderInfo.RenderQuality == GerberRenderQuality.HighQuality)
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
-            }
 
             else
-            {
                 graphics.SmoothingMode = SmoothingMode.HighSpeed;
-            }
 
             graphics.PageUnit = GraphicsUnit.Inch;
             double translateX = (renderInfo.Left * renderInfo.ScaleFactorX);
@@ -498,162 +746,30 @@ namespace GerberVS
             //graphics.ScaleTransform((float)renderInfo.ScaleFactorY, -(float)renderInfo.ScaleFactorY);
         }
 
+        // Calculate how big to make the bitmap back buffer.
+        private static Size GetBitmapSize(Graphics graphics, GerberRenderInformation renderInfo)
+        {
+            Size bmSize = new Size(0, 0);
+
+            if (renderInfo.ImageWidth < renderInfo.DisplayWidth)
+                bmSize.Width = (int)(renderInfo.DisplayWidth * graphics.DpiX);
+
+            else
+                bmSize.Width = (int)(renderInfo.ImageWidth * graphics.DpiX);
+
+            if (renderInfo.ImageHeight < renderInfo.DisplayHeight)
+                bmSize.Height = (int)(renderInfo.DisplayHeight * graphics.DpiY);
+
+            else
+                bmSize.Height = (int)(renderInfo.ImageHeight * graphics.DpiY);
+
+            return bmSize;
+        }
+
         // Check for a valid value.
         private bool IsNormal(double value)
         {
             return (!double.IsInfinity(value) && !double.IsNaN(value));
-        }
-
-        /// <summary>
-        /// Adds a gerber object to the selection buffer if it lies within the selection region.
-        /// </summary>
-        /// <param name="selectionInfo">current selection info</param>
-        /// <param name="image">gerber image containing the net</param>
-        /// <param name="net">net to add to the selection info</param>
-        public void ObjectInSelectedRegion(SelectionInformation selectionInfo, ref int i, Graphics graphics)
-        {
-            bool inSelect = false;
-            GerberImage image = selectionInfo.SelectionImage;
-            GerberNet net = image.GerberNetList[i];
-            float x1 = (float)selectionInfo.LowerLeftX;
-            float y1 = (float)selectionInfo.LowerLeftY;
-            float x2 = (float)selectionInfo.UpperRightX;
-            float y2 = (float)selectionInfo.UpperRightY;
-
-            if (selectionInfo.SelectionType == GerberSelection.PointClick)
-            {
-                if (net.BoundingBox != null)
-                {
-                    if (!net.BoundingBox.Contains(new PointD(x1, y1)))
-                        return;
-
-                    if (net.ApertureState == GerberApertureState.Flash)
-                        inSelect = net.BoundingBox.Contains(new PointD(x1, y1));
-
-                    else if (net.ApertureState == GerberApertureState.On)
-                    {
-                        switch (net.Interpolation)
-                        {
-                            case GerberInterpolation.PolygonAreaStart:
-                                inSelect = net.BoundingBox.Contains(new PointD(x1, y1));
-                                break;
-
-                            case GerberInterpolation.LinearX10:
-                            case GerberInterpolation.LinearX1:
-                            case GerberInterpolation.LinearX01:
-                            case GerberInterpolation.LinearX001:
-                                using (GraphicsPath gp = new GraphicsPath())
-                                using (Pen pen = new Pen(Color.Transparent))
-                                {
-                                    pen.Width = (float)image.ApertureArray[net.Aperture].Parameters[0];
-                                    pen.StartCap = pen.EndCap = LineCap.Round;
-                                    PointF start = new PointF((float)(net.StartX), (float)(net.StartY));
-                                    PointF end = new PointF((float)(net.StopX), (float)(net.StopY));
-                                    gp.AddLine(start, end);
-                                    if (gp.IsOutlineVisible(new PointF(x1, y1), pen, graphics))
-                                        inSelect = true;
-
-                                    break;
-                                }
-
-                            case GerberInterpolation.ClockwiseCircular:
-                            case GerberInterpolation.CounterClockwiseCircular:
-                                using (GraphicsPath gp = new GraphicsPath())
-                                using (Pen pen = new Pen(Color.Transparent))
-                                {
-                                    float centerX = (float)net.CircleSegment.CenterX;
-                                    float centerY = (float)net.CircleSegment.CenterY;
-                                    float width = (float)net.CircleSegment.Width;
-                                    float height = (float)net.CircleSegment.Height;
-                                    float startAngle = (float)net.CircleSegment.StartAngle;
-                                    float sweepAngle = (float)net.CircleSegment.SweepAngle;
-                                    if (image.ApertureArray[net.Aperture].ApertureType == GerberApertureType.Rectangle)
-                                        pen.StartCap = pen.EndCap = LineCap.Square;
-
-                                    else
-                                        pen.StartCap = pen.EndCap = LineCap.Round;
-
-                                    RectangleF arcRectangle = new RectangleF(centerX - (width / 2), centerY - (height / 2), width, height);
-                                    pen.Width = width;
-
-                                    gp.AddArc(arcRectangle, startAngle, sweepAngle);
-                                    if (gp.IsOutlineVisible(new PointF(x1, y1), pen, graphics))
-                                        inSelect = true;
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-
-            else if (selectionInfo.SelectionType == GerberSelection.DragBox)
-            {
-                if (net.BoundingBox != null)
-                {
-                    double left = Math.Min(selectionInfo.LowerLeftX, selectionInfo.UpperRightX);
-                    double right = Math.Max(selectionInfo.LowerLeftX, selectionInfo.UpperRightX);
-                    double top = Math.Min(selectionInfo.LowerLeftY, selectionInfo.UpperRightY);
-                    double bottom = Math.Max(selectionInfo.LowerLeftY, selectionInfo.UpperRightY);
-
-                    BoundingBox box = new BoundingBox(left, bottom, right, top);
-                    if (!box.Contains(net.BoundingBox))
-                        return;
-
-                    if (net.ApertureState == GerberApertureState.Flash)
-                        inSelect = box.Contains(net.BoundingBox);
-
-                    else if (net.ApertureState == GerberApertureState.On)
-                        inSelect = box.Contains(net.BoundingBox);
-                }
-            }
-
-            if (inSelect)
-            {
-                selectionInfo.SelectedNetList.Add(net);
-                selectionInfo.SelectionCount++;
-                if (net.Interpolation == GerberInterpolation.PolygonAreaStart)  // Add all the poly points.
-                {
-                    do
-                    {
-                        i++;
-                        net = image.GerberNetList[i];
-                        selectionInfo.SelectedNetList.Add(net);
-                    } while (net.Interpolation != GerberInterpolation.PolygonAreaEnd);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Clear the selection buffer.
-        /// </summary>
-        /// <param name="selectionInfo">selection info</param>
-        public void ClearSelectionBuffer(SelectionInformation selectionInfo)
-        {
-            if (selectionInfo.SelectedNetList.Count > 0)
-                selectionInfo.ClearSelectionList();
-        }
-
-        // Test if the net is already selected.
-        /*private bool ObjectInSelectionBuffer(GerberNet gerberNet, SelectionInformation selectionInfo)
-        {
-            foreach (GerberNet net in selectionInfo.SelectedNetList)
-            {
-                if (net == gerberNet)
-                    return true;
-            }
-
-            return false;
-        }*/
-
-        private RectangleF BoundingBoxToRectangle(GerberNet net)
-        {
-            float sx = (float)net.BoundingBox.Left;
-            float sy = (float)net.BoundingBox.Top;
-            float width = (float)(net.BoundingBox.Right - net.BoundingBox.Left);
-            float height = (float)(net.BoundingBox.Top - net.BoundingBox.Bottom);
-
-            rect = new RectangleF(sx, sy, width, height);
-            return rect;
         }
     }
 }

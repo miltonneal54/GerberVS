@@ -56,11 +56,11 @@ namespace GerberVS
         /// </summary>
         public const int MaximumApertureParameters = 102;
 
-        static List<GerberLineReader> lineReaderList;
+        private static List<GerberLineReader> lineReaderList;
 
-        static bool foundEOF = false;               // Will be set true if a gerber program stop/end command is found.
-        static int levelOfRecursion = 0;            // Keeps track of included file levels.
-        static string errorMessage = String.Empty;
+        private static bool foundEOF = false;               // Will be set true if a gerber program stop/end command is found.
+        private static int levelOfRecursion = 0;            // Keeps track of included file levels.
+        private static string errorMessage = String.Empty;
 
         private static double imageScaleA = 1.0;
         private static double imageScaleB = 1.0;
@@ -72,6 +72,11 @@ namespace GerberVS
         private static bool knockoutMeasure = false;
         private static double knockoutLimitXmin, knockoutLimitYmin, knockoutLimitXmax, knockoutLimitYmax;
         private static GerberLevel knockoutLevel = null;
+
+        public static bool IsGerber274D(string fullPathName)
+        {
+            return false;
+        }
 
         /// <summary>
         /// Logical test for RS427X file.
@@ -175,7 +180,7 @@ namespace GerberVS
         /// </remarks>
         public static GerberImage ParseGerber(string gerberFile)
         {
-            lineReaderList = new List<GerberLineReader>();
+            lineReaderList = new List<GerberLineReader>();  // Keep a list of linereaders, used for include files (IF).
             GerberLineReader lineReader;
             string fileName = Path.GetFileName(gerberFile);
             string filePath = Path.GetDirectoryName(gerberFile);
@@ -187,9 +192,9 @@ namespace GerberVS
             // Create new image. This will be returned.
             GerberImage gerberImage = new GerberImage("RS274-X (Gerber) File");
             gerberImage.FileType = GerberFileType.RS274X;
+            GerberNet gerberNet = new GerberNet(gerberImage);   // Create the first gerberNet filled with some initial values.
 
-            // Set active Netlist, Level and NetState to point
-            // to first default ones created in GerberImage constructor. 
+            // Set active Netlist, Level and NetState to point to first default ones created in GerberImage constructor. 
             GerberNet currentNet = gerberImage.GerberNetList[0];
             gerberStateLocal.Level = gerberImage.LevelList[0];
             gerberStateLocal.NetState = gerberImage.NetStateList[0];
@@ -198,7 +203,6 @@ namespace GerberVS
 
             // Start parsing.
             //Debug.WriteLine(String.Format("Starting to parse Gerber file: {0}", fileName));
-
             using (StreamReader gerberFileStream = new StreamReader(gerberFile, Encoding.ASCII))
             {
                 lineReader = new GerberLineReader(gerberFileStream);
@@ -230,8 +234,8 @@ namespace GerberVS
             double centerX = 0.0, centerY = 0.0;
             SizeD apertureSize = new SizeD();
             double scale;
-            int quadrant = -1;
-            
+            PointF[] transformPoints;
+
             GerberFileStats gerberStats = gerberImage.GerberStats;
             GerberLineReader lineReader = lineReaderList[levelOfRecursion];
             BoundingBox boundingBox = new BoundingBox();
@@ -281,7 +285,7 @@ namespace GerberVS
                         length = 0;
                         coordinate = lineReader.GetIntegerValue(ref length);
                         if (gerberImage.Format != null && gerberImage.Format.OmitZeros == GerberOmitZero.OmitZerosTrailing)
-                            NormaliseCoordinate(gerberImage.Format.IntegralPartX, gerberImage.Format.DecimalPartX, length, ref coordinate);
+                            AddTrailingZeros(gerberImage.Format.IntegralPartX, gerberImage.Format.DecimalPartX, length, ref coordinate);
 
                         if (gerberImage.Format != null && (gerberImage.Format.Coordinate == GerberCoordinate.Incremental))
                             gerberState.CurrentX += coordinate;
@@ -298,7 +302,7 @@ namespace GerberVS
                         length = 0;
                         coordinate = lineReader.GetIntegerValue(ref length);
                         if (gerberImage.Format != null && gerberImage.Format.OmitZeros == GerberOmitZero.OmitZerosTrailing)
-                            NormaliseCoordinate(gerberImage.Format.IntegralPartY, gerberImage.Format.DecimalPartY, length, ref coordinate);
+                            AddTrailingZeros(gerberImage.Format.IntegralPartY, gerberImage.Format.DecimalPartY, length, ref coordinate);
 
                         if (gerberImage.Format != null && (gerberImage.Format.Coordinate == GerberCoordinate.Incremental))
                             gerberState.CurrentY += coordinate;
@@ -314,7 +318,7 @@ namespace GerberVS
                         gerberStats.ICount++;
                         coordinate = lineReader.GetIntegerValue(ref length); ;
                         if (gerberImage.Format != null && gerberImage.Format.OmitZeros == GerberOmitZero.OmitZerosTrailing)
-                            NormaliseCoordinate(gerberImage.Format.IntegralPartX, gerberImage.Format.DecimalPartX, length, ref coordinate);
+                            AddTrailingZeros(gerberImage.Format.IntegralPartX, gerberImage.Format.DecimalPartX, length, ref coordinate);
 
                         gerberState.CenterX = coordinate;
                         gerberState.ChangedState = true;
@@ -325,7 +329,7 @@ namespace GerberVS
                         gerberStats.JCount++;
                         coordinate = lineReader.GetIntegerValue(ref length);
                         if (gerberImage.Format != null && gerberImage.Format.OmitZeros == GerberOmitZero.OmitZerosTrailing)
-                            NormaliseCoordinate(gerberImage.Format.IntegralPartY, gerberImage.Format.DecimalPartY, length, ref coordinate);
+                            AddTrailingZeros(gerberImage.Format.IntegralPartY, gerberImage.Format.DecimalPartY, length, ref coordinate);
 
                         gerberState.CenterY = coordinate;
                         gerberState.ChangedState = true;
@@ -354,8 +358,6 @@ namespace GerberVS
                         if (!gerberState.ChangedState)
                             break;
 
-                        apertureMatrix = new Matrix(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);    // Matrix for rotation, offsets etc.
-                        quadrant = -1;
                         gerberState.ChangedState = false;
                         // Don't even bother saving the geberNet if the aperture state is GERBER_APERTURE_STATE_OFF and we
                         // aren't starting a polygon fill (where we need it to get to the start point) 
@@ -387,23 +389,28 @@ namespace GerberVS
                         centerY = gerberState.CenterY / scaleY;
                         switch (gerberState.Interpolation)
                         {
-                            case GerberInterpolation.ClockwiseCircular:   // Clockwise.
-                                currentNet.CircleSegment = new CircleSegment();
-                                if (gerberState.MultiQuadrant)
-                                    CalculateCircleSegmentMQ(currentNet, true, centerX, centerY);
-
-                                else
-                                    CalculateCircleSegmentSQ(currentNet, true, centerX, centerY);
-
-                                break;
-
+                            case GerberInterpolation.ClockwiseCircular:
                             case GerberInterpolation.CounterClockwiseCircular:
+                                bool cw = gerberState.Interpolation == GerberInterpolation.ClockwiseCircular;
                                 currentNet.CircleSegment = new CircleSegment();
                                 if (gerberState.MultiQuadrant)
-                                    CalculateCircleSegmentMQ(currentNet, false, centerX, centerY);
+                                    CalculateCircleSegmentMQ(currentNet, cw, centerX, centerY);
 
                                 else
-                                    CalculateCircleSegmentSQ(currentNet, false, centerX, centerY);
+                                {
+                                    CalculateCircleSegmentSQ(currentNet, cw, centerX, centerY);
+                                    if(centerX < 0 || centerY < 0)
+                                    {
+                                        errorMessage = String.Format(CultureInfo.CurrentCulture,
+                                                                    "Signed incremental distance IxJy" +
+				                                                    "in single quadrant {0} circular " +
+				                                                    "interpolation {1}",
+                                                                    cw == true ? "CW" :"CCW",
+                                                                    cw == true ? "G02" :"G03");
+                                        gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
+                                    }
+
+                                }
 
                                 break;
 
@@ -494,6 +501,7 @@ namespace GerberVS
                             break;
 
                         // Only update the min/max values and aperture stats if we are drawing.
+                        apertureMatrix = new Matrix(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);    // Matrix for rotation, offsets etc.
                         if ((currentNet.ApertureState != GerberApertureState.Off) && (currentNet.Interpolation != GerberInterpolation.PolygonAreaStart))
                         {
                             double repeatOffsetX = 0.0;
@@ -503,9 +511,10 @@ namespace GerberVS
                             if (!gerberState.IsPolygonAreaFill)
                             {
                                 //Debug.WriteLine("    Found D code: adding 1 to D list.");
-                                if (!gerberStats.IncrementDListCount(currentNet.Aperture, 1))
+                                if (!gerberStats.IncrementDListCount(currentNet.Aperture, 1, lineReader.LineNumber))
                                 {
-                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Found undefined D code D{0}.\n", currentNet.Aperture);
+                                    currentNet.ApertureState = GerberApertureState.Off; // Undefined aperture, turn it off.
+                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Found use of undefined D code D{0}.\n", currentNet.Aperture);
                                     gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                                     gerberStats.UnknownDCodes++;
                                 }
@@ -570,27 +579,25 @@ namespace GerberVS
                                 foreach (SimplifiedApertureMacro macro in gerberImage.ApertureArray[currentNet.Aperture].SimplifiedMacroList)
                                 {
                                     PointD offset = new PointD();
-                                    double largestDimension;
+                                    Double widthX = 0.0, widthY = 0.0;
                                     bool calculatedAlready = false;
 
-                                    apertureMatrix.Reset();
                                     if (macro.ApertureType == GerberApertureType.MacroCircle)
                                     {
-                                        offset.X = macro.Parameters[(int)GerberCircleParameters.CentreX];
-                                        offset.Y = macro.Parameters[(int)GerberCircleParameters.CentreY];
-                                        apertureSize.Width = apertureSize.Height = macro.Parameters[(int)GerberCircleParameters.Diameter];
+                                        offset.X = macro.Parameters[(int)CircleParameters.CentreX];
+                                        offset.Y = macro.Parameters[(int)CircleParameters.CentreY];
+                                        widthX = widthY = macro.Parameters[(int)CircleParameters.Diameter];
                                     }
 
                                     else if (macro.ApertureType == GerberApertureType.MacroOutline)
                                     {
-                                        int numberOfPoints = (int)macro.Parameters[(int)GerberOutlineParameters.NumberOfPoints];
-
-                                        for (int pointCount = 0; pointCount <= numberOfPoints; pointCount++)
+                                        int numberOfPoints = (int)macro.Parameters[(int)OutlineParameters.NumberOfPoints] + 1;
+                                        for (int p = 0; p < numberOfPoints; p++)
                                         {
                                             UpdateNetBounds(boundingBox,
-                                                currentNet.StopX + macro.Parameters[pointCount * 2 + (int)GerberOutlineParameters.FirstX],
-                                                currentNet.StopY + macro.Parameters[pointCount * 2 + (int)GerberOutlineParameters.FirstY],
-                                                0, 0);
+                                                            currentNet.StopX + macro.Parameters[p * 2 + (int)OutlineParameters.FirstX],
+                                                            currentNet.StopY + macro.Parameters[p * 2 + (int)OutlineParameters.FirstY],
+                                                            0, 0);
                                         }
 
                                         calculatedAlready = true;
@@ -598,101 +605,68 @@ namespace GerberVS
 
                                     else if (macro.ApertureType == GerberApertureType.MacroPolygon)
                                     {
-                                        offset.X = macro.Parameters[(int)GerberPolygonParameters.CenterX];
-                                        offset.Y = macro.Parameters[(int)GerberPolygonParameters.CenterY];
-                                        apertureSize.Width = apertureSize.Height = macro.Parameters[(int)GerberPolygonParameters.Diameter];
+                                        offset.X = (float)macro.Parameters[(int)PolygonParameters.CentreX];
+                                        offset.Y = (float)macro.Parameters[(int)PolygonParameters.CentreY];
+                                        widthX = widthY = (float)macro.Parameters[(int)PolygonParameters.Diameter];
                                     }
 
                                     else if (macro.ApertureType == GerberApertureType.MacroMoire)
                                     {
-                                        double crossHairLength = macro.Parameters[(int)GerberMoireParameters.CrosshairLength];
-                                        double outsideDiameter = macro.Parameters[(int)GerberMoireParameters.OutsideDiameter];
-                                        offset.X = macro.Parameters[(int)GerberMoireParameters.CenterX];
-                                        offset.Y = macro.Parameters[(int)GerberMoireParameters.CenterY];
-                                        // Select the larger of crosshair length and outer diameter.
-                                        largestDimension = (crossHairLength > outsideDiameter) ? crossHairLength : outsideDiameter;
-                                        apertureSize.Width = apertureSize.Height = largestDimension;
+                                        double crossHairLength = macro.Parameters[(int)MoireParameters.CrosshairLength];
+                                        double outsideDiameter = macro.Parameters[(int)MoireParameters.OutsideDiameter];
+                                        offset.X = macro.Parameters[(int)MoireParameters.CentreX];
+                                        offset.Y = macro.Parameters[(int)MoireParameters.CentreY];
+                                        widthX = widthY = Math.Max(crossHairLength, outsideDiameter);
                                     }
 
                                     else if (macro.ApertureType == GerberApertureType.MacroThermal)
                                     {
-                                        offset.X = macro.Parameters[(int)GerberThermalParameters.CenterX];
-                                        offset.Y = macro.Parameters[(int)GerberThermalParameters.CenterY];
-                                        apertureSize.Width = apertureSize.Height = macro.Parameters[(int)GerberThermalParameters.OutsideDiameter];
+                                        offset.X = macro.Parameters[(int)ThermalParameters.CentreX];
+                                        offset.Y = macro.Parameters[(int)ThermalParameters.CentreY];
+                                        widthX = widthY = macro.Parameters[(int)ThermalParameters.OutsideDiameter];
                                     }
 
                                     else if (macro.ApertureType == GerberApertureType.MacroLine20)
                                     {
-                                        apertureSize.Width = apertureSize.Height = macro.Parameters[(int)GerberLine20Parameters.LineWidth];
+                                        widthX = widthY = macro.Parameters[(int)Line20Parameters.LineWidth];
                                         UpdateNetBounds(boundingBox,
-                                            currentNet.StopX + macro.Parameters[(int)GerberLine20Parameters.StartX],
-                                            currentNet.StopY + macro.Parameters[(int)GerberLine20Parameters.StartY],
-                                            apertureSize.Width / 2, apertureSize.Height / 2);
+                                                        currentNet.StopX + macro.Parameters[(int)Line20Parameters.StartX],
+                                                        currentNet.StopY + macro.Parameters[(int)Line20Parameters.StartY],
+                                                        widthX / 2, widthY / 2);
 
                                         UpdateNetBounds(boundingBox,
-                                            currentNet.StopX + macro.Parameters[(int)GerberLine20Parameters.EndX],
-                                            currentNet.StopY + macro.Parameters[(int)GerberLine20Parameters.EndY],
-                                            apertureSize.Width / 2, apertureSize.Height / 2);
+                                                        currentNet.StopX + macro.Parameters[(int)Line20Parameters.EndX],
+                                                        currentNet.StopY + macro.Parameters[(int)Line20Parameters.EndY],
+                                                        widthX / 2, widthY / 2);
 
                                         calculatedAlready = true;
                                     }
 
-                                    else if (macro.ApertureType == GerberApertureType.MarcoLine21)
+                                    else if (macro.ApertureType == GerberApertureType.MacroLine21)
                                     {
-                                        largestDimension = Math.Sqrt(macro.Parameters[(int)GerberLine21Parameters.LineWidth] / 2 *
-                                                         macro.Parameters[(int)GerberLine21Parameters.LineWidth] / 2 +
-                                                         macro.Parameters[(int)GerberLine21Parameters.LineHeight / 2] *
-                                                         macro.Parameters[(int)GerberLine21Parameters.LineHeight] / 2);
+                                        float width = (float)macro.Parameters[(int)Line21Parameters.LineWidth];
+                                        float height = (float)macro.Parameters[(int)Line21Parameters.LineHeight];
+                                        double largestDimension = Hypotenuse(width, height);
 
-                                        offset.X = macro.Parameters[(int)GerberLine21Parameters.CenterX];
-                                        offset.Y = macro.Parameters[(int)GerberLine21Parameters.CenterY];
-                                        apertureSize.Width = apertureSize.Height = largestDimension;
-                                        //apertureSize.Width = macro.Parameters[(int)GerberLine21Parameters.LineWidth];
-                                        //apertureSize.Height = macro.Parameters[(int)GerberLine21Parameters.LineHeight];
-                                        /*float angle = (float)(macro.Parameters[(int)GerberLine21Parameters.Rotation]);
-                                        PointF point = new PointF((float)offset.X, (float)offset.Y);
-                                        if (angle < 0)
-                                            angle += 360.0f;
-
-                                        quadrant = ((int)angle / 90) % 4 + 1;
-                                        angle = (float)(macro.Parameters[(int)GerberLine21Parameters.Rotation]);
-                                        apertureMatrix.Translate(point.X, point.Y);
-                                        apertureMatrix.Rotate(angle);*/
+                                        offset.X = macro.Parameters[(int)Line21Parameters.CentreX];
+                                        offset.Y = macro.Parameters[(int)Line21Parameters.CentreY];
+                                        widthX = widthY = largestDimension;
                                     }
 
                                     else if (macro.ApertureType == GerberApertureType.MacroLine22)
                                     {
-                                        largestDimension = Math.Sqrt(macro.Parameters[(int)GerberLine22Parameters.LineWidth] / 2 *
-                                                         macro.Parameters[(int)GerberLine22Parameters.LineWidth] / 2 +
-                                                         macro.Parameters[(int)GerberLine22Parameters.LineHeight / 2] *
-                                                         macro.Parameters[(int)GerberLine22Parameters.LineHeight] / 2);
+                                        float width = (float)macro.Parameters[(int)Line22Parameters.LineWidth];
+                                        float height = (float)macro.Parameters[(int)Line22Parameters.LineHeight];
+                                        float lowerLeftX = (float)macro.Parameters[(int)Line22Parameters.LowerLeftX];
+                                        float lowerLeftY = (float)macro.Parameters[(int)Line22Parameters.LowerLeftY];
+                                        double largestDimension = Hypotenuse(width, height);
 
-                                        offset.X = macro.Parameters[(int)GerberLine22Parameters.LowerLeftX] +
-                                                   macro.Parameters[(int)GerberLine22Parameters.LineWidth] / 2;
-
-                                        offset.Y = macro.Parameters[(int)GerberLine22Parameters.LowerLeftY] +
-                                                   macro.Parameters[(int)GerberLine22Parameters.LineHeight] / 2;
-
-                                        apertureSize.Width = apertureSize.Height = largestDimension;
-                                        //apertureSize.Width = macro.Parameters[(int)GerberLine22Parameters.LineWidth];
-                                        //apertureSize.Height = macro.Parameters[(int)GerberLine22Parameters.LineHeight];
-                                        /*float angle = (float)(macro.Parameters[(int)GerberLine22Parameters.Rotation]);
-                                        PointF point = new PointF((float)currentNet.StopX, (float)currentNet.StopY);
-                                        if (angle < 0)
-                                            angle += 360.0f;
-
-                                        quadrant = ((int)angle / 90) % 4 + 1;
-                                        angle = (float)(macro.Parameters[(int)GerberLine22Parameters.Rotation]);
-                                        //apertureMatrix.RotateAt(angle, point);
-                                        apertureMatrix.Translate(point.X, point.Y);
-                                        apertureMatrix.Rotate(angle);*/
+                                        offset.X = lowerLeftX + (width / 2);
+                                        widthX = widthY = largestDimension;
                                     }
 
                                     if (!calculatedAlready)
-                                    {
-                                        UpdateNetBounds(boundingBox, currentNet.StopX + offset.X, currentNet.StopY + offset.Y,
-                                                        apertureSize.Width / 2, apertureSize.Height / 2);
-                                    }
+                                        UpdateNetBounds(boundingBox, currentNet.StopX + offset.X, currentNet.StopY + offset.Y, widthX / 2, widthY / 2);
                                 }
                             }
 
@@ -701,11 +675,10 @@ namespace GerberVS
                                 if (gerberImage.ApertureArray[currentNet.Aperture] != null)
                                 {
                                     apertureSize.Width = gerberImage.ApertureArray[currentNet.Aperture].Parameters[0];
-                                    if ((gerberImage.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle) ||
-                                        (gerberImage.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Oval))
-                                    {
+                                    if (gerberImage.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle ||
+                                        gerberImage.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Oval)
+
                                         apertureSize.Height = gerberImage.ApertureArray[currentNet.Aperture].Parameters[1];
-                                    }
 
                                     else
                                         apertureSize.Height = apertureSize.Width;
@@ -718,24 +691,7 @@ namespace GerberVS
                                 if ((currentNet.Interpolation == GerberInterpolation.ClockwiseCircular) ||
                                      (currentNet.Interpolation == GerberInterpolation.CounterClockwiseCircular))
                                 {
-                                    // To calculate the arc bounding size, we chop it into 1 degree steps, calculate
-                                    // the point at each step, and use it to figure out the bounding size.
-                                    // **** This seems only to be accurate for a circular aperture ****
-                                    double sweepAngle = currentNet.CircleSegment.SweepAngle;
-                                    int steps = (int)(Math.Abs(sweepAngle));
-                                    PointD temp = new PointD();
-
-                                    for (int i = 0; i <= steps; i++)
-                                    {
-                                        temp.X = currentNet.CircleSegment.CenterX + currentNet.CircleSegment.Width / 2.0 *
-                                                Math.Cos((currentNet.CircleSegment.StartAngle + (sweepAngle * i) / steps) * Math.PI / 180);
-
-                                        temp.Y = currentNet.CircleSegment.CenterY + currentNet.CircleSegment.Height / 2.0 *
-                                                 Math.Sin((currentNet.CircleSegment.StartAngle + (sweepAngle * i) / steps) * Math.PI / 180);
-
-                                        UpdateNetBounds(boundingBox, temp.X, temp.Y,
-                                                        apertureSize.Width / 2, apertureSize.Height / 2);
-                                    }
+                                    CircleSegmentBounds(currentNet.CircleSegment, apertureSize.Width, apertureSize.Height, boundingBox);
                                 }
 
                                 else
@@ -782,7 +738,9 @@ namespace GerberVS
                             }
                         }
 
-                        apertureMatrix.Dispose();
+                        if (apertureMatrix != null)
+                            apertureMatrix.Dispose();
+
                         break;
 
                     // Ignore white space or null characters.
@@ -1062,7 +1020,7 @@ namespace GerberVS
             int intValue;
             int apertureNumber;
             string stringValue;
-            ApertureDefinition aperture = null;
+            Aperture aperture = null;
             ApertureMacro apertureMacro;
             GerberFileStats stats = gerberImage.GerberStats;
             char nextCharacter;
@@ -1102,7 +1060,9 @@ namespace GerberVS
                     break;
 
                 case "FS": // Format Statement.
-                    gerberImage.Format = new GerberFormat();
+                    if (gerberImage.Format == null)
+                        gerberImage.Format = new GerberFormat();
+
                     nextCharacter = lineReader.Read();
                     switch (nextCharacter)
                     {
@@ -1280,7 +1240,6 @@ namespace GerberVS
                             stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                             break;
                     }
-
                     break;
 
                 case "OF": // Offset.
@@ -1326,7 +1285,7 @@ namespace GerberVS
                                     includeLineReader.FilePath = lineReader.FilePath;   // Same path as caller.
                                     lineReaderList.Add(includeLineReader);
                                     levelOfRecursion++;
-                                    ParseFileSegment(gerberImage, gerberState, currentNet);
+                                    ParseFileSegment(gerberImage, gerberState, currentNet); // Parse the include file, and remove it from the the list.
                                     lineReaderList.RemoveAt(levelOfRecursion);
                                     levelOfRecursion--;
                                 }
@@ -1479,34 +1438,35 @@ namespace GerberVS
 
                 // Aperture parameters
                 case "AD": // Aperture Definition.
-                    aperture = new ApertureDefinition();
+                    aperture = new Aperture();
                     apertureNumber = ParseApertureDefinition(aperture, gerberImage, scale, lineReader);
-
-                    if ((apertureNumber >= 0) && (apertureNumber <= MaximumApertures))
+                    if (apertureNumber != -1)
                     {
-                        aperture.Unit = gerberState.NetState.Unit;
-                        gerberImage.ApertureArray[apertureNumber] = aperture;
-                        //Debug.WriteLine("In parseRS274X: adding new aperture.");
-                        stats.AddNewAperture(-1, apertureNumber, aperture.ApertureType, aperture.Parameters);
-                        stats.AddNewDList(apertureNumber);
-                        if (apertureNumber < MinimumAperture)
+                        if ((apertureNumber >= 0) && (apertureNumber <= MaximumApertures))
                         {
-                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Aperture number {0} out of lower bounds.", apertureNumber);
+                            aperture.Unit = gerberState.NetState.Unit;
+                            gerberImage.ApertureArray[apertureNumber] = aperture;
+                            //Debug.WriteLine("In parseRS274X: adding new aperture.");
+                            stats.AddNewAperture(-1, apertureNumber, aperture.ApertureType, aperture.Parameters);
+                            stats.AddNewDList(apertureNumber);
+                            if (apertureNumber < MinimumAperture)
+                            {
+                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Aperture number {0} out of lower bounds.", apertureNumber);
+                                stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
+                            }
+                        }
+
+                        else
+                        {
+                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Aperture number {0} out of upper bounds.", apertureNumber);
                             stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                         }
                     }
-
-                    else
-                    {
-                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Aperture number {0} out of upper bounds.", apertureNumber);
-                        stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
-                    }
-
                     break;
 
                 case "AM": // Aperture Macro.
                     //Debug.WriteLine(String.Format("Found {0} command in Line: {1}", stringValue, lineReader.LineNumber));
-                    apertureMacro = ApertureMacro.ProcessApertureMacro(lineReader);
+                    apertureMacro = ApertureMacro.ParseApertureMacro(lineReader);
                     if (apertureMacro != null)
                         gerberImage.ApertureMacroList.Add(apertureMacro);
 
@@ -1516,8 +1476,7 @@ namespace GerberVS
                         stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                     }
 
-                    // Return, since we want to skip the later back-up loop.
-                    return;
+                    return; // Return, since we want to skip the later back-up loop.
 
                 // Level Commands
                 case "LN": // Level Name.
@@ -1554,7 +1513,7 @@ namespace GerberVS
                     if (nextCharacter == '*')
                     {
                         // Disable previous SR parameters.
-                        gerberState.Level.Knockout.Type = GerberKnockoutType.NoKnockout;
+                        gerberState.Level.Knockout.KnockoutType = GerberKnockoutType.NoKnockout;
                         break;
                     }
 
@@ -1583,27 +1542,27 @@ namespace GerberVS
                         switch (nextCharacter)
                         {
                             case 'X':
-                                gerberState.Level.Knockout.Type = GerberKnockoutType.FixedKnockout;
+                                gerberState.Level.Knockout.KnockoutType = GerberKnockoutType.FixedKnockout;
                                 gerberState.Level.Knockout.LowerLeftX = lineReader.GetDoubleValue() / scale;
                                 break;
 
                             case 'Y':
-                                gerberState.Level.Knockout.Type = GerberKnockoutType.FixedKnockout;
+                                gerberState.Level.Knockout.KnockoutType = GerberKnockoutType.FixedKnockout;
                                 gerberState.Level.Knockout.LowerLeftY = lineReader.GetDoubleValue() / scale;
                                 break;
 
                             case 'I':
-                                gerberState.Level.Knockout.Type = GerberKnockoutType.FixedKnockout;
+                                gerberState.Level.Knockout.KnockoutType = GerberKnockoutType.FixedKnockout;
                                 gerberState.Level.Knockout.Width = lineReader.GetDoubleValue() / scale;
                                 break;
 
                             case 'J':
-                                gerberState.Level.Knockout.Type = GerberKnockoutType.FixedKnockout;
+                                gerberState.Level.Knockout.KnockoutType = GerberKnockoutType.FixedKnockout;
                                 gerberState.Level.Knockout.Height = lineReader.GetDoubleValue() / scale;
                                 break;
 
                             case 'K':
-                                gerberState.Level.Knockout.Type = GerberKnockoutType.Border;
+                                gerberState.Level.Knockout.KnockoutType = GerberKnockoutType.Border;
                                 gerberState.Level.Knockout.Border = lineReader.GetDoubleValue() / scale;
                                 // This is a bordered knockout, so we need to start measuring the size of the area bordering all future components.
                                 knockoutMeasure = true;
@@ -1617,13 +1576,11 @@ namespace GerberVS
                             default:
                                 errorMessage = "Unknown variable in knockout.";
                                 stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
-
                                 break;
                         }
 
                         nextCharacter = lineReader.Read();
                     }
-
                     break;
 
                 case "SR": // Step and Repeat
@@ -1679,10 +1636,9 @@ namespace GerberVS
 
                         nextCharacter = lineReader.Read();
                     }
-
                     break;
 
-                case "RO":  // Level Rotate  ** Depreciated, but included for legacy files ** ????
+                case "RO":  // Level Rotate  ** Depreciated, but included for legacy files ** -> Was this ever a valid command??
                     gerberState.Level.Rotation = lineReader.GetDoubleValue();
                     nextCharacter = lineReader.Read();
                     if (nextCharacter != '*')
@@ -1710,7 +1666,7 @@ namespace GerberVS
             return;
         }
 
-        private static int ParseApertureDefinition(ApertureDefinition aperture, GerberImage gerberImage, float scale, GerberLineReader lineReader)
+        private static int ParseApertureDefinition(Aperture aperture, GerberImage gerberImage, float scale, GerberLineReader lineReader)
         {
             int apertureNumber;
             int tokenCount;
@@ -1725,7 +1681,7 @@ namespace GerberVS
 
             if (lineReader.Read() != 'D')
             {
-                errorMessage = String.Format(CultureInfo.CurrentCulture, "Found AD code without 'D' code.");
+                errorMessage = String.Format(CultureInfo.CurrentCulture, "Found AD code without a following 'D' code.");
                 stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                 return -1;
             }
@@ -1863,10 +1819,10 @@ namespace GerberVS
             // Store the absolute offset for the justify so we can quickly offset the rendered picture during drawing.
             gerberImage.ImageInfo.ImageJustifyOffsetActualA = translateA + gerberImage.ImageInfo.ImageJustifyOffsetA;
             gerberImage.ImageInfo.ImageJustifyOffsetActualB = translateB + gerberImage.ImageInfo.ImageJustifyOffsetB;
-        } /* gerber_calculate_final_justify_effects */
+        }
 
         /// <summary>
-        /// Calculates the start, end and sweep angles of a multi-quadrant arc.
+        /// Calculates the start, and sweep angles of a multi-quadrant arc.
         /// </summary>
         /// <param name="currentNet">location to save the segment data</param>
         /// <param name="clockwise">true if clockwise arc</param>
@@ -1875,54 +1831,59 @@ namespace GerberVS
         private static void CalculateCircleSegmentMQ(GerberNet currentNet, bool clockwise, double centerX, double centerY)
         {
             double d1x, d1y, d2x, d2y;
-            double angle1, angle2;
+            double alpha, beta;
 
             currentNet.CircleSegment.CenterX = currentNet.StartX + centerX;
             currentNet.CircleSegment.CenterY = currentNet.StartY + centerY;
 
-            d1x = currentNet.StartX - currentNet.CircleSegment.CenterX;
-            d1y = currentNet.StartY - currentNet.CircleSegment.CenterY;
+            d1x = -centerX;
+            d1y = -centerY;
             d2x = currentNet.StopX - currentNet.CircleSegment.CenterX;
             d2y = currentNet.StopY - currentNet.CircleSegment.CenterY;
 
-            angle1 = Math.Atan2(d1y, d1x) * (180 / Math.PI);
-            angle2 = Math.Atan2(d2y, d2x) * (180 / Math.PI);
+            if (Math.Abs(d1x) < Double.Epsilon) d1x = 0;
+            if (Math.Abs(d1y) < Double.Epsilon) d1y = 0;
+            if (Math.Abs(d2x) < Double.Epsilon) d2x = 0;
+            if (Math.Abs(d2y) < Double.Epsilon) d2y = 0;
 
-            currentNet.CircleSegment.Width = Math.Sqrt((centerX * centerX) + (centerY * centerY));
+            //c = √(a² + b²)
+            //currentNet.CircleSegment.Width = Math.Sqrt((centerX * centerX) + (centerY * centerY));
+            currentNet.CircleSegment.Width = Hypotenuse(centerX, centerY);
             currentNet.CircleSegment.Width *= 2.0;
             currentNet.CircleSegment.Height = currentNet.CircleSegment.Width;
+
+            alpha = Math.Atan2(d1y, d1x);
+            beta = Math.Atan2(d2y, d2x);
             // Make sure it's always positive angles
-            if (angle1 < 0.0)
+            if (alpha < 0.0)
             {
-                angle1 += 360.0;
-                angle2 += 360.0;
+                alpha += Math.PI * 2;
+                beta += Math.PI * 2;
             }
 
-            if (angle2 < 0.0)
-                angle2 += 360.0;
+            if (beta < 0.0)
+                beta += Math.PI * 2;
 
-            if (angle2 == 0.0)
-                angle2 = 360.0;
+            /*if (beta == 0.0)
+                beta = Math.PI * 2;*/
 
             if (clockwise)
             {
-                if (angle1 <= angle2)
-                    angle2 -= 360;
+                if (alpha - beta < Double.Epsilon)
+                    beta -= Math.PI * 2;
             }
 
             else
             {
-                if (angle1 >= angle2)
-                    angle2 += 360;
+                if (beta - alpha < Double.Epsilon)
+                    beta += Math.PI * 2;
             }
 
-            currentNet.CircleSegment.StartAngle = angle1;
-            currentNet.CircleSegment.EndAngle = angle2;
-            currentNet.CircleSegment.SweepAngle = angle2 - angle1;
-            return;
+            currentNet.CircleSegment.StartAngle = alpha * (180 / Math.PI);
+            currentNet.CircleSegment.EndAngle = beta * (180 / Math.PI);
         }
 
-        private static void CalculateCircleSegmentSQ(GerberNet gerberNet, bool clockWise, double delta_cp_x, double delta_cp_y)
+        private static void CalculateCircleSegmentSQ(GerberNet gerberNet, bool clockWise, double centreX, double centerY)
         {
             double d1x, d1y, d2x, d2y;
             double alpha, beta;
@@ -1987,32 +1948,30 @@ namespace GerberVS
             switch (quadrant)
             {
                 case 1:
-                    gerberNet.CircleSegment.CenterX = gerberNet.StartX - delta_cp_x;
-                    gerberNet.CircleSegment.CenterY = gerberNet.StartY - delta_cp_y;
+                    gerberNet.CircleSegment.CenterX = gerberNet.StartX - centreX;
+                    gerberNet.CircleSegment.CenterY = gerberNet.StartY - centerY;
                     break;
 
                 case 2:
-                    gerberNet.CircleSegment.CenterX = gerberNet.StartX + delta_cp_x;
-                    gerberNet.CircleSegment.CenterY = gerberNet.StartY - delta_cp_y;
+                    gerberNet.CircleSegment.CenterX = gerberNet.StartX + centreX;
+                    gerberNet.CircleSegment.CenterY = gerberNet.StartY - centerY;
                     break;
 
                 case 3:
-                    gerberNet.CircleSegment.CenterX = gerberNet.StartX + delta_cp_x;
-                    gerberNet.CircleSegment.CenterY = gerberNet.StartY + delta_cp_y;
+                    gerberNet.CircleSegment.CenterX = gerberNet.StartX + centreX;
+                    gerberNet.CircleSegment.CenterY = gerberNet.StartY + centerY;
                     break;
 
                 case 4:
-                    gerberNet.CircleSegment.CenterX = gerberNet.StartX - delta_cp_x;
-                    gerberNet.CircleSegment.CenterY = gerberNet.StartY + delta_cp_y;
+                    gerberNet.CircleSegment.CenterX = gerberNet.StartX - centreX;
+                    gerberNet.CircleSegment.CenterY = gerberNet.StartY + centerY;
                     break;
 
                 default:
                     break;
             }
 
-            /*
-             * Some good values 
-             */
+             // Some good values. 
             d1x = Math.Abs(gerberNet.StartX - gerberNet.CircleSegment.CenterX);
             d1y = Math.Abs(gerberNet.StartY - gerberNet.CircleSegment.CenterY);
             d2x = Math.Abs(gerberNet.StopX - gerberNet.CircleSegment.CenterX);
@@ -2022,10 +1981,13 @@ namespace GerberVS
             beta = Math.Atan2(d2y, d2x);
 
             // Avoid divide by zero when sin(0) = 0 and cos(90) = 0
-            gerberNet.CircleSegment.Width = alpha < beta ?
-            2 * (d1x / Math.Cos(alpha)) : 2 * (d2x / Math.Cos(beta));
-            gerberNet.CircleSegment.Height = alpha > beta ?
-            2 * (d1y / Math.Sin(alpha)) : 2 * (d2y / Math.Sin(beta));
+            gerberNet.CircleSegment.Width = alpha < beta 
+                ? 2 * (d1x / Math.Cos(alpha)) 
+                : 2 * (d2x / Math.Cos(beta));
+
+            gerberNet.CircleSegment.Height = alpha > beta 
+                ? 2 * (d1y / Math.Sin(alpha)) 
+                : 2 * (d2y / Math.Sin(beta));
 
             if (alpha < 0.000001 && beta < 0.000001)
                 gerberNet.CircleSegment.Height = 0;
@@ -2038,36 +2000,57 @@ namespace GerberVS
                     break;
 
                 case 2:
-                    gerberNet.CircleSegment.StartAngle = 180.0 - alpha * 180 / Math.PI;
+                    gerberNet.CircleSegment.StartAngle = 180.0 - (alpha * 180 / Math.PI);
                     gerberNet.CircleSegment.EndAngle = 180.0 - beta * 180 / Math.PI;
                     break;
 
                 case 3:
-                    gerberNet.CircleSegment.StartAngle = 180.0 + alpha * 180 / Math.PI;
+                    gerberNet.CircleSegment.StartAngle = 180.0 + (alpha * 180 / Math.PI);
                     gerberNet.CircleSegment.EndAngle = 180.0 + beta * 180 / Math.PI;
                     break;
 
                 case 4:
-                    gerberNet.CircleSegment.StartAngle = 360.0 - alpha * 180 / Math.PI;
+                    gerberNet.CircleSegment.StartAngle = 360.0 - (alpha * 180 / Math.PI);
                     gerberNet.CircleSegment.EndAngle = 360.0 - beta * 180 / Math.PI;
                     break;
 
                 default:
                     break;
             }
+        }
 
-            gerberNet.CircleSegment.SweepAngle = gerberNet.CircleSegment.EndAngle - gerberNet.CircleSegment.StartAngle;
+        // Calculate circular interpolation bounding box.
+        private static void CircleSegmentBounds(CircleSegment circleSegment, double apertureSizeX1, double apertureSizeY1, BoundingBox boundingBox)
+        {
+            double x, y, angle1, angle2, stepPi_2;
+            double startAngle = circleSegment.StartAngle;
+            double endAngle = startAngle + circleSegment.SweepAngle;
+            const double MPI_2 = Math.PI / 2;
 
-            /*if (gerberNet.cirseg.width < 0.0)
-	        GERB_COMPILE_WARNING("Negative width [%f] in quadrant %d [%f][%f]\n", 
-			             gerberNet.cirseg.width, quadrant, alfa, beta);
-    
-            if (gerberNet.cirseg.height < 0.0)
-	        GERB_COMPILE_WARNING("Negative height [%f] in quadrant %d [%f][%f]\n", 
-			             gerberNet.cirseg.height, quadrant, RAD2DEG(alfa), RAD2DEG(beta));*/
+            // For bounding box calculation only half of aperture size is used.
+            apertureSizeX1 /= 2;
+            apertureSizeY1 /= 2;
 
-            return;
+            angle1 = 0.017453 * (Math.Min(startAngle, endAngle));
+            angle2 = 0.017453 * (Math.Max(startAngle, endAngle));
 
+            // Start arc poin.
+            x = circleSegment.CenterX + circleSegment.Width * Math.Cos(angle1) / 2;
+            y = circleSegment.CenterY + circleSegment.Width * Math.Sin(angle1) / 2;
+            UpdateNetBounds(boundingBox, x, y, apertureSizeX1, apertureSizeY1);
+
+            // Middle arc points.
+            for (stepPi_2 = (angle1 / MPI_2 + 1) * MPI_2; stepPi_2 < Math.Min(angle2, angle1 + 2 * Math.PI); stepPi_2 += MPI_2)
+            {
+                x = circleSegment.CenterX + circleSegment.Width * Math.Cos(stepPi_2) / 2;
+                y = circleSegment.CenterY + circleSegment.Width * Math.Sin(stepPi_2) / 2;
+                UpdateNetBounds(boundingBox, x, y, apertureSizeX1, apertureSizeY1);
+            }
+
+            // Stop arc point.
+            x = circleSegment.CenterX + circleSegment.Width * Math.Cos(angle2) / 2;
+            y = circleSegment.CenterY + circleSegment.Width * Math.Sin(angle2) / 2;
+            UpdateNetBounds(boundingBox, x, y, apertureSizeX1, apertureSizeY1);
         }
 
         private static void UpdateKnockoutMeasurements()
@@ -2111,9 +2094,7 @@ namespace GerberVS
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="apertureSizeX1"></param>
-        /// <param name="apertureSizeX2"></param>
         /// <param name="apertureSizeY1"></param>
-        /// <param name="apertureSizeY2"></param>
         private static void UpdateNetBounds(BoundingBox boundingBox, double x, double y, double apertureSizeX1, double apertureSizeY1)
         {
             bool transform = false;
@@ -2136,17 +2117,6 @@ namespace GerberVS
             // Transform the point to the final rendered position, accounting for any scaling, offsets, mirroring, etc.
             if (transform)
                 apertureMatrix.TransformPoints(points);
-
-            // Swap X and Y values if the rotation angle is in quadrant 2 or 4.
-            /*if ((quadrant % 2) == 0)
-            {
-               for(int i = 0; i < points.Length; i++)
-                {
-                    float px = points[i].X;
-                    points[i].X = points[i].Y;
-                    points[i].Y = px;
-                }
-            }*/
 
             // Check both points against the min/max, since depending on the rotation,
             // mirroring, etc, either point could possibly be a min or max
@@ -2175,81 +2145,81 @@ namespace GerberVS
                 boundingBox.Top = points[1].Y;
         }
 
-        private static void RotateImage(GerberImageInfo imageInfo)
+        private static void UpdateMacroBounds(BoundingBox boundingbox, PointF[] points)
         {
-            float angle = (float)imageInfo.ImageRotation;
-            float minX = (float)imageInfo.MinX;
-            float minY = (float)imageInfo.MinY;
-            float maxX = (float)imageInfo.MaxX;
-            float maxY = (float)imageInfo.MaxY;
+            float maxX = 0, maxY = 0, minX = 0, minY = 0;
+            apertureMatrix.TransformPoints(points);
+            minX = points[0].X;
+            maxX = points[0].X;
+            minY = points[0].Y;
+            maxY = points[0].Y;
+            for (int p = 1; p < points.Length; p++)
+            {
+                minX = Math.Min(minX, points[p].X);
+                maxX = Math.Max(maxX, points[p].X);
+                minY = Math.Min(minY, points[p].Y);
+                maxY = Math.Max(maxY, points[p].Y);
+            }
 
-            var corners = new[] { new PointF(minX, minY), new PointF(maxX, minY), new PointF(minX, maxY), new PointF(maxX, maxY) };
+            boundingbox.Left = Math.Min(minX, boundingbox.Left);
+            boundingbox.Right = Math.Max(maxX, boundingbox.Right);
+            boundingbox.Bottom = Math.Min(minY, boundingbox.Bottom);
+            boundingbox.Top = Math.Max(maxY, boundingbox.Top);
 
-            var xc = corners.Select(p => Rotate(p, angle).X);
-            var yc = corners.Select(p => Rotate(p, angle).Y);
-
-            imageInfo.MinX = xc.Min();
-            imageInfo.MinY = yc.Min();
-            imageInfo.MaxX = xc.Max();
-            imageInfo.MaxY = yc.Max();
         }
 
-        /// <summary>
-        /// Rotates a point around the origin (0,0)
-        /// </summary>
-        private static PointF Rotate(PointF p, float angle)
-        {
-            // Convert from degrees to radians.
-            var theta = Math.PI * angle / 180;
-            return new PointF(
-                (float)(Math.Cos(theta) * (p.X) - Math.Sin(theta) * (p.Y)),
-                (float)(Math.Sin(theta) * (p.X) + Math.Cos(theta) * (p.Y)));
-        }
+        /* private static void RotateImage(GerberImageInfo imageInfo)
+         {
+             float angle = (float)imageInfo.ImageRotation;
+             float minX = (float)imageInfo.MinX;
+             float minY = (float)imageInfo.MinY;
+             float maxX = (float)imageInfo.MaxX;
+             float maxY = (float)imageInfo.MaxY;
+
+             var corners = new[] { new PointF(minX, minY), new PointF(maxX, minY), new PointF(minX, maxY), new PointF(maxX, maxY) };
+
+             var xc = corners.Select(p => Rotate(p, angle).X);
+             var yc = corners.Select(p => Rotate(p, angle).Y);
+
+             imageInfo.MinX = xc.Min();
+             imageInfo.MinY = yc.Min();
+             imageInfo.MaxX = xc.Max();
+             imageInfo.MaxY = yc.Max();
+         }
+
+         /// <summary>
+         /// Rotates a point around the origin (0,0)
+         /// </summary>
+         private static PointF Rotate(PointF p, float angle)
+         {
+             // Convert from degrees to radians.
+             var theta = Math.PI * angle / 180;
+             return new PointF(
+                 (float)(Math.Cos(theta) * (p.X) - Math.Sin(theta) * (p.Y)),
+                 (float)(Math.Sin(theta) * (p.X) + Math.Cos(theta) * (p.Y)));
+         }*/
 
         /// <summary>
-        /// Normalises a coordinate if the trailing zeros are omitted.
+        /// Adds trailing zeros if they are omitted.
         /// </summary>
         /// <param name="integerPart">integer part of the format scale (FS)</param>
         /// <param name="decimalPart">decimal part od the formatscale (FS)</param>
         /// <param name="length">length of coordinate</param>
         /// <param name="coordinate">coordinate value</param>
-        private static void NormaliseCoordinate(int integerPart, int decimalPart, int length, ref int coordinate)
+        private static void AddTrailingZeros(int integerPart, int decimalPart, int length, ref int coordinate)
         {
-            switch ((integerPart + decimalPart) - length)
+            int omittedValue = (integerPart + decimalPart) - length;
+            if (omittedValue > 0)
             {
-                case 7:
-                    coordinate *= 10000000;
-                    break;
-
-                case 6:
-                    coordinate *= 1000000;
-                    break;
-
-                case 5:
-                    coordinate *= 100000;
-                    break;
-
-                case 4:
-                    coordinate *= 10000;
-                    break;
-
-                case 3:
-                    coordinate *= 1000;
-                    break;
-
-                case 2:
-                    coordinate *= 100;
-                    break;
-
-                case 1:
+                for (int x = 0; x < omittedValue; x++)
                     coordinate *= 10;
-                    break;
             }
         }
 
-        public static bool IsGerber274D(string fullPathName)
+        private static double Hypotenuse(double x, double y)
         {
-            return false;
+            return Math.Sqrt((x * x) + (y * y));
         }
+
     }
 }

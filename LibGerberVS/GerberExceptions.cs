@@ -46,13 +46,14 @@ namespace GerberVS
             : base(info, context)
         { }
     }
+
     /// <summary>
     /// GerberVS.GerberFileException class.
     /// </summary>
     [Serializable]
     public class GerberFileException : System.Exception
     {
-        private static string baseMessage = "File Process Error.";
+        private static string baseMessage = "File process error.";
         /// <summary>
         /// Initialses a new instance of GerberVS.GerberFileException class.
         /// </summary>
@@ -87,30 +88,93 @@ namespace GerberVS
         { }
     }
 
+    /// <summary>
+    /// GerberVS.GerberApertureException class.
+    /// </summary>
     [Serializable]
     public class GerberApertureException : System.Exception
     {
-        private static string baseMessage = "Aperture Undefined.";
+        private static string baseMessage = "Aperture undefined.";
         /// <summary>
-        /// Initialses a new instance of GerberVS.NullApertureException class.
+        /// Initialses a new instance of GerberVS.GerberApertureException class.
         /// </summary>
         public GerberApertureException()
             : base(baseMessage)
         { }
 
         /// <summary>
-        /// Initialses a new instance of GerberVS.NullApertureException class with a specified error message.
+        /// Initialses a new instance of GerberVS.GerberApertureException class with a specified error message.
         /// </summary>
         /// <param name="message">exception message</param>
         public GerberApertureException(string message)
             : base(baseMessage + Environment.NewLine + message)
         { }
+
+        /// <summary>
+        /// Initialses a new instance of GerberVS.GerberApertureException class with a specified error message and a reference to the inner exception.
+        /// </summary>
+        /// <param name="message">error message</param>
+        /// <param name="innerException">inner exception</param>
+        public GerberApertureException(string message, Exception innerException)
+            : base(baseMessage + Environment.NewLine + message, innerException)
+        { }
+
+        /// <summary>
+        /// Initialses a new instance of GerberVS.GerberApertureException class with a specified serialization information and streaming context.
+        /// </summary>
+        /// <param name="info">serialization info.</param>
+        /// <param name="context">streaming context.</param>
+        protected GerberApertureException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
     }
+
+    // <summary>
+    /// GerberVS.GerberExportException class.
+    /// </summary>
+    [Serializable]
+    public class GerberExportException : System.Exception
+    {
+        private static string baseMessage = "File expoert failed.";
+        /// <summary>
+        /// Initialses a new instance of GerberVS.GerberExportException class.
+        /// </summary>
+        public GerberExportException()
+            : base(baseMessage)
+        { }
+
+        /// <summary>
+        /// Initialses a new instance of GerberVS.GerberExportException class with a specified error message.
+        /// </summary>
+        /// <param name="message">exception message</param>
+        public GerberExportException(string message)
+            : base(baseMessage + Environment.NewLine + message)
+        { }
+
+        /// <summary>
+        /// Initialses a new instance of GerberVS.GerberExportException class with a specified error message and a reference to the inner exception.
+        /// </summary>
+        /// <param name="message">error message</param>
+        /// <param name="innerException">inner exception</param>
+        public GerberExportException(string message, Exception innerException)
+            : base(baseMessage + Environment.NewLine + message, innerException)
+        { }
+
+        /// <summary>
+        /// Initialses a new instance of GerberVS.GerberExportException class with a specified serialization information and streaming context.
+        /// </summary>
+        /// <param name="info">serialization info.</param>
+        /// <param name="context">streaming context.</param>
+        protected GerberExportException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
+    }
+
 
     [Serializable]
     public class MacroStackOverflowException : System.Exception
     {
-        private static string baseMessage = "Macro Stack Error.";
+        private static string baseMessage = "Macro stack error.";
         /// <summary>
         /// Initialses a new instance of GerberVS.MacroStackOverflowException class.
         /// </summary>
@@ -130,7 +194,7 @@ namespace GerberVS
     [Serializable]
     public class GerberImageException : System.Exception
     {
-        private static string baseMessage = "Gerber Image Error.";
+        private static string baseMessage = "Gerber image error.";
         /// <summary>
         /// Initialses a new instance of GerberVS.MacroStackOverflowException class.
         /// </summary>

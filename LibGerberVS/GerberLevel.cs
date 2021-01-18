@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace GerberVS
 {
     /// <summary>
-    /// Creates a new instance of the Gerber Level.
+    /// Class for defining a gerber level.
     /// </summary>
     /// <remarks>
     /// Construct name "Level" replaces "Layer" in the later Gerber specifications.
@@ -15,14 +15,17 @@ namespace GerberVS
     public class GerberLevel
     {
         // Auto properties.
-        public GerberStepAndRepeat StepAndRepeat { get; set; }   // The current step and repeat group (refer to RS274X specs).
-        public GerberKnockout Knockout { get; set; }             // The current knockout group (refer to RS274X specs)
-        public double Rotation { get; set; }                     // The current rotation around the origin.
-        public GerberPolarity Polarity { get; set; }             // The polarity of this level.
-        public string LevelName { get; set; }                    // The level name (NULL for none).
+        internal GerberStepAndRepeat StepAndRepeat { get; set; }   // The current step and repeat group (refer to RS274X specs).
+        internal GerberKnockout Knockout { get; set; }             // The current knockout group (refer to RS274X specs)
+        internal double Rotation { get; set; }                     // The current rotation around the origin.
+        internal GerberPolarity Polarity { get; set; }             // The polarity of this level.
+        /// <summary>
+        /// The level name.
+        /// </summary>
+        public string LevelName { get; set; }
 
         /// <summary>
-        /// Create a new Gerber Level.
+        /// Creates a new Gerber Level.
         /// </summary>
         public GerberLevel(GerberImage gerberImage)
         {
@@ -48,10 +51,11 @@ namespace GerberVS
         }
     }
 
-    public class GerberKnockout
+    
+    internal class GerberKnockout
     {
         public bool FirstInstance { get; set; }
-        public GerberKnockoutType Type { get; set; }
+        public GerberKnockoutType KnockoutType { get; set; }
         public GerberPolarity Polarity { get; set; }    // The polarity of the knockout.
         public double LowerLeftX { get; set; }
         public double LowerLeftY { get; set; }
@@ -59,6 +63,9 @@ namespace GerberVS
         public double Height { get; set; }
         public double Border { get; set; }
 
+        /// <summary>
+        /// Creates a new instance of GerberKnockout.
+        /// </summary>
         public GerberKnockout()
         {
             FirstInstance = false;
@@ -68,7 +75,7 @@ namespace GerberVS
     /// <summary>
     /// Step and Repeat class.
     /// </summary>
-    public class GerberStepAndRepeat
+    internal class GerberStepAndRepeat
     {
         public int X { get; set; }
         public int Y { get; set; }

@@ -59,23 +59,34 @@ namespace GerberVS
         public int UnknownCount { get; set; }
 
         // Properties
+        /// <summary>
+        /// Gets the error list.
+        /// </summary>
         public Collection<GerberError> ErrorList
         {
             get { return errorList; }
         }
 
+        /// <summary>
+        /// Gets the aperture list.
+        /// </summary>
         public Collection<GerberApertureInfo> ApertureList
         {
             get { return apertureList; }
         }
 
+        /// <summary>
+        /// Gets the D code list.
+        /// </summary>
         public Collection<GerberApertureInfo> DCodeList
         {
             get { return dCodeList; }
         }
 
-        // Constructor
-        public GerberFileStats()
+        /// <summary>
+        /// Create a new instance of the Gerber file stats.
+        /// </summary>
+        internal GerberFileStats()
         {
             errorList = new Collection<GerberError>();
             apertureList = new Collection<GerberApertureInfo>();
@@ -88,19 +99,21 @@ namespace GerberVS
         /// <param name="level"></param>
         /// <param name="errorMessage"></param>
         /// <param name="errorType"></param>
+        /// <param name="fileName"></param>
+        /// <param name="lineNumber"></param>
         /// <remarks>
         /// Only unique errors are added to the list.
         /// </remarks>
-        public void AddNewError(int level, string errorMessage, GerberErrorType errorType, string fileName = "", int lineNumber = 0)
+       internal void AddNewError(int level, string errorMessage, GerberErrorType errorType, string fileName = "", int lineNumber = 0)
         {
-            errorList.Add(new GerberError(level, errorMessage, errorType, fileName, lineNumber));
+            //errorList.Add(new GerberError(level, errorMessage, errorType, fileName, lineNumber));
 
-            /*bool exists = false;
+            bool exists = false;
 
             // Check that the new error is unique.
             foreach(GerberError error in errorList)
             {
-                if (error.ErrorMessage == errorMessage && error.Level == level && fileName == error.FileName)
+                if (error.ErrorMessage == errorMessage && error.Level == level && fileName == error.FileName && lineNumber == error.LineNumber)
                 {
                     exists = true;
                     break;
@@ -109,10 +122,10 @@ namespace GerberVS
             }
 
             if (!exists)
-                errorList.Add(new GerberError(level, errorMessage, errorType, fileName, lineNumber));*/
+                errorList.Add(new GerberError(level, errorMessage, errorType, fileName, lineNumber));
         }
 
-        public void AddNewAperture(int level, int number, GerberApertureType type, double[] parameter)
+        internal void AddNewAperture(int level, int number, GerberApertureType type, double[] parameter)
         {
             GerberApertureInfo newAperture;
 
@@ -141,7 +154,11 @@ namespace GerberVS
             return;
         }
 
-        public void AddNewDList(int number)
+        /// <summary>
+        /// Add a new aperture definition to the D list.
+        /// </summary>
+        /// <param name="number">aperture number</param>
+        internal void AddNewDList(int number)
         {
             GerberApertureInfo newDCode;
 
@@ -155,7 +172,7 @@ namespace GerberVS
                 }
             }
 
-            // This aperture number is unique.  Therefore, add it to the list.
+            // This aperture number is unique, add it to the list.
             //Debug.WriteLine("    Adding code {0} to D List", number);
             newDCode = new GerberApertureInfo();
             // Set member elements.
@@ -165,7 +182,14 @@ namespace GerberVS
             return;
         }
 
-        public bool IncrementDListCount(int number, int count)
+        /// <summary>
+        /// Add the aperture to the D list count.
+        /// </summary>
+        /// <param name="number">d code aperture number</param>
+        /// <param name="count">d code count</param>
+        /// <param name="line">current file line number</param>
+        /// <returns></returns>
+        internal bool IncrementDListCount(int number, int count, int line)
         {
             // Find D code in list and increment it.
             foreach (GerberApertureInfo dCode in dCodeList)
@@ -180,7 +204,7 @@ namespace GerberVS
 
             // This D number is not defined.  Therefore, flag error.
             //Debug.WriteLine("    Didn't find this D code {0} in defined list.");
-            AddNewError(-1, "Undefined aperture number called out in D code", GerberErrorType.GerberError);
+            AddNewError(-1, "Undefined aperture number called out in D code", GerberErrorType.GerberError, "", line);
             return false;  // Return false for failure.
         }
     }

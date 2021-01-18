@@ -31,7 +31,6 @@
     <DocumentationFile>bin\Release\LibGerberVS.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -45,6 +44,8 @@
     <Compile Include="Drill.cs" />
     <Compile Include="DrillEnums.cs" />
     <Compile Include="DrillState.cs" />
+    <Compile Include="ExportNCDrill.cs" />
+    <Compile Include="ExportRS274X.cs" />
     <Compile Include="GerberDraw.cs" />
     <Compile Include="GerberProject.cs" />
     <Compile Include="DrillStats.cs" />

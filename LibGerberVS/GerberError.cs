@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace GerberVS
 {
     /// <summary>
-    /// Maintains a list of errors during parsing of the gerber file.
+    /// Maintains a list of errors encounted during parsing of the gerber file.
     /// </summary>
     public class GerberError
     {
@@ -19,11 +19,13 @@ namespace GerberVS
         public int LineNumber { get; set; }
 
         /// <summary>
-        /// Creates an new instance an error log entry.
+        /// Creates an new instance of an error log entry.
         /// </summary>
         /// <param name="level"></param>
         /// <param name="errorMessage"></param>
         /// <param name="errorType"></param>
+        /// <param name="fileName"></param>
+        /// <param name="lineNumber"></param>
         public GerberError(int level, string errorMessage, GerberErrorType errorType, string fileName = "", int lineNumber = 0)
         {
             this.Level = level;

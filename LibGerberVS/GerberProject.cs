@@ -5,26 +5,79 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+//using System.IO;
+//using System.Runtime.Serialization.Formatters.Binary;
 
 namespace GerberVS
 {
+    /// <summary>
+    /// Maintains information about the current file group.
+    /// </summary>
     public class GerberProject
     {
-        private Collection<GerberFileInformation> fileInfo;         // The array for holding the child fileinfos.
-        public Color BackgroundColor { get; set; }                  // The background color used for rendering.
-        public int CurrentIndex { get; set; }                       // The index of the currently active fileinfo.
-        public GerberUserTransform UserTransform { get; set; }      // User-specified transformation for the file (mirroring, translating, etc)
-        public GerberRenderQuality RenderQuality { get; set; }      // The type of renderer to use.
-        public string Path { get; set; }                            // The default path to load new files from.
-        public string ProjectName { get;set; }                      // The default name for the private project file.
+        private Collection<GerberFileInformation> fileInfo;         // Collection of the child file information.
 
+        /// <summary>
+        /// The background color used for rendering the project.
+        /// </summary>
+        public Color BackgroundColor { get; set; }
+
+        /// <summary>
+        /// Number of files in the project.
+        /// </summary>
+        public int FileCount { get; set; }
+
+        /// <summary>
+        /// The index of the selected file.
+        /// </summary>
+        public int CurrentIndex { get; set; }
+
+        /// <summary>
+        /// The quality of rendering to use.
+        /// </summary>
+        public GerberRenderQuality RenderQuality { get; set; }
+
+        /// <summary>
+        /// Confirm before deleting nets from an image.
+        /// </summary>
+        public bool CheckBeforeDelete { get; set; }
+
+        /// <summary>
+        /// Determine if a user selection is shown on a hidden layer.
+        /// </summary>
+        public bool ShowHiddenSelection { get; set; }
+        /// <summary>
+        /// The default path to load project files from.
+        /// </summary>
+        public string Path { get; set; }
+
+        /// <summary>
+        /// The default name for the private project file.
+        /// </summary>
+        public string ProjectName { get; set; } 
+        
+        /// <summary>
+        /// Test for an empty project.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get { return fileInfo.Count == 0; }
+        }
+
+        /// <summary>
+        /// Creates a new instance of the gerber project type class.
+        /// </summary>
         public GerberProject()
         {
             fileInfo = new Collection<GerberFileInformation>();
+            CheckBeforeDelete = true;
+            ShowHiddenSelection = true;
             RenderQuality = GerberRenderQuality.Default;
-            UserTransform = new GerberUserTransform();
         }
 
+        /// <summary>
+        /// Gets the file information list.
+        /// </summary>
         public Collection<GerberFileInformation> FileInfo
         {
             get { return fileInfo; }
@@ -32,33 +85,84 @@ namespace GerberVS
     }
 
     /// <summary>
-    /// Holds the rendering infomation for the graphics surface
+    /// Holds the rendering infomation for the gerber image.
     /// </summary>
-    public class RenderInformation
+    public class GerberRenderInformation
     {
         // Auto properties.
         /// <summary>
-        /// The width of the image.
+        /// The width of the scaled image.
         /// </summary>
         public double ImageWidth { get; set; }
-        public double ImageHeight { get; set; }     // The height of the image.
-        public double DisplayWidth { get; set; }    // The width of the render area.
-        public double DisplayHeight { get; set; }   // The height of the render area.
-        public double ScaleFactorX { get; set; }    // X direction scale factor.
-        public double ScaleFactorY { get; set; }    // Y direction scale factor.
-        public double TranslateX { get; set; }      // The X translate value.
-        public double TranslateY { get; set; }      // The Y translate value.
-        public double ScrollValueX { get; set; }    // Current X scroll value.
-        public double ScrollValueY { get; set; }    // Current Y scroll value.
-        public double Left { get; set; }            // The X coordinate of the lower left corner (in real world coordinates, in inches).
-        public double Bottom { get; set; }          // The Y coordinate of the lower left corner (in real world coordinates, in inches).
-        public GerberRenderQuality RenderType { get; set; } //!< the type of rendering to use.
 
-        public RenderInformation()
+        /// <summary>
+        /// The height of the scaled image.
+        /// </summary>
+        public double ImageHeight { get; set; }
+
+        /// <summary>
+        /// The width of the display or print area.
+        /// </summary>
+        public double DisplayWidth { get; set; }
+
+        /// <summary>
+        /// The height of the display or print area.
+        /// </summary>
+        public double DisplayHeight { get; set; }   // The height of the render area.
+
+        /// <summary>
+        /// Gets or sets the X direction scale factor.
+        /// </summary>
+        public double ScaleFactorX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Y direction scale factor.
+        /// </summary>
+        public double ScaleFactorY { get; set; }
+
+        /// <summary>
+        /// Gets or sets the X translate value.
+        /// </summary>
+        public double TranslateX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Y translate value.
+        /// </summary>
+        public double TranslateY { get; set; }
+
+        /// <summary>
+        /// Gets or sets the X scroll value.
+        /// </summary>
+        public double ScrollValueX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Y scroll value.
+        /// </summary>
+        public double ScrollValueY { get; set; }    // Current Y scroll value.
+
+        /// <summary>
+        /// The X coordinate of the lower left corner (in real world coordinates, in inches).
+        /// </summary>
+        public double Left { get; set; } 
+
+        /// <summary>
+        /// The Y coordinate of the lower left corner (in real world coordinates, in inches).
+        /// </summary>
+        public double Bottom { get; set; }
+
+        /// <summary>
+        /// The quality of rendering to use when drawing layers.
+        /// </summary>
+        public GerberRenderQuality RenderQuality { get; set; }
+
+        /// <summary>
+        /// Creates a new RenderInformation type class.
+        /// </summary>
+        public GerberRenderInformation()
         {
             ScaleFactorX = 1.0;
             ScaleFactorY = 1.0;
-            RenderType = GerberRenderQuality.Default;
+            RenderQuality = GerberRenderQuality.Default;
         }
     }
 
@@ -67,21 +171,54 @@ namespace GerberVS
     /// </summary>
     public class GerberFileInformation
     {
-        public GerberImage Image { get; set; }      // The image holding all the geometry of the layer.
-        public Color Color { get; set; }            // The color to render this layer with.
-        public int Alpha { get; set; }              // Alpha level;
-        public bool IsVisible { get; set; }         // True if this layer file should be rendered with the project.
-        public string FullPathName { get; set; }    // Full pathname to the file.
-        public string FileName { get; set; }        // The name used when referring to this layer file(e.g. in a layer selection menu)
-        public bool LayerDirty { get; set; }        // True if layer has been modified since last save.
-        public bool Inverted { get; set; }          // True if the file image should be rendered "inverted" (light is dark and vice versa).
-        //public GerberUserTransform UserTransform { get; set; }      // User-specified transformation for the file (mirroring, translating, etc)
+        /// <summary>
+        /// The image holding all the geometry of the layer.
+        /// </summary>
+        public GerberImage Image { get; set; }
 
+        /// <summary>
+        /// The color to render this layer with.
+        /// </summary>
+        public Color Color { get; set; }
+
+        /// <summary>
+        /// The alpha level (transparency) of the layer color.
+        /// </summary>
+        public int Alpha { get; set; }
+
+        /// <summary>
+        /// Set true if this layer file should be rendered with the project.
+        /// </summary>
+        public bool IsVisible { get; set; }
+
+        /// <summary>
+        /// Full path and file name.
+        /// </summary>
+        public string FullPathName { get; set; }
+
+        /// <summary>
+        /// Short filename.
+        /// </summary>
+        public string FileName { get; set; }
+
+        /// <summary>
+        /// Set true if layer has been modified since last save.
+        /// </summary>
+        public bool LayerDirty { get; set; }
+
+        /// <summary>
+        /// User specified transformation for the layer.
+        /// </summary>
+        public GerberUserTransform UserTransform { get; set; }
+
+        /// <summary>
+        /// Creates a new instance of gerber file information type.
+        /// </summary>
         public GerberFileInformation()
         {
             Image = null;
             IsVisible = true;
-            //UserTransform = new GerberUserTransform();
+            UserTransform = new GerberUserTransform();
         }
     }
 
@@ -156,19 +293,66 @@ namespace GerberVS
     /// </summary>
     public class GerberUserTransform
     {
-        public double TranslateX { get; set; }      // The X translation (in inches)
-        public double TranslateY { get; set; }      // The Y translation (in inches)
-        public double ScaleX { get; set; }          // The X scale factor (1.0 is default).
-        public double ScaleY { get; set; }          // The Y scale factor (1.0 is default).
-        public double Rotation { get; set; }        // The rotation of the level around the origin (in degrees).
-        public bool MirrorAroundX { get; set; }     // True if the level is mirrored around the X axis (horizonal flip).
-        public bool MirrorAroundY { get; set; }     // True if the level is mirrored around the Y axis (vertical flip).
+        /// <summary>
+        /// Gets or sets the X translation (in inches).
+        /// </summary>
+        public double TranslateX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Y translation (in inches).
+        /// </summary>
+        public double TranslateY { get; set; }
+
+        /// <summary>
+        /// Gets or sets the X direction scale.
+        /// </summary>
+        public double ScaleX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Y direction scale.
+        /// </summary>
+        public double ScaleY { get; set; }
+
+        /// <summary>
+        /// The rotation of the layer around the origin (in degrees).
+        /// </summary>
+        public double Rotation { get; set; }
+
+        /// <summary>
+        /// True if the layer is mirrored around the X axis (horizonal flip).
+        /// </summary>
+        public bool MirrorAroundX { get; set; }
+
+        /// <summary>
+        /// True if the layer is mirrored around the Y axis (vertical flip).
+        /// </summary>
+        public bool MirrorAroundY { get; set; }
+
+        /// <summary>
+        /// Set true if the layer should be rendered inverted.
+        /// </summary>
+        public bool Inverted { get; set; }
        
+        /// <summary>
+        /// Creates a new instance of the user transformation type class.
+        /// </summary>
         public GerberUserTransform()
         {
             ScaleX = 1.0;
             ScaleY = 1.0;
-            // All others are default initial values;
+        }
+
+        public GerberUserTransform(double translateX, Double translateY, double scaleX, double scaleY, double rotation,
+                                   bool mirrorArroundX, bool mirrorAroundY, bool Inverted)
+        {
+            TranslateX = translateX;
+            TranslateY = translateY;
+            ScaleX = scaleX;
+            ScaleY = scaleY;
+            Rotation = rotation;
+            MirrorAroundX = mirrorArroundX;
+            MirrorAroundY = mirrorAroundY;
+            Inverted = false;
         }
     }
 }

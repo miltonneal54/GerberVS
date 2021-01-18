@@ -105,5 +105,11 @@ namespace GerberVS
 
             return false;
         }
+
+        public RectangleF ToRectangle()
+        {
+            RectangleF rect = new RectangleF((float)Left, (float)Top, (float)(Right - Left), (float)(Top - Bottom));
+            return rect;
+        }
     }
 }

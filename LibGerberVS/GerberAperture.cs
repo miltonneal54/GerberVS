@@ -35,19 +35,45 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Globalization;
 using System.Diagnostics;
 
 namespace GerberVS
 {
+    /// <summary>
+    /// Type class containing information on an aperture.
+    /// </summary>
     public class GerberApertureInfo
     {
+        /// <summary>
+        /// Aperture number.
+        /// </summary>
         public int Number { get; set; }
+
+        /// <summary>
+        /// Aperture level.
+        /// </summary>
         public int Level { get; set; }
+
+        /// <summary>
+        /// Number of D codes.
+        /// </summary>
         public int Count { get; set; }
+
+        /// <summary>
+        /// Type of aperture.
+        /// </summary>
         public GerberApertureType ApertureType { get; set; }
+
+        /// <summary>
+        /// Aperture parameter list.
+        /// </summary>
         public double[] Parameters { get; set; }
 
+        /// <summary>
+        /// Creates a new instance of the aperture information type class.
+        /// </summary>
         public GerberApertureInfo()
         {
             Parameters = new double[5];
@@ -55,9 +81,9 @@ namespace GerberVS
     }
 
     /// <summary>
-    /// Holds an aperture definition.
+    /// Type class for defining an aperture.
     /// </summary>
-    public class ApertureDefinition
+    public class Aperture
     {
         private Collection<SimplifiedApertureMacro> simplifiedMacroList;
         public GerberApertureType ApertureType { get; set; }
@@ -67,14 +93,17 @@ namespace GerberVS
         public GerberUnit Unit { get; set; }
 
         /// <summary>
-        /// Gets the simplified macro collection.
+        /// Gets the simplified macro list.
         /// </summary>
         public Collection<SimplifiedApertureMacro> SimplifiedMacroList
-        { 
+        {
             get { return simplifiedMacroList; }
         }
 
-        public ApertureDefinition()
+        /// <summary>
+        /// Creates a new instance of an aperture definition type class.
+        /// </summary>
+        public Aperture()
         {
             simplifiedMacroList = new Collection<SimplifiedApertureMacro>();
             Parameters = new double[Gerber.MaximumApertureParameters];
@@ -82,32 +111,42 @@ namespace GerberVS
     }
 
     /// <summary>
-    /// Processes an aperture macro.
+    /// Type class for defining an aperture macro.
     /// </summary>
     public class ApertureMacro
     {
         private Collection<GerberInstruction> instructionList;
-
         public string Name { get; set; }
         public int NufPushes { get; set; }                  // Nuf pushes in program to estimate stack size.
 
-        public Collection<GerberInstruction> InstructionList
+        /// <summary>
+        /// Gets the macro instruction list.
+        /// </summary>
+        internal Collection<GerberInstruction> InstructionList
         {
             get { return instructionList; }
         }
 
+        /// <summary>
+        /// Creates a new instance of the Aperture Macro class.
+        /// </summary>
         public ApertureMacro()
         {
             instructionList = new Collection<GerberInstruction>();
         }
 
-        public static ApertureMacro ProcessApertureMacro(GerberLineReader reader)
+        /// <summary>
+        /// Read in and resolve the aperture macro data.
+        /// </summary>
+        /// <param name="reader">reader hold the macro data</param>
+        /// <returns></returns>
+        internal static ApertureMacro ParseApertureMacro(GerberLineReader reader)
         {
             const int MathOperationStackSize = 2;
             ApertureMacro apertureMacro = new ApertureMacro();
             GerberInstruction instruction;
 
-            GerberOpcodes[] mathOperations = new GerberOpcodes[MathOperationStackSize];
+            GerberOpCode[] mathOperations = new GerberOpCode[MathOperationStackSize];
             char characterRead;
             int primitive = 0;
             int mathOperationIndex = 0;
@@ -120,11 +159,11 @@ namespace GerberVS
 
             // Get macro name
             apertureMacro.Name = reader.GetStringValue('*');
-            characterRead = reader.Read();	// skip '*'
+            characterRead = reader.Read();	    // skip '*'
 
             // The first instruction in all programs will be NOP.
             instruction = new GerberInstruction();
-            instruction.Opcode = GerberOpcodes.NOP;
+            instruction.Opcode = GerberOpCode.Nop;
             apertureMacro.InstructionList.Add(instruction);
 
             while (continueLoop && !reader.EndOfFile)
@@ -137,7 +176,7 @@ namespace GerberVS
                         if (foundPrimitive)
                         {
                             instruction = new GerberInstruction();
-                            instruction.Opcode = GerberOpcodes.PushParameter;
+                            instruction.Opcode = GerberOpCode.PushParameter;
                             apertureMacro.InstructionList.Add(instruction);
                             apertureMacro.NufPushes++;
                             instruction.Data.IntValue = reader.GetIntegerValue(ref length);
@@ -163,13 +202,13 @@ namespace GerberVS
                             instruction = new GerberInstruction();
                             if (equate > 0)
                             {
-                                instruction.Opcode = GerberOpcodes.PopParameter;
+                                instruction.Opcode = GerberOpCode.PopParameter;
                                 instruction.Data.IntValue = equate;
                             }
 
                             else
                             {
-                                instruction.Opcode = GerberOpcodes.Primative;
+                                instruction.Opcode = GerberOpCode.Primitive;
                                 instruction.Data.IntValue = primitive;
                             }
 
@@ -206,15 +245,15 @@ namespace GerberVS
 
                     case '+':
                         while ((mathOperationIndex != 0) &&
-                                OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpcodes.NOP) >=
-                                (OperatorPrecedence(GerberOpcodes.Add)))
+                                OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpCode.Nop) >=
+                                (OperatorPrecedence(GerberOpCode.Add)))
                         {
                             instruction = new GerberInstruction();
                             instruction.Opcode = mathOperations[--mathOperationIndex];
                             apertureMacro.InstructionList.Add(instruction);
                         }
 
-                        mathOperations[mathOperationIndex++] = GerberOpcodes.Add;
+                        mathOperations[mathOperationIndex++] = GerberOpCode.Add;
                         comma = true;
                         break;
 
@@ -227,43 +266,43 @@ namespace GerberVS
                         }
 
                         while ((mathOperationIndex != 0) &&
-                                OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpcodes.NOP) >=
-                                (OperatorPrecedence(GerberOpcodes.Subtract)))
+                                OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpCode.Nop) >=
+                                (OperatorPrecedence(GerberOpCode.Subtract)))
                         {
                             instruction = new GerberInstruction();
                             instruction.Opcode = mathOperations[--mathOperationIndex];
                             apertureMacro.InstructionList.Add(instruction);
                         }
 
-                        mathOperations[mathOperationIndex++] = GerberOpcodes.Subtract;
+                        mathOperations[mathOperationIndex++] = GerberOpCode.Subtract;
                         break;
 
                     case '/':
                         while ((mathOperationIndex != 0) &&
-                                OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpcodes.NOP) >=
-                                (OperatorPrecedence(GerberOpcodes.Divide)))
+                                OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpCode.Nop) >=
+                                (OperatorPrecedence(GerberOpCode.Divide)))
                         {
                             instruction = new GerberInstruction();
                             instruction.Opcode = mathOperations[--mathOperationIndex];
                             apertureMacro.InstructionList.Add(instruction);
                         }
 
-                        mathOperations[mathOperationIndex++] = GerberOpcodes.Divide;
+                        mathOperations[mathOperationIndex++] = GerberOpCode.Divide;
                         comma = true;
                         break;
 
                     case 'X':
                     case 'x':
                         while ((mathOperationIndex != 0) &&
-                            OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpcodes.NOP) >=
-                            (OperatorPrecedence(GerberOpcodes.Multiple)))
+                            OperatorPrecedence((mathOperationIndex > 0) ? mathOperations[mathOperationIndex - 1] : GerberOpCode.Nop) >=
+                            (OperatorPrecedence(GerberOpCode.Multiple)))
                         {
                             instruction = new GerberInstruction();
                             instruction.Opcode = mathOperations[--mathOperationIndex];
                             apertureMacro.InstructionList.Add(instruction);
                         }
 
-                        mathOperations[mathOperationIndex++] = GerberOpcodes.Multiple;
+                        mathOperations[mathOperationIndex++] = GerberOpCode.Multiple;
                         comma = true;
                         break;
 
@@ -296,7 +335,7 @@ namespace GerberVS
 
                         reader.Position--;
                         instruction = new GerberInstruction();
-                        instruction.Opcode = GerberOpcodes.Push;
+                        instruction.Opcode = GerberOpCode.Push;
                         apertureMacro.InstructionList.Add(instruction);
                         apertureMacro.NufPushes++;
                         instruction.Data.DoubleValue = reader.GetDoubleValue();
@@ -329,16 +368,16 @@ namespace GerberVS
         /// </summary>
         /// <param name="opcode">operater code</param>
         /// <returns>value indicating precedence</returns>
-        private static int OperatorPrecedence(GerberOpcodes opcode)
+        private static int OperatorPrecedence(GerberOpCode opcode)
         {
             switch (opcode)
             {
-                case GerberOpcodes.Add:
-                case GerberOpcodes.Subtract:
+                case GerberOpCode.Add:
+                case GerberOpCode.Subtract:
                     return 1;
 
-                case GerberOpcodes.Multiple:
-                case GerberOpcodes.Divide:
+                case GerberOpCode.Multiple:
+                case GerberOpCode.Divide:
                     return 2;
             }
 
@@ -346,8 +385,9 @@ namespace GerberVS
         }
     }
 
+
     /// <summary>
-    /// Simplifies an aperture macro.
+    /// Type class for defining a simplified aperture macro.
     /// </summary>
     public class SimplifiedApertureMacro
     {
@@ -359,55 +399,21 @@ namespace GerberVS
             Parameters = new double[Gerber.MaximumApertureParameters];
         }
 
-        // Stack declarations and operations to be used by the simplify engine that executes the parsed aperture macros.
-        private static class MacroStack
-        {
-            public static double[] Values { get; set; }
-            public static int Count { get; set; }
-
-            public static void InitializeStack(int stackSize)
-            {
-                Values = new double[stackSize];
-                Count = 0;
-            }
-
-            // Pushes a value onto the stack.
-            public static void Push(double value)
-            {
-                Values[Count++] = value;
-                return;
-            }
-
-            // Pops a value off the stack.
-            public static bool Pop(ref double value)
-            {
-                // Check if we try to pop an empty stack.
-                if (Count == 0)
-                    throw new MacroStackOverflowException("Attempt to pop an empty stack.");
-
-                value = Values[--Count];
-                return true;
-            }
-
-            // Reset the stack.
-            public static void Reset()
-            {
-                for (int i = 0; i < Values.Length; i++)
-                    Values[i] = 0.0;
-
-                Count = 0;
-            }
-        }
-
-        // Simplify the aperture macro.
-        public static bool SimplifyApertureMacro(ApertureDefinition aperture, double scale)
+        /// <summary>
+        /// Simplifies an aperture macro.
+        /// </summary>
+        /// <param name="aperture">aperture to be simplified</param>
+        /// <param name="scale">scale to use when simplifing</param>
+        /// <returns></returns>
+        public static bool SimplifyApertureMacro(Aperture aperture, double scale)
         {
             const int extraStackSize = 10;
+
             bool success = true;
             int numberOfParameters = 0;
             bool clearOperatorUsed = false;
             double[] localParameters = new double[Gerber.MaximumApertureParameters]; // Local copy of parameters.
-            double[] tmp = { 0.0, 0.0 };
+            double[] temp = { 0.0, 0.0 };
             int index = 0;
             GerberApertureType type = GerberApertureType.None;
             SimplifiedApertureMacro macro;
@@ -415,7 +421,7 @@ namespace GerberVS
             if (aperture == null || aperture.ApertureMacro == null)
                 throw new GerberApertureException("In SimplifyApertureMacro, aperture = null");
 
-            // Allocate stack for VM.
+            // Allocate stack.
             MacroStack.InitializeStack(aperture.ApertureMacro.NufPushes + extraStackSize);
 
             // Make a copy of the parameter list that we can rewrite if necessary.
@@ -427,47 +433,47 @@ namespace GerberVS
             {
                 switch (instruction.Opcode)
                 {
-                    case GerberOpcodes.NOP:
+                    case GerberOpCode.Nop:
                         break;
 
-                    case GerberOpcodes.Push:
+                    case GerberOpCode.Push:
                         MacroStack.Push(instruction.Data.DoubleValue);
                         break;
 
-                    case GerberOpcodes.PushParameter:
+                    case GerberOpCode.PushParameter:
                         MacroStack.Push(localParameters[instruction.Data.IntValue - 1]);
                         break;
 
-                    case GerberOpcodes.PopParameter:
-                        MacroStack.Pop(ref tmp[0]);
-                        localParameters[instruction.Data.IntValue - 1] = tmp[0];
+                    case GerberOpCode.PopParameter:
+                        MacroStack.Pop(ref temp[0]);
+                        localParameters[instruction.Data.IntValue - 1] = temp[0];
                         break;
 
-                    case GerberOpcodes.Add:
-                        MacroStack.Pop(ref tmp[0]);
-                        MacroStack.Pop(ref tmp[1]);
-                        MacroStack.Push(tmp[1] + tmp[0]);
+                    case GerberOpCode.Add:
+                        MacroStack.Pop(ref temp[0]);
+                        MacroStack.Pop(ref temp[1]);
+                        MacroStack.Push(temp[1] + temp[0]);
                         break;
 
-                    case GerberOpcodes.Subtract:
-                        MacroStack.Pop(ref tmp[0]);
-                        MacroStack.Pop(ref tmp[1]);
-                        MacroStack.Push(tmp[1] - tmp[0]);
+                    case GerberOpCode.Subtract:
+                        MacroStack.Pop(ref temp[0]);
+                        MacroStack.Pop(ref temp[1]);
+                        MacroStack.Push(temp[1] - temp[0]);
                         break;
 
-                    case GerberOpcodes.Multiple:
-                        MacroStack.Pop(ref tmp[0]);
-                        MacroStack.Pop(ref tmp[1]);
-                        MacroStack.Push(tmp[1] * tmp[0]);
+                    case GerberOpCode.Multiple:
+                        MacroStack.Pop(ref temp[0]);
+                        MacroStack.Pop(ref temp[1]);
+                        MacroStack.Push(temp[1] * temp[0]);
                         break;
 
-                    case GerberOpcodes.Divide:
-                        MacroStack.Pop(ref tmp[0]);
-                        MacroStack.Pop(ref tmp[1]);
-                        MacroStack.Push(tmp[1] / tmp[0]);
+                    case GerberOpCode.Divide:
+                        MacroStack.Pop(ref temp[0]);
+                        MacroStack.Pop(ref temp[1]);
+                        MacroStack.Push(temp[1] / temp[0]);
                         break;
 
-                    case GerberOpcodes.Primative:
+                    case GerberOpCode.Primitive:
                         // This handles the exposure thing in the aperture macro.
                         // The exposure is always the first element on stack independent
                         // of aperture macro.
@@ -518,7 +524,7 @@ namespace GerberVS
 
                             case 21:
                                 //Debug.Write("    Aperture macro line 21 (");
-                                type = GerberApertureType.MarcoLine21;
+                                type = GerberApertureType.MacroLine21;
                                 numberOfParameters = 6;
                                 break;
 
@@ -607,7 +613,7 @@ namespace GerberVS
                                     macro.Parameters[5] /= scale;
                                     break;
 
-                                case GerberApertureType.MarcoLine21:
+                                case GerberApertureType.MacroLine21:
                                 case GerberApertureType.MacroLine22:
                                     if (Math.Abs(macro.Parameters[0]) < 0.001)
                                         clearOperatorUsed = true;
@@ -629,10 +635,6 @@ namespace GerberVS
                             //Debug.WriteLine(")");
                         }
 
-                        // Here we reset the stack pointer. It's not generally
-                        // correct to do this, but since I know how the compiler works
-                        // I can do this. The correct way to do this should be to 
-                        // subtract number of used elements in each primitive operation.
                         MacroStack.Reset();
                         break;
 
@@ -643,44 +645,72 @@ namespace GerberVS
 
             // Store a flag to let the renderer know if it should expect any "clear" primatives.
             aperture.Parameters[0] = clearOperatorUsed ? 1.0f : 0.0f;
+
             return success;
         }
+
+        // Stack declarations and operations to be used by the simplify engine that executes the parsed aperture macros.
+        private static class MacroStack
+        {
+            public static double[] Values { get; set; }
+            public static int Count { get; set; }
+
+            public static void InitializeStack(int stackSize)
+            {
+                Values = new double[stackSize];
+                Count = 0;
+            }
+
+            // Pushes a value onto the stack.
+            public static void Push(double value)
+            {
+                Values[Count++] = value;
+                return;
+            }
+
+            // Pops a value off the stack.
+            public static bool Pop(ref double value)
+            {
+                // Check if we try to pop an empty stack.
+                if (Count == 0)
+                    throw new MacroStackOverflowException("Attempt to pop an empty stack.");
+
+                value = Values[--Count];
+                return true;
+            }
+
+            // Reset the stack.
+            public static void Reset()
+            {
+                for (int i = 0; i < Values.Length; i++)
+                    Values[i] = 0.0;
+
+                Count = 0;
+            }
+        }
     }
 
-    public struct Union
+    internal class GerberInstruction
     {
-        private int intValue;
-        private double doubleValue;
-
-        public int IntValue
-        {
-            get { return intValue; }
-            set { intValue = value; }
-        }
-
-        public double DoubleValue
-        {
-            get { return doubleValue; }
-            set { doubleValue = value; }
-        }
-
-        public Union(int intValue, double doubleValue)
-        {
-            this.intValue = intValue;
-            this.doubleValue = doubleValue;
-        }
-    }
-
-    public class GerberInstruction
-    {
-        // Auto Properties
-        public GerberOpcodes Opcode { get; set; }
-        public Union Data;
+        internal GerberOpCode Opcode { get; set; }
+        internal Union Data;
 
         public GerberInstruction()
         {
             Data = new Union();
         }
+
+        [StructLayout(LayoutKind.Explicit)]
+        internal struct Union
+        {
+            // Set the offsets to the same position so that both variables occupy
+            // the same memory address which is essentially C++ union does.
+            [FieldOffset(0)]
+            public double DoubleValue;
+            [FieldOffset(0)]
+            public int IntValue;
+        }  
+
     }
 }
 

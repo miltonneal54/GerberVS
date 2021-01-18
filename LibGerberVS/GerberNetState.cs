@@ -7,8 +7,13 @@ using System.Threading.Tasks;
 namespace GerberVS
 {
     /// <summary>
-    /// Gerber Net State type
+    /// Class for defining the current net state.
     /// </summary>
+    /// <remarks>
+    /// If any of these values change during file parsing
+    /// a new net state is created reflecting the changes
+    /// and added to the net state list.
+    /// </remarks>
     public class GerberNetState
     {
         public GerberAxisSelect AxisSelect { get; set; }    // The AB to XY coordinate mapping (refer to RS274X spec)
@@ -25,6 +30,8 @@ namespace GerberVS
         public GerberNetState(GerberImage gerberImage)
         {
             Unit = GerberUnit.Inch;
+            OffsetA = 0.0;
+            OffsetB = 0.0;
             ScaleA = 1.0;
             ScaleB = 1.0;
             gerberImage.NetStateList.Add(this);

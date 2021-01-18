@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GerberVS
 {
-    public class GerberState
+    internal class GerberState
     {
         // Auto properties.
         public int CurrentX { get; set; }
@@ -26,8 +26,11 @@ namespace GerberVS
         public bool IsPolygonAreaFill { get; set; }
         public bool MultiQuadrant { get; set; }          // Set true if multi quadrant else single quadrant.
 
+        /// <summary>
+        /// Creates a new instance of the gerber state.
+        /// </summary>
         public GerberState()
-        {}
+        { }
     }
 
    

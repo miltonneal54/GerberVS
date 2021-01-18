@@ -38,20 +38,23 @@ using System.Threading.Tasks;
 
 namespace GerberVS
 {
-    // Linked list of drills found in active levels. Used in reporting statistics.
+    /// <summary>
+    /// List of drills found in active levels.
+    /// </summary>
+    /// <remarks>Used in reporting statistics.</remarks>
     public class DrillInfo
     {
-        public int drillCount { get; set; }
-        public int drillNumber { get; set; }
-        public double drillSize { get; set; }
-        public string drillUnit { get; set; }
+        public int DrillCount { get; set; }
+        public int DrillNumber { get; set; }
+        public double DrillSize { get; set; }
+        public string DrillUnit { get; set; }
 
         public DrillInfo()
         {
-            drillCount = 0;
-            drillNumber = -1;
-            drillSize = 0.0;
-            drillUnit = String.Empty;
+            DrillCount = 0;
+            DrillNumber = -1;
+            DrillSize = 0.0;
+            DrillUnit = String.Empty;
         }
     }
 
@@ -152,46 +155,61 @@ namespace GerberVS
             AddNewError(level, errorMessage, errorType, 0, String.Empty);
         }
 
+        /// <summary>
+        /// Update the count of an existing drill.
+        /// </summary>
+        /// <param name="drillNumber"></param>
         public void IncrementDrillCounter(int drillNumber)
         {
-
             // First check to see if this drill is already in the list.
-            foreach (DrillInfo d in drillInfoList)
+            foreach (DrillInfo drillInfo in drillInfoList)
             {
-                if (d.drillNumber == drillNumber)
+                if (drillInfo.DrillNumber == drillNumber)
                 {
-                    d.drillCount++;
+                    drillInfo.DrillCount++;
                     break;
                 }
             }
         }
 
+        /// <summary>
+        /// Updates the drill information of an existing drill entry.
+        /// </summary>
+        /// <param name="drillNumber"></param>
+        /// <param name="drillSize"></param>
+        /// <param name="drillUnit"></param>
         public void ModifyDrillList(int drillNumber, double drillSize, string drillUnit)
         {
 
             // Look for this drill number in drill list.
-            foreach (DrillInfo d in drillInfoList)
+            foreach (DrillInfo drillInfo in drillInfoList)
             {
                 // And update it.
-                if (d.drillNumber == drillNumber)
+                if (drillInfo.DrillNumber == drillNumber)
                 {
-                    d.drillSize = drillSize;
-                    d.drillUnit = drillUnit;
+                    drillInfo.DrillSize = drillSize;
+                    drillInfo.DrillUnit = drillUnit;
                 }
             }
 
             return;
         }
 
+        /// <summary>
+        /// Adds a new drill to the drill list.
+        /// </summary>
+        /// <param name="drillNumber"></param>
+        /// <param name="drillSize"></param>
+        /// <param name="drillUnit"></param>
         public void AddToDrillList(int drillNumber, double drillSize, string drillUnit)
         {
             bool exists = false;
             // First check to see if this drill is already in the list.
             if (drillInfoList.Count > 0)
             {
-                foreach (DrillInfo d in drillInfoList)
+                foreach (DrillInfo drillInfo in drillInfoList)
                 {
-                    if (drillNumber == d.drillNumber)
+                    if (drillNumber == drillInfo.DrillNumber)
                     {
                         exists = true;
                         break;
@@ -203,10 +221,10 @@ namespace GerberVS
             if (!exists)
             {
                 DrillInfo drillInfo = new DrillInfo();
-                drillInfo.drillNumber = drillNumber;
-                drillInfo.drillSize = drillSize;
-                drillInfo.drillCount = 0;
-                drillInfo.drillUnit = drillUnit;
+                drillInfo.DrillNumber = drillNumber;
+                drillInfo.DrillSize = drillSize;
+                drillInfo.DrillCount = 0;
+                drillInfo.DrillUnit = drillUnit;
 
                 drillInfoList.Add(drillInfo);
             }

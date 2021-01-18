@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace GerberVS
 {
-    public enum GerberOpcodes
+    /// <summary>
+    /// Op codes used when parsing aperture macros.
+    /// </summary>
+    internal enum GerberOpCode
     {
-        NOP = 0,            // No operation.
+        Nop = 0,            // No operation.
         Push,               // Push the instruction onto the stack.
         PushParameter,      // Push parameter onto stack.
         PopParameter,       // Pop parameter from stack.
@@ -16,10 +19,12 @@ namespace GerberVS
         Subtract,           // Mathmatical subtract operation.
         Multiple,           // Mathmatical multiply operation.
         Divide,             // Mathmatical divide operation.
-        Primative           // Draw macro primative.
+        Primitive           // Draw macro primative.
     }
 
-    // The different error message types used in GerberVS Library
+    /// <summary>
+    /// Error message types used in GerberVS Library.
+    /// </summary>
     public enum GerberErrorType
     {
         GerberCritical = 0,    // File processing can not continue.
@@ -45,8 +50,16 @@ namespace GerberVS
     /// </summary>
     public enum GerberApertureType
     {
-        None,             // no aperture used.
-        Circle,           // a round aperture.
+        /// <summary>
+        /// No aperture used.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// A round aperture.
+        /// </summary>
+        Circle,
+
         Rectangle,        // a rectangular aperture.
         Oval,             // an ovular (obround) aperture.
         Polygon,          // a polygon aperture.
@@ -57,7 +70,7 @@ namespace GerberVS
         MacroMoire,      // a RS274X moire macro.
         MacroThermal,    // a RS274X thermal macro.
         MacroLine20,     // a RS274X line (code 20) macro.
-        MarcoLine21,     // a RS274X line (code 21) macro.
+        MacroLine21,     // a RS274X line (code 21) macro.
         MacroLine22      // a RS274X line (code 22) macro.
     }
 
@@ -66,7 +79,8 @@ namespace GerberVS
     {
         Off,   // tool drawing is off, and nothing will be drawn.
         On,    // tool drawing is on, and something will be drawn.
-        Flash  // tool is flashing, and will draw a single aperture.
+        Flash,  // tool is flashing, and will draw a single aperture.
+        Deleted
     }
 
     // The current unit used.
@@ -94,26 +108,38 @@ namespace GerberVS
         /// <summary>
         /// Omit extra zeros before the decimal point.
         /// </summary>
-        OmitZerosLeading, 
+        OmitZerosLeading,
+ 
         /// <summary>
         /// Omit extra zeros after the decimal point.
         /// </summary>
         OmitZerosTrailing,
+
         /// <summary>
         /// Explicitly specify how many decimal places are used.
         /// </summary>
         OmitZerosExplicit,
+
         /// <summary>
         /// Use the default parsing style.
         /// </summary>
         OmitZerosUnspecified
     }
 
-    // the coordinate system used.
+    /// <summary>
+    /// The coordinate system used.
+    /// </summary>
     public enum GerberCoordinate
     {
-        Absolute,    // all coordinates are absolute from a common origin.
-        Incremental  // all coordinates are relative to the previous coordinate.
+        /// <summary>
+        /// All coordinates are absolute from a common origin.
+        /// </summary>
+        Absolute,
+
+        /// <summary>
+        /// All coordinates are relative to the previous coordinate.
+        /// </summary>
+        Incremental
     }
 
     // The interpolation methods available.
@@ -151,7 +177,7 @@ namespace GerberVS
     {
         RS274X,        // the file is a RS274X file.
         Drill,         // the file is an Excellon drill file.
-        PickAndPlace   // the file is a CSV pick and place file.
+       // PickAndPlace   // the file is a CSV pick and place file.
     }
 
     public enum GerberKnockoutType
@@ -193,18 +219,19 @@ namespace GerberVS
     /// <summary>
     /// Enumerates the circlular aperture parameter indexes.
     /// </summary>
-    internal enum GerberCircleParameters : int
+    internal enum CircleParameters : int
     {
         Exposure,
         Diameter,
         CentreX,
         CentreY,
+        Rotation
     }
 
     /// <summary>
     /// Enumerates the outline aperture parameter indexes.
     /// </summary>
-    internal enum GerberOutlineParameters : int
+    internal enum OutlineParameters : int
     {
         Exposure,
         NumberOfPoints,
@@ -213,20 +240,20 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum GerberPolygonParameters : int
+    internal enum PolygonParameters : int
     {
         Exposure,
-        NumberOfPoints,
-        CenterX,
-        CenterY,
+        NumberOfSides,
+        CentreX,
+        CentreY,
         Diameter,
         Rotation
     }
 
-    internal enum GerberMoireParameters : int
+    internal enum MoireParameters : int
     {
-        CenterX,
-        CenterY,
+        CentreX,
+        CentreY,
         OutsideDiameter,
         CircleLineWidth,
         GapWidth,
@@ -236,17 +263,17 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum GerberThermalParameters : int
+    internal enum ThermalParameters : int
     {
-        CenterX,
-        CenterY,
+        CentreX,
+        CentreY,
         OutsideDiameter,
         InsideDiameter,
         CrosshairLineWidth,
         Rotation
     }
 
-    internal enum GerberLine20Parameters : int
+    internal enum Line20Parameters : int
     {
         Exposure,
         LineWidth,
@@ -257,17 +284,17 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum GerberLine21Parameters : int
+    internal enum Line21Parameters : int
     {
         Exposure,
         LineWidth,
         LineHeight,
-        CenterX,
-        CenterY,
+        CentreX,
+        CentreY,
         Rotation
     }
 
-    internal enum GerberLine22Parameters
+    internal enum Line22Parameters
     {
         Exposure,
         LineWidth,
@@ -290,7 +317,10 @@ namespace GerberVS
     [Flags]
     public enum GerberVerifyError : int
     {
-        ImageOK = 0,
+        /// <summary>
+        /// No error found in image.
+        /// </summary>
+        None = 0,
         MissingNetList = 1,
         MissingFormat = 2,
         MissingApertures = 4,

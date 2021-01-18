@@ -50,7 +50,56 @@ namespace GerberVS
         Incremental
     }
 
+    // NOTE: keep DrillMCode in actual M code order.
     internal enum DrillMCode
+    {
+        Unknown = -1,
+
+        End = 0,
+        EndPattern,
+        RepeatPatternOffset,
+
+        OptionalStop = 6,
+
+        StepAndRepeatEnd = 8,	/* Step and repeat */
+        StopInspection,
+
+        ZAxisRoutePostionDepth = 14,
+        ZAxisRoutePosition,
+        RetractClamping,
+        RetractNoClamping,
+        ToolTipCheck,
+
+        BeginPattern = 25,
+        EndRewind = 30,
+        LongMessage = 45,
+
+        Message = 47,
+        Header,
+
+        VisualStepAndRepeatPattern = 50,	/* Visual step and repeat */
+        VisualPatternRepeat,
+        VisualStepAndRepeatPatternOffset,
+
+        ReferenceScaling = 60,	/* Reference scaling */
+        ReferenceScalingEnd,
+        PeckDrilling,
+        PeckDrillingEnd,
+
+        SwapAxis = 70,
+        Metric,
+        Imperial,
+
+        MirrorX = 80,
+        MirrorY = 90,
+        EndHeader = 95,
+
+        CannedTextX = 97,
+        CannedTextY,
+        UserDefinedPattern,
+    }
+
+  /*  internal enum DrillMCode
     {
         NotImplemented,
         End,
@@ -66,7 +115,7 @@ namespace GerberVS
         CannedText,
         TipCheck,
         Unknown
-    }
+    }*/
 
     internal enum HeaderScale
     {
@@ -74,18 +123,168 @@ namespace GerberVS
         ImperialHeader
     }
 
+    // NOTE: keep DrillGCode in actual G code order.
     internal enum DrillGCode
     {
-        Absolute,
-        Incrementle,
-        ZeroSet,
-        Rout,
-        Drill,
+        /// <summary>
+        /// Unknown drill G code.
+        /// </summary>
+        Unknown = -1,
+
+        /// <summary>
+        /// Route mode
+        /// </summary>
+        Rout = 0,
+
+        /// <summary>
+        /// Linear (straight line) mode.
+        /// </summary>
         LinearMove,
+
+        /// <summary>
+        /// Circular clockwise mode.
+        /// </summary>
         ClockwiseMove,
+
+        /// <summary>
+        /// Circular counter clockwise mode.
+        /// </summary>
         CounterClockwiseMove,
+
+        /// <summary>
+        /// Variable dwell.
+        /// </summary>
+        VariableDwell,
+
+        /// <summary>
+        /// Drill mode.
+        /// </summary>
+        Drill,
+
+        /// <summary>
+        /// Override current tool feed or speed.
+        /// </summary>
+        OverrideDrillSpeed = 7,
+
+        /// <summary>
+        /// Routed circle canned cycle clockwise
+        /// </summary>
+        RoutCircleClockwise = 32,
+
+        /// <summary>
+        /// Routed circle canned cycle counter clockwise.
+        /// </summary>
+        RoutCircleCounterClockwise,
+
+        /// <summary>
+        /// Select vision tool.
+        /// </summary>
+        VisionTool,
+
+        /// <summary>
+        /// Single point vision offset.
+        /// </summary>
+        VisionSinglePointOffset,
+
+        /// <summary>
+        /// Multipoint vision translation.
+        /// </summary>
+        VisionMultiPointTranslate,
+
+        /// <summary>
+        /// Cancel vision translation or offset.
+        /// </summary>
+        VisionCancel,
+
+        /// <summary>
+        /// Vision corrected single hole drilling.
+        /// </summary>
+        VisionCorrectHoleDrill,
+
+        /// <summary>
+        /// Vision system autocalibration.
+        /// </summary>
+        VisionAutoCalibrate,
+
+        /// <summary>
+        /// Cutter compensation off.
+        /// </summary>
+        CutterCompensateOff,
+
+        /// <summary>
+        /// Cutter compensation left.
+        /// </summary>
+        CutterCompensateLeft,
+
+        /// <summary>
+        /// Cutter compensation right.
+        /// </summary>
+        CutterCompensateRight,
+
+        /// <summary>
+        /// Single point vision offset relative to G35 or G36.
+        /// </summary>
+        VisionSinglePointOffsetRelative = 45,
+
+        /// <summary>
+        /// Multipoint vision translation relative to G35 or G36
+        /// </summary>
+        VisionMultiPointTranslateRelative,
+
+        /// <summary>
+        /// Cancel vision translation or offset from G45 or G46
+        /// </summary>
+        VisionCancelRelative,
+
+        /// <summary>
+        /// Vision corrected single hole drilling relative to G35 or G36
+        /// </summary>
+        VisionCorrectHoleDrillRelative,
+
+        /// <summary>
+        /// Dual in line package, same to G82 in Format 2.
+        /// </summary>
+        PackDip2 = 81,
+
+        /// <summary>
+        /// Dual in line package.
+        /// </summary>
+        PackDip,
+
+        /// <summary>
+        /// Eight pin L pack.
+        /// </summary>
+        Pack8PinL,
+
+        /// <summary>
+        /// Canned circle.
+        /// </summary>
+        Circle,
+
+        /// <summary>
+        /// Canned slot.
+        /// </summary>
         Slot,
-        Unknown
+
+        /// <summary>
+        /// Routed slot canned cycle.
+        /// </summary>
+        RoutSlot = 87,
+
+        /// <summary>
+        /// Absolute input mode.
+        /// </summary>
+        Absolute = 90,
+
+        /// <summary>
+        /// Incremental input mode.
+        /// </summary>
+        Incrementle,
+
+        /// <summary>
+        /// Sets work zero relative to absolute zero.
+        /// </summary>
+        ZeroSet = 93,
     }
 
     internal enum DrillNumberFormat

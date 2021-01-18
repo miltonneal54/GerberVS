@@ -37,17 +37,78 @@ using System.Threading.Tasks;
 
 namespace GerberVS
 {
+    /// <summary>
+    /// Type class for defining gerber circle segments.
+    /// </summary>
     public class CircleSegment
     {
+        /// <summary>
+        /// Center X coordinate.
+        /// </summary>
         public double CenterX { get; set; }
-        public double CenterY { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
-        public double StartAngle { get; set; }
-        public double EndAngle { get; set; }
-        public double SweepAngle { get; set; }
 
+        /// <summary>
+        /// Center Y coordinate.
+        /// </summary>
+        public double CenterY { get; set; }
+
+        /// <summary>
+        /// Rectangular width of the segment.
+        /// </summary>
+        public double Width { get; set; }
+
+        /// <summary>
+        /// Rectangular height of the segment.
+        /// </summary>
+        public double Height { get; set; }
+
+        /// <summary>
+        /// Start angle of the circle segment in degrees.
+        /// </summary>
+        public double StartAngle { get; set; }
+
+        /// <summary>
+        /// End angle of the circle segment in degrees.
+        /// </summary>
+        public double EndAngle { get; set; }
+
+        /// <summary>
+        /// Gets the sweep angle based on the start and end angles.
+        /// </summary>
+        public double SweepAngle
+        {
+            get
+            {
+                if (EndAngle == StartAngle)
+                    return 360;
+
+                return (EndAngle - StartAngle);
+            }
+        }
+
+        /// <summary>
+        /// Create a new instance of the circle segment type class.
+        /// </summary>
         public CircleSegment()
         { }
+
+        /// <summary>
+        /// Create a new instance of the circle segment type class with parameters.
+        /// </summary>
+        /// <param name="centerX">center x coordinate</param>
+        /// <param name="centerY">center y coordinate</param>
+        /// <param name="width">rectanglar width</param>
+        /// <param name="height">retangular height</param>
+        /// <param name="startAngle">circle segment start angle in degrees</param>
+        /// <param name="endAngle">circle segment end angle in degrees</param>
+        public CircleSegment(double centerX, double centerY, double width, double height, double startAngle, double endAngle)
+        {
+            CenterX = centerX;
+            CenterY = centerY;
+            Width = width;
+            Height = height;
+            StartAngle = startAngle;
+            EndAngle = endAngle;
+        }
     }
 }
