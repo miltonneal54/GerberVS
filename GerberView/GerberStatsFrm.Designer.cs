@@ -56,6 +56,7 @@
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.apUseLabel = new System.Windows.Forms.Label();
             this.apertureUseDataGridView = new System.Windows.Forms.DataGridView();
+            this.errorLabel = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.generalDataGridView)).BeginInit();
@@ -91,6 +92,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.errorLabel);
             this.tabPage1.Controls.Add(this.generalDataGridView);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
@@ -402,6 +404,17 @@
             this.apertureUseDataGridView.Size = new System.Drawing.Size(476, 156);
             this.apertureUseDataGridView.TabIndex = 0;
             // 
+            // errorLabel
+            // 
+            this.errorLabel.AutoSize = true;
+            this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.errorLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.errorLabel.Location = new System.Drawing.Point(0, 5);
+            this.errorLabel.Name = "errorLabel";
+            this.errorLabel.Size = new System.Drawing.Size(39, 13);
+            this.errorLabel.TabIndex = 3;
+            this.errorLabel.Text = "errors";
+            // 
             // GerberStatsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -419,6 +432,7 @@
             this.Load += new System.EventHandler(this.GerberStatsForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.generalDataGridView)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
@@ -465,6 +479,7 @@
         private System.Windows.Forms.Label apDefLabel;
         private System.Windows.Forms.Label apUseLabel;
         private System.Windows.Forms.DataGridView dCodeDataGridView;
+        private System.Windows.Forms.Label errorLabel;
 
     }
 }

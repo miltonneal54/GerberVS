@@ -48,9 +48,9 @@ namespace GerberView
         StringBuilder selectionText = new StringBuilder();
         private GerberApertureType apertureType;
         private int apertureNumber = 0;
-        private double parameter0 = 0.0;
-        private double parameter1 = 0.0;
-        private double x, y = 0.0;
+        private double parameter0 = 0.00;
+        private double parameter1 = 0.00;
+        private double x, y = 0.00;
 
         public SelectionPropertiesFrm(SelectionInformation selectionInfo)
         {
@@ -61,8 +61,8 @@ namespace GerberView
         private void SelectionListFrm_Load(object sender, EventArgs e)
         {
             textBox1.Text = String.Empty;
-            selectionText.Append("File: " + selectionInfo.Filename);
-            foreach (GerberNet net in selectionInfo.SelectedNetList)
+            selectionText.Append("File: " + selectionInfo.SelectedFileInfo.FileName);
+            foreach (GerberNet net in selectionInfo.SelectedNodeArray.SelectedNetList)
             {
                 if (net.ApertureState == GerberApertureState.On)
                 {
@@ -84,19 +84,27 @@ namespace GerberView
                                 selectionText.Append("Object type: Line" + Environment.NewLine);
                                 apertureNumber = net.Aperture;
                                 selectionText.Append("  Aperture used: " + "D" + apertureNumber.ToString() + Environment.NewLine);
-                                apertureType = selectionInfo.SelectionImage.ApertureArray[apertureNumber].ApertureType;
+                                apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureType;
                                 selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
-                                parameter0 = selectionInfo.SelectionImage.ApertureArray[apertureNumber].Parameters[0] * 1000;
-                                selectionText.Append("  Diameter: " + parameter0.ToString("0.0") + Environment.NewLine);
+                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                if (apertureType == GerberApertureType.Rectangle || apertureType == GerberApertureType.Oval)
+                                {
+                                    parameter1 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
+                                    selectionText.Append("  Dimension: " + parameter0.ToString("0.000") + " x " + parameter1.ToString("0.000") + Environment.NewLine);
+                                }
+
+                                else
+                                    selectionText.Append("  Diameter: " + parameter0.ToString("0.000") + Environment.NewLine);
+
                                 x = net.StartX * 1000;
                                 y = net.StartY * 1000;
                                 PointD start = new PointD(x, y);
-                                selectionText.Append("  Start: (" + x.ToString("0.0") + ", " + y.ToString("0.0") + ")");
+                                selectionText.Append("  Start: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                                 selectionText.Append(Environment.NewLine);
                                 x = net.StopX * 1000;
                                 y = net.StopY * 1000;
                                 PointD stop = new PointD(x, y);
-                                selectionText.Append("  Stop: (" + x.ToString("0.0") + ", " + y.ToString("0.0") + ")");
+                                selectionText.Append("  Stop: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                                 selectionText.Append(Environment.NewLine);
                                 double length = GetLineLength(start, stop);
                                 selectionText.Append("  Length: " + length);
@@ -120,49 +128,60 @@ namespace GerberView
 
                         case GerberInterpolation.ClockwiseCircular:
                         case GerberInterpolation.CounterClockwiseCircular:
-                            selectionText.Append(Environment.NewLine);
-                            selectionText.Append(Environment.NewLine);
-                            selectionText.Append("Object type: Arc" + Environment.NewLine);
-                            apertureNumber = net.Aperture;
-                            selectionText.Append("  Aperture used: " + "D" + apertureNumber.ToString() + Environment.NewLine);
-                            apertureType = selectionInfo.SelectionImage.ApertureArray[apertureNumber].ApertureType;
-                            selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
-                            parameter0 = selectionInfo.SelectionImage.ApertureArray[apertureNumber].Parameters[0] * 1000;
-                            selectionText.Append("  Diameter: " + parameter0.ToString("0.0") + Environment.NewLine);
-                            x = net.StartX * 1000;
-                            y = net.StartY * 1000;
-                            selectionText.Append("  Start: (" + x.ToString("0.0") + ", " + y.ToString("0.0") + ")");
-                            selectionText.Append(Environment.NewLine);
-                            x = net.StopX * 1000;
-                            y = net.StopY * 1000;
-                            selectionText.Append("  Stop: (" + x.ToString("0.0") + ", " + y.ToString("0.0") + ")");
-                            selectionText.Append(Environment.NewLine);
-                            x = net.CircleSegment.CenterX * 1000;
-                            y = net.CircleSegment.CenterY * 1000;
-                            selectionText.Append("  Centre: (" + x.ToString("0.0") + ", " + y.ToString("0.0") + ")");
-                            selectionText.Append(Environment.NewLine);
-                            x = net.CircleSegment.StartAngle;
-                            y = net.CircleSegment.EndAngle;
-                            selectionText.Append("  Angles [Deg]: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
-                            selectionText.Append(Environment.NewLine);
-                            selectionText.Append("  Direction: ");
-                            selectionText.Append(net.Interpolation == GerberInterpolation.ClockwiseCircular ? "CW" : "CCW");
-                            selectionText.Append(Environment.NewLine);
-                            selectionText.Append("  Level Name: ");
-                            if (net.Level.LevelName == String.Empty)
-                                selectionText.Append("<Unnamed Level>");
+                            if (net.BoundingBox != null)
+                            {
+                                selectionText.Append(Environment.NewLine);
+                                selectionText.Append(Environment.NewLine);
+                                selectionText.Append("Object type: Arc" + Environment.NewLine);
+                                apertureNumber = net.Aperture;
+                                selectionText.Append("  Aperture used: " + "D" + apertureNumber.ToString() + Environment.NewLine);
+                                apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureType;
+                                selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
+                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                if (apertureType == GerberApertureType.Rectangle || apertureType == GerberApertureType.Oval)
+                                {
+                                    parameter1 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
+                                    selectionText.Append("  Dimension: " + parameter0.ToString("0.000") + " x " + parameter1.ToString("0.000") + Environment.NewLine);
+                                }
 
-                            else
-                                selectionText.Append(net.Level.LevelName);
+                                else
+                                    selectionText.Append("  Diameter: " + parameter0.ToString("0.000") + Environment.NewLine);
 
-                            selectionText.Append(Environment.NewLine);
-                            selectionText.Append("  Net Label: ");
-                            if (net.Label == String.Empty)
-                                selectionText.Append("<Unlabeled Net>");
+                                x = net.StartX * 1000;
+                                y = net.StartY * 1000;
+                                selectionText.Append("  Start: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
+                                selectionText.Append(Environment.NewLine);
+                                x = net.StopX * 1000;
+                                y = net.StopY * 1000;
+                                selectionText.Append("  Stop: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
+                                selectionText.Append(Environment.NewLine);
+                                x = net.CircleSegment.CenterX * 1000;
+                                y = net.CircleSegment.CenterY * 1000;
+                                selectionText.Append("  Centre: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
+                                selectionText.Append(Environment.NewLine);
+                                x = net.CircleSegment.StartAngle;
+                                y = net.CircleSegment.SweepAngle;
+                                selectionText.Append("  Start: "+ x.ToString("0.0000") + ", Sweep: " + y.ToString("0.0000"));
+                                selectionText.Append(Environment.NewLine);
+                                selectionText.Append("  Direction: ");
+                                selectionText.Append(net.Interpolation == GerberInterpolation.ClockwiseCircular ? "CW" : "CCW");
+                                selectionText.Append(Environment.NewLine);
+                                selectionText.Append("  Level Name: ");
+                                if (net.Level.LevelName == String.Empty)
+                                    selectionText.Append("<Unnamed Level>");
 
-                            else
-                                selectionText.Append(net.Label);
+                                else
+                                    selectionText.Append(net.Level.LevelName);
 
+                                selectionText.Append(Environment.NewLine);
+                                selectionText.Append("  Net Label: ");
+                                if (net.Label == String.Empty)
+                                    selectionText.Append("<Unlabeled Net>");
+
+                                else
+                                    selectionText.Append(net.Label);
+
+                            }
                             break;
                     }
                 }
@@ -174,22 +193,22 @@ namespace GerberView
                     selectionText.Append(Environment.NewLine);
                     selectionText.Append("Object type: Flashed Aperture" + Environment.NewLine);
                     selectionText.Append("  Aperture used: " + "D" + apertureNumber.ToString() + Environment.NewLine);
-                    apertureType = selectionInfo.SelectionImage.ApertureArray[apertureNumber].ApertureType;
+                    apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureType;
                     if (apertureType != GerberApertureType.Macro)
                     {
                         selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
                         switch (apertureType)
                         {
                             case GerberApertureType.Circle:
-                                parameter0 = selectionInfo.SelectionImage.ApertureArray[apertureNumber].Parameters[0] * 1000;
-                                selectionText.Append("  Diameter: " + parameter0.ToString("0.0") + Environment.NewLine);
+                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                selectionText.Append("  Diameter: " + parameter0.ToString("0.000") + Environment.NewLine);
                                 break;
 
                             case GerberApertureType.Rectangle:
                             case GerberApertureType.Oval:
-                                parameter0 = selectionInfo.SelectionImage.ApertureArray[apertureNumber].Parameters[0] * 1000;
-                                parameter1 = selectionInfo.SelectionImage.ApertureArray[apertureNumber].Parameters[1] * 1000;
-                                selectionText.Append("  Dimension: " + parameter0.ToString("0.0") + " x " + parameter1.ToString("0.0") + Environment.NewLine);
+                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                parameter1 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
+                                selectionText.Append("  Dimension: " + parameter0.ToString("0.000") + " x " + parameter1.ToString("0.000") + Environment.NewLine);
                                 break;
                         }
 
@@ -197,16 +216,16 @@ namespace GerberView
 
                     else
                     {
-                        if (selectionInfo.SelectionImage.ApertureArray[apertureNumber].ApertureMacro != null)
+                        if (selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureMacro != null)
                         {
-                            apertureType = selectionInfo.SelectionImage.ApertureArray[apertureNumber].SimplifiedMacroList[0].ApertureType;
+                            apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].SimplifiedMacroList[0].ApertureType;
                             selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
                         }
                     }
 
                     x = net.StopX * 1000;
                     y = net.StopY * 1000;
-                    selectionText.Append("  Location: (" + x.ToString("0.0") + ", " + y.ToString("0.0") + ")");
+                    selectionText.Append("  Location: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                     selectionText.Append(Environment.NewLine);
                     selectionText.Append("  Level Name: ");
                     if (net.Level.LevelName == String.Empty)
@@ -235,5 +254,6 @@ namespace GerberView
             double result = Math.Sqrt(Math.Pow((stop.Y - start.Y), 2) + Math.Pow((stop.X - start.X), 2));
             return Math.Round(result, 1);
         }
+
     }
 }

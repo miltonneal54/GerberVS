@@ -14,9 +14,14 @@ namespace GerberView
         [STAThread]
         static void Main()
         {
+            string fileName = String.Empty;
+            string[] args = Environment.GetCommandLineArgs();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            if (args.Length > 1)
+                fileName = args[1];
+
+            Application.Run(new Form1(fileName));
         }
     }
 }

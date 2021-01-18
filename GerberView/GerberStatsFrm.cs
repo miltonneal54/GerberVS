@@ -1,6 +1,6 @@
 ﻿// GerberStatsFrm.cs - Builds and displays the statistics of a selected gerber layer file.
 
-/*  Copyright (C) 2015-2019 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2020 Milton Neal <milton200954@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -61,6 +61,7 @@ namespace GerberView
         private string[,] MCodes = new string[,] { { "M00", "Program Stop" }, { "M01", "Optional Stop" }, { "M2", "Program End" }, { "M?", "Unknown M Codes" } };
 
         private string[] MiscCodes = new string[] { "X", "Y", "I", "J", "*", "Unknown" };
+        private List<bool> IsRS274X = new List<bool>();
 
         public GerberStatsForm(GerberProject project)
         {
@@ -83,12 +84,16 @@ namespace GerberView
 
         private void GeneralDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            fileIndex = (int)(generalDataGridView.Rows[e.RowIndex].Cells["Layer"].Value) - 1;
-            GetAllCodes();
+            if (e.RowIndex > -1)
+            {
+                fileIndex = (int)(generalDataGridView.Rows[e.RowIndex].Cells["Layer"].Value) - 1;
+                GetAllCodes();
+            }
         }
 
         private void GetAllCodes()
         {
+            GetNextIndex();
             GetGCodes();
             GetDCodes();
             GetMCodes();
@@ -99,27 +104,61 @@ namespace GerberView
 
         private void GetGeneralInfo()
         {
-            bool first = true;
-            //int errorCount = 0;
+            DataRow row = null;
             DataTable infoTable = new DataTable();
+            bool hasErrors = false;
+
             infoTable.Columns.Add("Layer", typeof(Int32));
             infoTable.Columns.Add("Filename", typeof(String));
-            //infoTable.Columns.Add("Error", typeof(String));
+            errorLabel.Text = "No message(s) in visible files.";
+
+            // Check if any visible layers have errors and if necessary, add columns to support error reporting.
+            for (int i = 0; i < project.FileInfo.Count; i++)
+            {
+                if (project.FileInfo[i].Image.FileType == GerberFileType.RS274X 
+                    && project.FileInfo[i].IsVisible 
+                    && project.FileInfo[i].Image.GerberStats.ErrorList.Count > 0)
+                        hasErrors = true;
+
+                if(hasErrors)
+                {
+                    errorLabel.Text = "Message(s) exist in visible files.";
+                    infoTable.Columns.Add("Message", typeof(String));
+                    infoTable.Columns.Add("Line", typeof(Int32));
+                    break;
+                }
+            }
 
             for (int i = 0; i < project.FileInfo.Count; i++)
             {
                 if (project.FileInfo[i].Image.FileType == GerberFileType.RS274X && project.FileInfo[i].IsVisible)
                 {
-                    DataRow row = infoTable.NewRow();
-                    if (first)
-                        fileIndex = i;
+                    IsRS274X.Add(true);
+                    if (project.FileInfo[i].Image.GerberStats.ErrorList.Count == 0)
+                    {
+                        row = infoTable.NewRow();
+                        row["Layer"] = i + 1;
+                        row["Filename"] = project.FileInfo[i].FileName;
+                        infoTable.Rows.Add(row);
+                    }
 
-                    row["Layer"] = i + 1;
-                    row["Filename"] = project.FileInfo[i].FileName;
-                    //row["Error"] = String.Empty;
-                    infoTable.Rows.Add(row);
-                    first = false;
+                    else
+                    {
+                        // Display found gerber errors.
+                        for (int c = 0; c < project.FileInfo[i].Image.GerberStats.ErrorList.Count; c++)
+                        {
+                            row = infoTable.NewRow();
+                            row["Layer"] = i + 1;
+                            row["Filename"] = project.FileInfo[i].FileName;
+                            row["Message"] = project.FileInfo[i].Image.GerberStats.ErrorList[c].ErrorMessage;
+                            row["Line"] = project.FileInfo[i].Image.GerberStats.ErrorList[c].LineNumber;
+                            infoTable.Rows.Add(row);
+                        }
+                    }
                 }
+
+                else
+                    IsRS274X.Add(false);
             }
 
             generalDataGridView.DataSource = infoTable;
@@ -127,12 +166,17 @@ namespace GerberView
             generalDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             generalDataGridView.RowHeadersVisible = false;
             generalDataGridView.RowTemplate.Resizable = DataGridViewTriState.False;
-            generalDataGridView.Columns["Layer"].Width = 75;
+            generalDataGridView.Columns["Layer"].Width = 40;
             generalDataGridView.Columns["Layer"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            generalDataGridView.Columns["Filename"].Width = 390;
+            generalDataGridView.Columns["Filename"].Width = hasErrors ? 190 : 430;
             generalDataGridView.Columns["Filename"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            //generalDataGridView.Columns["Error"].Width = 325;
-            //generalDataGridView.Columns["Error"].SortMode = DataGridViewColumnSortMode.NotSortable;
+            if (hasErrors)
+            {
+                generalDataGridView.Columns["Message"].Width = 250;
+                generalDataGridView.Columns["Message"].SortMode = DataGridViewColumnSortMode.NotSortable;
+                generalDataGridView.Columns["Line"].Width = 50;
+                generalDataGridView.Columns["Line"].SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
         }
 
         private void GetGCodes()
@@ -449,6 +493,7 @@ namespace GerberView
             apertureDefinitionGridView.RowHeadersVisible = false;
             apertureDefinitionGridView.RowTemplate.Resizable = DataGridViewTriState.False;
             apertureDefinitionGridView.Columns["D Code"].Width = 75;
+            apertureDefinitionGridView.Columns["D Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             apertureDefinitionGridView.Columns["D Code"].SortMode = DataGridViewColumnSortMode.NotSortable;
             apertureDefinitionGridView.Columns["Aperture"].Width = 82;
             apertureDefinitionGridView.Columns["Aperture"].SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -492,6 +537,19 @@ namespace GerberView
             apertureUseDataGridView.Columns["D Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             apertureUseDataGridView.Columns["Count"].Width = 395;
             apertureUseDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
+        }
+
+        private void GetNextIndex()
+        {
+            // Look for the next RS274X file.
+            for (int i = fileIndex; i < IsRS274X.Count; i++)
+            {
+                if (IsRS274X[i])
+                {
+                    fileIndex = i;
+                    break;
+                }
+            }
         }
     }
 }

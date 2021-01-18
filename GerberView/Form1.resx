@@ -121,7 +121,7 @@
     <value>17, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="openToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="openLayerToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJHSURBVDhPxZBdSNNhFMb/F110ZZEVhVBgeeHNICiiuggp
@@ -137,7 +137,7 @@
         g6eHO+A/lyD8ARfG3mk9fv1YAAAAAElFTkSuQmCC
 </value>
   </data>
-  <data name="saveToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="saveLayerToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIySURBVDhPrZLfS5NRGMfff6H7boIuuq2pMZyL1eAt11CW
@@ -251,20 +251,36 @@
   </data>
   <data name="scaleToFitToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        Qk02AwAAAAAAADYAAAAoAAAAEAAAABAAAAABABgAAAAAAAAAAADEDgAAxA4AAAAAAAAAAAAA////////
-        ////////////////////////////////////////////EGoMEGoMEGoM////////////////////////
-        ////////////////////////EGoMEGoMEGoMEGoM////////////////////////////////////////
-        ////////EGoMEGoMEGoMEGoM////////////////////////////////////////////EGoMEGoMEGoM
-        EGoM////////////////////////////////////////////EGoMEGoMEGoM////////////////////
-        ////EGoMEGoMEGoMEGoMEGoM////////EGoMEGoM////////////////////////EGoMEGoM/v7+/v7+
-        /v7+EGoMEGoMEGoM////////////////////////////EGoM/v7+/////////////////////v7+EGoM
-        ////////////////////////EGoMEGoMAAAAAAAAAAAA////AAAAAAAAAAAAEGoMEGoM////////////
-        ////////EGoM/v7+AAAA////////////////////AAAA/v7+EGoM////////////////////EGoM/v7+
-        /////////////////////////////v7+EGoM////////////////////EGoM/v7+AAAA////////////
-        ////////AAAA/v7+EGoM////////////////////EGoMEGoMAAAAAAAAAAAA////AAAAAAAAAAAAEGoM
-        EGoM////////////////////////EGoM/v7+/////////////////////v7+EGoM////////////////
-        ////////////////EGoMEGoM/v7+/v7+/v7+EGoMEGoM////////////////////////////////////
-        ////EGoMEGoMEGoMEGoMEGoM////////////////////////////////
+        Qk32BgAAAAAAADYAAAAoAAAAGAAAABgAAAABABgAAAAAAAAAAADEDgAAxA4AAAAAAAAAAAAA////////
+        ////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
+        ////E4wpE4wp////////////////////////////////////////////////////////////////////
+        ////////////////E4wpE4wpE4wpE4wp////////////////////////////////////////////////
+        ////////////////////////////E4wpE4wpE4wpE4wpE4wp////////////////////////////////
+        ////////////////////////////////////////E4wpE4wpE4wpE4wpE4wp////////////////////
+        ////////////////////////////////////////////////////////E4wpE4wpE4wpE4wp////////
+        ////////////////////////////////////////////////////////////////////E4wpE4wpE4wp
+        E4wp////////////////////////////////////////////////////////////////////////////
+        E4wpE4wpE4wp////////////////////////////////////////////////E4wpE4wpE4wpE4wpE4wp
+        E4wpE4wpE4wpE4wpE4wpE4wp////////////////////////////////////////////////E4wpE4wp
+        E4wpE4wpE4wpE4wpE4wpE4wpE4wpE4wpE4wp////////////////////////////////////////////
+        ////E4wpE4wpE4wp/v7+/////////////////v7+E4wpE4wpE4wp////////////////////////////
+        ////////////////E4wpE4wpE4wp/v7+/////////////////////////v7+E4wpE4wpE4wp////////
+        ////////////////////////////////E4wpE4wp/v7+AAAAAAAAAAAA////////AAAAAAAAAAAA/v7+
+        E4wpE4wp////////////////////////////////////////E4wpE4wp////AAAA////////////////
+        ////////AAAA////E4wpE4wp////////////////////////////////////////E4wpE4wp////////
+        ////////////////////////////////E4wpE4wp////////////////////////////////////////
+        E4wpE4wp////////////////////////////////////////E4wpE4wp////////////////////////
+        ////////////////E4wpE4wp////AAAA////////////////////////AAAA////E4wpE4wp////////
+        ////////////////////////////////E4wpE4wp/v7+AAAAAAAAAAAA////////AAAAAAAAAAAA/v7+
+        E4wpE4wp////////////////////////////////////////E4wpE4wpE4wp/v7+////////////////
+        /////////v7+E4wpE4wpE4wp////////////////////////////////////////////E4wpE4wpE4wp
+        /v7+/////////////////v7+E4wpE4wpE4wp////////////////////////////////////////////
+        ////////E4wpE4wpE4wpE4wpE4wpE4wpE4wpE4wpE4wpE4wp////////////////////////////////
+        ////////////////////////////E4wpE4wpE4wpE4wpE4wpE4wpE4wpE4wp////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////
 </value>
   </data>
   <metadata name="fileListToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -278,7 +294,7 @@
         HR4w+wDw9TD1QXZv+AAAAABJRU5ErkJggg==
 </value>
   </data>
-  <data name="addFileStripButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="addFileToolStripButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABaSURBVEhL7c1LCgAgCATQjtJRu7l9oI1oo4HUwgeuHGYK
@@ -363,18 +379,30 @@
         bfChJhkqF7jACk760cregpP5fC4JE4VL7oJ1JBjPJbRcJ6ULg0cMEfzxtVkAAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="zoomTofitToolStripButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB3SURBVDhPpY9JEoAwCAR9gIe80/+fiU4V4EgWs3QVB7Ym
-        OZjzSjmGtv6xBRHxGJbYoqYfTKRpCV3hAJ7TTAkaer0+8NS7ryBBk1HB+gu0yQE8p5k6aLa+0b3O2BUs
-        WFhtSAB4IS7GfJqadBqWLIu2JdsC8ApSvgFe8aYeTqhuKAAAAABJRU5ErkJggg==
-</value>
-  </data>
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>354, 20</value>
+  </metadata>
+  <metadata name="selectedObjectsContextMenuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>586, 20</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>46</value>
   </metadata>
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAICAQAAAABADoAgAAFgAAACgAAAAgAAAAQAAAAAEABAAAAAAAgAIAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD//wD/AAAA/wD/AP//
+        AAD///8A/////5n/mf+Z/6r/qv+q///0T/+Z//mf+Zqpmq/6r///RET/mf//mf+q/6r/qv//9E/0Sqqq
+        qqqqqZqpmq////RP9Eqqqqqqqv+q/6r/////RET/mf////maqZqpn/////RP/5n/9E//qv+q/5n/////
+        //+Z/0RE+qn6qf/5n/+qqqqqqqRP9EqZqpn/+Z//qqqqqqqkT/RPmq+Z//mf//////+Z/0RE/6r/mf/5
+        n/r/9E//mf/0T/qp/5n/+Z+q/0RE/5n///+qmf9E//mar/RP9Eqqqqqqr5n0/0/5qv/0T/RKqqqqqv+Z
+        pP9P+q/6/0RE/5n/////mq9E/6qfqv/0T/+Z//RP/6r/mfqpmq//////mf9ERPqp/5mq+ar//////5n0
+        T/RKmaqqr/qv//////+Z9E/0T5qqqv+qn///////mf9ERP+q/5n6qZ////RP/5n/9E/6qf+Zqvmf+v9E
+        RP+Z////qpn/qq/5n6r0T/RKqqqqqq+Z+qr/+Zqv9E/0Sqqqqqr/maqZ//mq//9ERP+Z/////5qvmf/6
+        r/r/9E//mf/0T/+q/5n/qp+q/////5n/RET6qf9E+qmar6qqqqqqpE/0Spn0/0r5qv+qqqqqqqRP9E+Z
+        9P9P+q///////5n/RET/mf9E/6qf//////+Z//RP/5n///qpn/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+</value>
+  </data>
 </root>

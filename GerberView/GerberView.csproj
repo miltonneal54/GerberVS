@@ -33,8 +33,14 @@
     <DocumentationFile>
     </DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>TraxPrint1.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LibGerberVS, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="AlphaColorDiolog">
+      <HintPath>..\..\MyAlphaColorDiolog\AlphaColorDiolog\bin\Release\AlphaColorDiolog.dll</HintPath>
+    </Reference>
+    <Reference Include="LibGerberVS, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\LibGerberVS\bin\Release\LibGerberVS.dll</HintPath>
     </Reference>
@@ -83,7 +89,7 @@
       <DependentUpon>LayerEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="Project.cs" />
+    <Compile Include="ProjectFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectionPropertiesFrm.cs">
       <SubType>Form</SubType>
@@ -143,8 +149,11 @@
     <None Include="Resources\Plus.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\Bitmap1.bmp" />
+    <Content Include="Resources\Delete.bmp" />
+    <Content Include="Resources\List.bmp" />
+    <Content Include="Resources\ZoomOut1.bmp" />
     <Content Include="Resources\ZoomToFit.bmp" />
+    <Content Include="TraxPrint1.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,6 @@
 ﻿// DrillStatsFrm.cs - Builds and displays the statistics of a selected drill layer file.
 
-/*  Copyright (C) 2015-2019 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2020 Milton Neal <milton200954@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -27,6 +27,7 @@
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
  */
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,9 +54,11 @@ namespace GerberView
         private string[,] MCodes = new string[,] { { "M00", "End Of Program" }, { "M01", "End Of Pattern" }, { "M18", "Tool Tip Check" }, { "M25", "Begin Pattern"},
                                                    { "M30", "End Program Rewind"}, { "M31", "Begin Pattern"}, { "M45", "Long Message"}, { "M47", "Operator Message"},
                                                    { "M48", "Begin Program Header"}, { "M71", "Metric Units"}, { "M72", "Imperial Units"}, { "M95", "End Program Header"},
-                                                   { "M97", "Canned Text"}, { "M98", "Canned Text"},{ "M??", "Unknown M Codes" } };
+                                                   { "M97", "Canned Text X"}, { "M98", "Canned Text Y"},{ "M??", "Unknown M Codes" } };
 
         private string[] MiscCodes = new string[] { "Comments", "Repeat Hole(R)", "Unknown" };
+        private List<bool> IsDrill = new List<bool>();
+
         public DrillStatsForm(GerberProject project)
         {
             InitializeComponent();
@@ -83,6 +86,7 @@ namespace GerberView
 
         private void GetAllCodes()
         {
+            GetNextIndex();
             GetGCodes();
             GetMCodes();
             GetMiscCodes();
@@ -91,27 +95,61 @@ namespace GerberView
 
         private void GetGeneralInfo()
         {
-            bool first = true;
-            //int errorCount = 0;
+            DataRow row = null;
             DataTable infoTable = new DataTable();
+            bool hasErrors = false;
+
             infoTable.Columns.Add("Layer", typeof(Int32));
             infoTable.Columns.Add("Filename", typeof(String));
-            //infoTable.Columns.Add("Error", typeof(String));
+            errorLabel.Text = "No message(s) in visible files.";
+
+            // Check if any visible layers have errors and if necessary, add columns to support error reporting.
+            for (int i = 0; i < project.FileInfo.Count; i++)
+            {
+                if (project.FileInfo[i].Image.FileType == GerberFileType.Drill
+                    && project.FileInfo[i].IsVisible
+                    && project.FileInfo[i].Image.DrillStats.ErrorList.Count > 0)
+                    hasErrors = true;
+
+                if (hasErrors)
+                {
+                    errorLabel.Text = "Message(s) exist in visible files.";
+                    infoTable.Columns.Add("Message", typeof(String));
+                    infoTable.Columns.Add("Line", typeof(Int32));
+                    break;
+                }
+            }
 
             for (int i = 0; i < project.FileInfo.Count; i++)
             {
                 if (project.FileInfo[i].Image.FileType == GerberFileType.Drill && project.FileInfo[i].IsVisible)
                 {
-                    DataRow row = infoTable.NewRow();
-                    if (first)
-                        fileIndex = i;
+                    IsDrill.Add(true);
+                    if (project.FileInfo[i].Image.DrillStats.ErrorList.Count == 0)
+                    {
+                        row = infoTable.NewRow();
+                        row["Layer"] = i + 1;
+                        row["Filename"] = project.FileInfo[i].FileName;
+                        infoTable.Rows.Add(row);
+                    }
 
-                    row["Layer"] = i + 1;
-                    row["Filename"] = project.FileInfo[i].FileName;
-                    //row["Error"] = String.Empty;
-                    infoTable.Rows.Add(row);
-                    first = false;
+                    else
+                    {
+                        // Display found gerber errors.
+                        for (int c = 0; c < project.FileInfo[i].Image.DrillStats.ErrorList.Count; c++)
+                        {
+                            row = infoTable.NewRow();
+                            row["Layer"] = i + 1;
+                            row["Filename"] = project.FileInfo[i].FileName;
+                            row["Message"] = project.FileInfo[i].Image.DrillStats.ErrorList[c].ErrorMessage;
+                            row["Line"] = project.FileInfo[i].Image.DrillStats.ErrorList[c].LineNumber;
+                            infoTable.Rows.Add(row);
+                        }
+                    }
                 }
+
+                else
+                    IsDrill.Add(false);
             }
 
             generalDataGridView.DataSource = infoTable;
@@ -119,12 +157,17 @@ namespace GerberView
             generalDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             generalDataGridView.RowHeadersVisible = false;
             generalDataGridView.RowTemplate.Resizable = DataGridViewTriState.False;
-            generalDataGridView.Columns["Layer"].Width = 75;
+            generalDataGridView.Columns["Layer"].Width = 40;
             generalDataGridView.Columns["Layer"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            generalDataGridView.Columns["Filename"].Width = 290;
+            generalDataGridView.Columns["Filename"].Width = hasErrors ? 190 : 330;
             generalDataGridView.Columns["Filename"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            //generalDataGridView.Columns["Error"].Width = 325;
-            //generalDataGridView.Columns["Error"].SortMode = DataGridViewColumnSortMode.NotSortable;
+            if (hasErrors)
+            {
+                generalDataGridView.Columns["Message"].Width = 250;
+                generalDataGridView.Columns["Message"].SortMode = DataGridViewColumnSortMode.NotSortable;
+                generalDataGridView.Columns["Line"].Width = 50;
+                generalDataGridView.Columns["Line"].SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
         }
 
         private void GetGCodes()
@@ -360,13 +403,13 @@ namespace GerberView
             GerberFileInformation fileInfo = project.FileInfo[fileIndex];
             foreach(DrillInfo drillInfo in fileInfo.Image.DrillStats.DrillInfoList)
             {
-                if (drillInfo.drillCount > 0)
+                if (drillInfo.DrillCount > 0)
                 {
                     row = drillUseTable.NewRow();
-                    row["Drill Number"] = drillInfo.drillNumber;
-                    row["Diameter"] = String.Format("{0:0.000000}", (float)drillInfo.drillSize);
-                    row["Units"] = drillInfo.drillUnit;
-                    row["Count"] = drillInfo.drillCount;
+                    row["Drill Number"] = drillInfo.DrillNumber;
+                    row["Diameter"] = String.Format("{0:0.000000}", (float)drillInfo.DrillSize);
+                    row["Units"] = drillInfo.DrillUnit;
+                    row["Count"] = drillInfo.DrillCount;
                     drillUseTable.Rows.Add(row);
                 }
             }
@@ -384,6 +427,19 @@ namespace GerberView
             drillUseDataGridView.Columns["Units"].SortMode = DataGridViewColumnSortMode.NotSortable;
             drillUseDataGridView.Columns["Count"].Width = 145;
             drillUseDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
+        }
+
+        private void GetNextIndex()
+        {
+            // Look for the next drill file.
+            for(int i = fileIndex; i < IsDrill.Count; i++)
+            {
+                if (IsDrill[i])
+                {
+                    fileIndex = i;
+                    break;
+                }
+            }
         }
     }
 }
