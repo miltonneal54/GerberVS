@@ -1,6 +1,6 @@
 ﻿/* Gerber.cs - Handles processing of Gerber files. */
 
-/*  Copyright (C) 2015-2018 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
     *** Acknowledgments to Gerbv Authors and Contributors. ***
 
     Redistribution and use in source and binary forms, with or without
@@ -1034,7 +1034,7 @@ namespace GerberVS
 
             if (lineReader.CurrentLine == null)
             {
-                errorMessage = string.Format(CultureInfo.CurrentCulture, "Unexpected EOF found in file {0}", lineReader.FileName);
+                errorMessage = string.Format(CultureInfo.CurrentCulture, "Unexpected EOF in file {0}", lineReader.FileName);
                 stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError);
             }
 
@@ -1070,11 +1070,11 @@ namespace GerberVS
                             gerberImage.Format.OmitZeros = GerberOmitZero.OmitZerosLeading;
                             break;
 
-                        case 'T':
+                        case 'T':   // ** Depreciated but included for legacy files **
                             gerberImage.Format.OmitZeros = GerberOmitZero.OmitZerosTrailing;
                             break;
 
-                        case 'D':
+                        case 'D':   // ** Depreciated but included for legacy files **
                             gerberImage.Format.OmitZeros = GerberOmitZero.OmitZerosExplicit;
                             break;
 
@@ -1095,7 +1095,7 @@ namespace GerberVS
                             gerberImage.Format.Coordinate = GerberCoordinate.Absolute;
                             break;
 
-                        case 'I':
+                        case 'I':   // ** Depreciated but included for legacy files **
                             gerberImage.Format.Coordinate = GerberCoordinate.Incremental;
                             break;
 
@@ -1111,21 +1111,26 @@ namespace GerberVS
                     nextCharacter = lineReader.Read();
                     while (nextCharacter != '*')
                     {
+                        // Note: Nn, Gn, Dn, Mn parameters ** Depreciated but included for legacy files **
                         switch (nextCharacter)
                         {
                             case 'N':
+                                nextCharacter = lineReader.Read();
                                 gerberImage.Format.SequenceNumberLimit = nextCharacter - '0';
                                 break;
 
                             case 'G':
+                                nextCharacter = lineReader.Read();
                                 gerberImage.Format.GeneralFunctionLimit = nextCharacter - '0';
                                 break;
 
                             case 'D':
+                                nextCharacter = lineReader.Read();
                                 gerberImage.Format.PlotFunctionLimit = nextCharacter - '0';
                                 break;
 
                             case 'M':
+                                nextCharacter = lineReader.Read();
                                 gerberImage.Format.MiscFunctionLimit = (nextCharacter & 0xff) - '0';
                                 break;
 
