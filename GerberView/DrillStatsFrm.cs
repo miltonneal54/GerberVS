@@ -163,7 +163,7 @@ namespace GerberView
             generalDataGridView.Columns["Filename"].SortMode = DataGridViewColumnSortMode.NotSortable;
             if (hasErrors)
             {
-                generalDataGridView.Columns["Message"].Width = 250;
+                generalDataGridView.Columns["Message"].Width = 300;
                 generalDataGridView.Columns["Message"].SortMode = DataGridViewColumnSortMode.NotSortable;
                 generalDataGridView.Columns["Line"].Width = 50;
                 generalDataGridView.Columns["Line"].SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -248,7 +248,7 @@ namespace GerberView
             gCodeDataGridView.Columns["Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             gCodeDataGridView.Columns["Count"].Width = 75;
             gCodeDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            gCodeDataGridView.Columns["Description"].Width = 220;
+            gCodeDataGridView.Columns["Description"].Width = 210;
             gCodeDataGridView.Columns["Description"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -345,7 +345,7 @@ namespace GerberView
             mCodeDataGridView.Columns["Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             mCodeDataGridView.Columns["Count"].Width = 75;
             mCodeDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            mCodeDataGridView.Columns["Description"].Width = 220;
+            mCodeDataGridView.Columns["Description"].Width = 210;
             mCodeDataGridView.Columns["Description"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -386,7 +386,7 @@ namespace GerberView
             miscCodeDataGridView.RowTemplate.Resizable = DataGridViewTriState.False;
             miscCodeDataGridView.Columns["Code"].Width = 95;
             miscCodeDataGridView.Columns["Code"].DefaultCellStyle.BackColor = Color.LightGreen;
-            miscCodeDataGridView.Columns["Count"].Width = 275;
+            miscCodeDataGridView.Columns["Count"].Width = 278;
             miscCodeDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -425,7 +425,7 @@ namespace GerberView
             drillUseDataGridView.Columns["Diameter"].SortMode = DataGridViewColumnSortMode.NotSortable;
             drillUseDataGridView.Columns["Units"].Width = 75;
             drillUseDataGridView.Columns["Units"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            drillUseDataGridView.Columns["Count"].Width = 145;
+            drillUseDataGridView.Columns["Count"].Width = 135;
             drillUseDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 

@@ -37,6 +37,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.errorLabel = new System.Windows.Forms.Label();
             this.generalDataGridView = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.gCodeLabel = new System.Windows.Forms.Label();
@@ -56,7 +57,6 @@
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.apUseLabel = new System.Windows.Forms.Label();
             this.apertureUseDataGridView = new System.Windows.Forms.DataGridView();
-            this.errorLabel = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.generalDataGridView)).BeginInit();
@@ -100,6 +100,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // errorLabel
+            // 
+            this.errorLabel.AutoSize = true;
+            this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.errorLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.errorLabel.Location = new System.Drawing.Point(0, 5);
+            this.errorLabel.Name = "errorLabel";
+            this.errorLabel.Size = new System.Drawing.Size(39, 13);
+            this.errorLabel.TabIndex = 3;
+            this.errorLabel.Text = "errors";
             // 
             // generalDataGridView
             // 
@@ -403,17 +414,6 @@
             this.apertureUseDataGridView.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.apertureUseDataGridView.Size = new System.Drawing.Size(476, 156);
             this.apertureUseDataGridView.TabIndex = 0;
-            // 
-            // errorLabel
-            // 
-            this.errorLabel.AutoSize = true;
-            this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.errorLabel.ForeColor = System.Drawing.Color.SeaGreen;
-            this.errorLabel.Location = new System.Drawing.Point(0, 5);
-            this.errorLabel.Name = "errorLabel";
-            this.errorLabel.Size = new System.Drawing.Size(39, 13);
-            this.errorLabel.TabIndex = 3;
-            this.errorLabel.Text = "errors";
             // 
             // GerberStatsForm
             // 

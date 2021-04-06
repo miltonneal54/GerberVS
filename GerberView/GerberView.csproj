@@ -45,8 +45,9 @@
       <HintPath>..\LibGerberVS\bin\Release\LibGerberVS.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualC" />
-    <Reference Include="MyListBox">
-      <HintPath>..\..\MyListBox\bin\Debug\MyListBox.dll</HintPath>
+    <Reference Include="MyListBox, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Release\MyListBox.dll</HintPath>
     </Reference>
     <Reference Include="RulerControl">
       <HintPath>..\..\RulerControl\RulerControl\bin\Release\RulerControl.dll</HintPath>

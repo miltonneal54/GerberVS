@@ -37,7 +37,6 @@ namespace GerberView
         private bool userMirrorX;
         private bool userMirrorY;
         private bool userInverted;
-        //private bool applyToAll = false;        // True if user transformation applies to all layers.
 
         // Mouse tracking.
         private double startLocationX = 0.0;
@@ -45,7 +44,7 @@ namespace GerberView
         private double lastLocationX = 0.0;
         private double lastLocationY = 0.0;
         private bool hasMouse = false;
-        private bool isDragging = false;
+        private bool isPanning = false;
         private bool isSelecting = false;
         private bool hasSelection = false;
         private bool selectionFormOpen = false;
@@ -56,6 +55,7 @@ namespace GerberView
         int visibleGerberFiles = 0;
         int visibleDrillFiles = 0;
         bool fullScreen = false;
+
         public Form1(string fileName)
         {
             InitializeComponent();
@@ -68,6 +68,8 @@ namespace GerberView
 	            System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, true});
 
             pcbImagePanel.ContextMenuStrip = selectedObjectsContextMenuStrip;
+            gerberLib = new LibGerberVS();
+
             clFileName = fileName;
         }
 
@@ -76,36 +78,12 @@ namespace GerberView
             selectedObjectsContextMenuStrip.Visible = false;
             formName = this.Text;
             Initialise();
-        }
 
-        // Initialise variables and objects;
-        private void Initialise()
-        {
-            hasProject = false;
-            hasSelection = false;
-            userScale = 1.0f;
-            userTranslateX = 0.0f;
-            userTranslateY = 0.0f;
-            userRotation = 0.0f;
-            userMirrorX = false;
-            userMirrorY = false;
-            userInverted = false;
-            visibleDrillFiles = 0;
-            visibleGerberFiles = 0;
-
-            gerberLib = new LibGerberVS();
-            renderInfo = new GerberRenderInformation();
-            RenderModeComboBox.SelectedIndex = 0;
-            renderMode = GerberRenderMode.TranslateToCentre;
-            pcbImagePanel.BackColor = Color.Black;
-            project = gerberLib.CreateNewProject();
-            project.BackgroundColor = pcbImagePanel.BackColor;
-            fileListBox.Clear();
-            this.Text = formName;
+            // Get the commandline arguments, if any.
             if (!String.IsNullOrEmpty(clFileName))
             {
                 if (Path.GetExtension(clFileName).ToLower() == ".gpf")
-                    OpenProjectWithName(clFileName);
+                    OpenProject(clFileName);
 
                 else
                 {
@@ -113,7 +91,36 @@ namespace GerberView
                     OpenLayers();
                 }
             }
+        }
 
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveAsGerberProject();
+        }
+
+        // Initialise variables and objects;
+        private void Initialise()
+        {
+            this.Text = formName;
+            hasProject = false;
+            hasSelection = false;
+            visibleDrillFiles = 0;
+            visibleGerberFiles = 0;
+            pcbImagePanel.BackColor = Color.Black;
+            selectedObjectsToolStripStatusLabel.Text = "0";
+            // Create a ne project.
+            project = gerberLib.CreateNewProject();
+            project.BackgroundColor = pcbImagePanel.BackColor;
+
+            renderInfo = new GerberRenderInformation();
+            renderMode = GerberRenderMode.TranslateToCentre;
+            RenderModeComboBox.SelectedIndex = 0;
+
+            pcbImagePanel.AutoScrollMinSize = new System.Drawing.Size(0, 0);
+            UpdateRulers();
+            UpdateScale();
+            fileListBox.Clear();
             UpdateMenus();
         }
 
@@ -150,7 +157,7 @@ namespace GerberView
             int index = -1;
             foreach (string file in fileList)
             {
-                // Don't try to open gerber project files here.
+                // Don't open gerber project files here.
                 if (Path.GetExtension(file).ToLower() == ".gpf")
                     continue;
 
@@ -162,18 +169,19 @@ namespace GerberView
                     index = project.FileCount - 1;
                     fileListBox.AddItem(project.FileInfo[index].IsVisible, project.FileInfo[index].Color, project.FileInfo[index].FileName);
                     LayerNameToolStripStatusLabel.Text = project.FileInfo[fileListBox.SelectedIndex].FileName;
-                    // Open all layers in the same scale.
-                    project.FileInfo[index].UserTransform.ScaleX = userScale;
-                    project.FileInfo[index].UserTransform.ScaleY = userScale;
                 }
             }
 
             pcbImagePanel.Refresh();
             UpdateMenus();
+            if (project.FileCount > 0)
+                hasProject = true;
+
             if (project.ProjectName == string.Empty)
                 this.Text = formName + " [Untitled Project]";
         }
 
+        // Open layer file and if sucessful, add it to file list box.
         private bool OpenLayer(string fileName)
         {
             try
@@ -194,13 +202,13 @@ namespace GerberView
             }
         }
 
-        // Open file and if sucessful, add it to file list box.
-        private bool OpenLayer(string file, Color color, int alpha)
+        // Open layer file with colour.
+        private bool OpenLayer(string fileName, Color color, int alpha)
         {
             int index = 0;
             try
             {
-                gerberLib.OpenLayerFromFilenameAndColor(project, file, color, alpha);
+                gerberLib.OpenLayerFromFilenameAndColor(project, fileName, color, alpha);
                 index = project.FileInfo.Count - 1;
                 fileListBox.AddItem(true, project.FileInfo[index].Color, project.FileInfo[index].FileName);
                 UpdateFileTypeCounts();
@@ -227,15 +235,13 @@ namespace GerberView
                 openFileDialog.RestoreDirectory = true;
                 openFileDialog.Multiselect = false;
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    OpenProjectWithName(openFileDialog.FileName);
+                    OpenProject(openFileDialog.FileName);
             }
         }
 
-        private void OpenProjectWithName(string fileName)
+        private void OpenProject(string fileName)
         {
-            if (hasProject) // Save current project;
-                SaveProject();
-
+            SaveAsGerberProject();
             UnloadAllLayers();
             ProjectFile.ReadProject(project, fileName);
             for (int i = project.FileCount - 1; i >= 0; i--)
@@ -294,10 +300,57 @@ namespace GerberView
 
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving project." + Environment.NewLine + ex.Message, "Save Project Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Error saving project." + Environment.NewLine + ex.Message, "Save Project Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
+        private void SaveAsGerberProject()
+        {
+            if (hasProject)
+            {
+                if (project.ProjectName == String.Empty)
+                {
+                    DialogResult result = MessageBox.Show("Do you want to save this session as a project?", "Save As Gerber Project",
+                                                          MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes)
+                        SaveProjectAs();
+
+                    return;
+                }
+
+                SaveProject();
+            }
+        }
+
+        // Unloads the current layer.
+        private void UnloadLayer()
+        {
+            int index = fileListBox.SelectedIndex;
+            if (index > -1)
+            {
+                // Check if this layer has a user selection.
+                if (hasSelection && selectionInfo.FileInfo.FileName == project.FileInfo[index].FileName)
+                    hasSelection = false;
+
+                CheckDirtyFlag(index);
+
+                // Then unload the layer.
+                gerberLib.UnloadLayer(project, index);
+                fileListBox.RemoveAt(index);
+                if (project.FileCount > 0)
+                {
+                    fileListBox.SelectedIndex = index;
+                    UpdateFileTypeCounts();
+                    UpdateMenus();
+                }
+
+                else
+                    Initialise();
+
+                pcbImagePanel.Refresh();
+            }
+        }
 
         // Unload all open layers in current project.
         private void UnloadAllLayers()
@@ -310,15 +363,8 @@ namespace GerberView
                     CheckDirtyFlag(i);
 
                 gerberLib.UnloadAllLayers(project);
-                fileListBox.Clear();
-                visibleDrillFiles = 0;
-                visibleGerberFiles = 0;
-                hasProject = false;
-                userScale = 1.0f;
-                UpdateUserTransform();
-                UpdateRulers();
+                Initialise();
                 pcbImagePanel.Refresh();
-                UpdateMenus();
             }
         }
 
@@ -331,7 +377,7 @@ namespace GerberView
                     DialogResult result = MessageBox.Show(project.FileInfo[i].FileName + "has been changed./nSave changes.", "File Changed", MessageBoxButtons.YesNo);
                     if (result == System.Windows.Forms.DialogResult.Yes)
                     {
-                        GerberVS.ExportGerberRS274X.RS274xFromImage(project.FileInfo[i].FullPathName, project.FileInfo[project.CurrentIndex].Image,
+                        GerberVS.ExportGerberRS274X.RS274XFromImage(project.FileInfo[i].FullPathName, project.FileInfo[project.CurrentIndex].Image,
                         project.FileInfo[project.CurrentIndex].UserTransform);
                     }
                 }
@@ -360,27 +406,6 @@ namespace GerberView
             }
         }
 
-        // Unloads the current layer.
-        private void UnloadLayer()
-        {
-            int index = fileListBox.SelectedIndex;
-            if (index > -1)
-            {
-                // Check if this layer has a user selection.
-                if (hasSelection && selectionInfo.SelectedFileInfo.FileName == project.FileInfo[index].FileName)
-                    hasSelection = false;
-
-                CheckDirtyFlag(index);
-
-                // Then unload the layer.
-                gerberLib.UnloadLayer(project, index);
-                fileListBox.RemoveAt(index);
-                pcbImagePanel.Refresh();
-                UpdateFileTypeCounts();
-                UpdateMenus();
-            }
-        }
-
         // Check project files for changes.
         private void CheckDirtyFlag(int index)
         {
@@ -390,7 +415,7 @@ namespace GerberView
                                                       + Environment.NewLine + "Save changes?", "File Changed", MessageBoxButtons.YesNo);
                 if (result == System.Windows.Forms.DialogResult.Yes)
                 {
-                    GerberVS.ExportGerberRS274X.RS274xFromImage(project.FileInfo[index].FullPathName, project.FileInfo[project.CurrentIndex].Image);
+                    GerberVS.ExportGerberRS274X.RS274XFromImage(project.FileInfo[index].FullPathName, project.FileInfo[project.CurrentIndex].Image);
                 }
             }
         }
@@ -418,14 +443,12 @@ namespace GerberView
             Graphics graphics = e.Graphics;
             if (project.FileCount > 0)
             {
-                float panelWidth = pcbImagePanel.Width / graphics.DpiX;
-                float panelHeight = pcbImagePanel.Height / graphics.DpiY;
+                renderInfo.DisplayWidth = pcbImagePanel.Width / graphics.DpiX;
+                renderInfo.DisplayHeight = pcbImagePanel.Height / graphics.DpiY;
 
                 if (renderMode == GerberRenderMode.TranslateToCentre)
                 {
-                    renderInfo.DisplayWidth = panelWidth;
-                    renderInfo.DisplayHeight = panelHeight;
-                    gerberLib.TranslateToCentreDisplay(project, renderInfo);
+                    gerberLib.TranslateToCentre(project, renderInfo);
                 }
 
                 // Manage scrollbars.
@@ -433,8 +456,8 @@ namespace GerberView
                 pcbImagePanel.AutoScrollMinSize = imageSize;
                 float scrollValueX = pcbImagePanel.AutoScrollPosition.X / graphics.DpiX;
                 float scrollValueY = pcbImagePanel.AutoScrollPosition.Y / graphics.DpiY;
-                renderInfo.ScrollValueX = scrollValueX;
-                renderInfo.ScrollValueY = scrollValueY;
+                renderInfo.Left += scrollValueX;
+                renderInfo.Bottom -= scrollValueY;
                 gerberLib.RenderAllLayers(graphics, project, renderInfo);
                 if (hasSelection)
                     gerberLib.RenderSelectionLayer(graphics, selectionInfo, renderInfo);
@@ -442,10 +465,10 @@ namespace GerberView
                 UpdateRulers();
             }
 
-            splitContainer1.Panel2.Focus();
+            //splitContainer1.Panel2.Focus();
+            fileListBox.Focus();
         }
 
-        // Use the mouse wheel to set the image scale in 20% steps and apply to loaded all layers independant of visiblity.
         private void PcbImagePanel_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (project.FileInfo.Count == 0)
@@ -453,54 +476,24 @@ namespace GerberView
 
             if (e.Delta < 0)
             {
-                userScale -= 0.25f;
-                if (userScale < 0.25f)
-                    userScale = 0.25f;
+                if (renderInfo.ScaleFactorX > 0.25f && renderInfo.ScaleFactorY > 0.25f)
+                {
+                    renderInfo.ScaleFactorX -= 0.25f;
+                    renderInfo.ScaleFactorY -= 0.25f;
+                }
             }
 
             if (e.Delta > 0)
             {
-                userScale += 0.25f;
-                if (userScale > 10.0f)
-                    userScale = 10.0f;
+                if (renderInfo.ScaleFactorX < 10.0f && renderInfo.ScaleFactorY < 10.0f)
+                {
+                    renderInfo.ScaleFactorX += 0.25f;
+                    renderInfo.ScaleFactorY += 0.25f;
+                }
             }
 
-            UpdateUserTransform();
+            UpdateScale();
             pcbImagePanel.Refresh();
-
-        }
-
-        private void UpdateUserTransform()
-        {
-            if (userScale < 0.25f)
-                userScale = 0.25f;
-
-            if (userScale > 10.0f)
-                userScale = 10.0f;
-
-            foreach (GerberFileInformation fileInfo in project.FileInfo)
-            {
-                fileInfo.UserTransform.ScaleX = userScale;
-                fileInfo.UserTransform.ScaleY = userScale;
-                fileInfo.UserTransform.Rotation = userRotation;
-                fileInfo.UserTransform.TranslateX = userTranslateX;
-                fileInfo.UserTransform.TranslateY = userTranslateY;
-            }
-
-            int scale = (int)Math.Ceiling(userScale * 100);
-            scaleToolStripStatusLabel.Text = scale.ToString() + "%";
-        }
-
-        // Resets the global user translations to default values.
-        private void ResetUserTransform()
-        {
-            userScale = 1.0f;
-            userTranslateX = 0.0f;
-            userTranslateY = 0.0f;
-            userRotation = 0.0f;
-            userMirrorX = false;
-            userMirrorY = false;
-            userInverted = false;
         }
 
         private void PcbImagePanel_Resize(object sender, EventArgs e)
@@ -525,6 +518,7 @@ namespace GerberView
 
         private void ChangeLayerVisiblity()
         {
+            fileListBox.ItemChecked = !fileListBox.ItemChecked;
             project.FileInfo[fileListBox.SelectedIndex].IsVisible = fileListBox.ItemChecked;
 
             // Update the visible layers counts.
@@ -554,7 +548,6 @@ namespace GerberView
         {
             Color currentColor = project.FileInfo[fileListBox.SelectedIndex].Color;
             using (AlphaColorDialog colorDialog = new AlphaColorDialog())
-            // using (ColorDialog colorDialog = new ColorDialog())
             {
                 colorDialog.AnyColor = true;
                 colorDialog.AllowFullOpen = true;
@@ -570,30 +563,32 @@ namespace GerberView
 
         private void UpdateRulers()
         {
-            if (userScale < 1.0f)
+            if (renderInfo.ScaleFactorX < 1.0f)
             {
                 horizonalRuler.ScaleMode = RulerControl.ScaleMode.Inches;
                 verticleRuler.ScaleMode = RulerControl.ScaleMode.Inches;
+                rulerScaleLabel.Text = "ins";
             }
 
             else
             {
                 horizonalRuler.ScaleMode = RulerControl.ScaleMode.Mils;
                 verticleRuler.ScaleMode = RulerControl.ScaleMode.Mils;
+                rulerScaleLabel.Text = "mils";
             }
 
             // Calibrate ruler scale.
             //float horizonalOffset = (float)((renderInfo.Left - renderInfo.ScrollValueX) - project.UserTransform.TranslateX);
             //float verticleOffset = (float)((renderInfo.DisplayHeight - (renderInfo.Bottom + renderInfo.ImageHeight + renderInfo.ScrollValueY)) + project.UserTransform.TranslateY);
-            float horizonalOffset = -(float)((renderInfo.Left + renderInfo.ScrollValueX) - userTranslateX);
-            float verticleOffset = (float)(((renderInfo.DisplayHeight + renderInfo.Bottom - renderInfo.ScrollValueY)) + userTranslateX);
-            horizonalRuler.ZoomFactor = userScale;
-            verticleRuler.ZoomFactor = userScale;
+            float horizonalOffset = -(float)((renderInfo.Left) - userTranslateX);
+            float verticleOffset = (float)(((renderInfo.DisplayHeight + renderInfo.Bottom)) + userTranslateX);
+            horizonalRuler.ZoomFactor = renderInfo.ScaleFactorX;
+            verticleRuler.ZoomFactor = renderInfo.ScaleFactorY;
 
             //horizonalRuler.StartValue = -((renderInfo.Left + project.UserTransform.TranslateX) / userScaleX) * horizonalRuler.MajorInterval;
             //verticleRuler.StartValue = -((renderInfo.DisplayHeight + renderInfo.Bottom + project.UserTransform.TranslateY) / userScaleY) * verticleRuler.MajorInterval;
-            horizonalRuler.StartValue = (horizonalOffset / userScale) * horizonalRuler.MajorInterval;
-            verticleRuler.StartValue = -(verticleOffset / userScale) * verticleRuler.MajorInterval;
+            horizonalRuler.StartValue = (horizonalOffset / renderInfo.ScaleFactorX) * horizonalRuler.MajorInterval;
+            verticleRuler.StartValue = -(verticleOffset / renderInfo.ScaleFactorY) * verticleRuler.MajorInterval;
 
             // Update ruler displays.
             horizonalRuler.Refresh();
@@ -627,12 +622,11 @@ namespace GerberView
             {
                 xLocationToolStripStatusLabel.Text = String.Format("{0:0.000}", e.Value);
                 lastLocationX = e.Value;
+                lastLocationX /= verticleRuler.MajorInterval;
             }
 
             else
                 xLocationToolStripStatusLabel.Text = String.Format("{0:0.000}", lastLocationX);
-
-            lastLocationX /= verticleRuler.MajorInterval;
         }
 
         private void VerticalRuler_HoverValue(object sender, RulerControl.Ruler.HoverValueChangedEventArgs e)
@@ -641,12 +635,11 @@ namespace GerberView
             {
                 yLocationToolStripStatusLabel.Text = String.Format("{0:0.000}", e.Value);
                 lastLocationY = e.Value;
+                lastLocationY /= verticleRuler.MajorInterval;
             }
 
             else
                 yLocationToolStripStatusLabel.Text = String.Format("{0:0.000}", lastLocationY);
-
-            lastLocationY /= verticleRuler.MajorInterval;
         }
 
         private void MoveLayerDown()
@@ -773,6 +766,7 @@ namespace GerberView
             reloadAllLayersoolStripMenuItem.Enabled = !project.IsEmpty;
             saveProjectToolStripMenuItem.Enabled = !project.IsEmpty && project.Path != String.Empty;
             saveProjectAsToolStripMenuItem.Enabled = !project.IsEmpty;
+            newProjectToolStripMenuItem.Enabled = !project.IsEmpty;
             printPreviewToolStripMenuItem.Enabled = !project.IsEmpty;
             printToolStripMenuItem.Enabled = !project.IsEmpty;
             exportImageToolStripMenuItem.Enabled = !project.IsEmpty;
@@ -786,7 +780,7 @@ namespace GerberView
             moveLayerDownToolStripButton.Enabled = index < fileListBox.ItemCount - 1;
             moveLayerDownToolStripMenuItem.Enabled = index < fileListBox.ItemCount - 1;
 
-            // Later stats menu.
+            // Layer stats menu.
             statisticsToolStripMenuItem.Enabled = !project.IsEmpty;
             gerberLayersToolStripMenuItem.Enabled = visibleGerberFiles > 0;
             drillLayersToolStripMenuItem.Enabled = visibleDrillFiles > 0;
@@ -830,8 +824,9 @@ namespace GerberView
         {
             if (e.Effect != DragDropEffects.None)
             {
-                string[] fileList = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                {
+                fileList = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+                OpenLayers();
+                /*{
                     foreach (string file in fileList)
                     {
                         if (OpenLayer(file))
@@ -850,15 +845,21 @@ namespace GerberView
                     ReOrderFileList();
                     pcbImagePanel.Refresh();
                     UpdateMenus();
-                }
+                }*/
             }
         }
 
         private void PcbImagePanel_MouseDown(object sender, MouseEventArgs e)
         {
             hasMouse = true;
+            isSelecting = false;
+            selectionRectangle = Rectangle.Empty;
+
             if (e.Button == MouseButtons.Left)
+            {
                 startPoint = pcbImagePanel.PointToScreen(new Point(e.X, e.Y));
+                //startPoint = new Point(e.X, e.Y);
+            }
 
             startLocationX = lastLocationX;
             startLocationY = lastLocationY;
@@ -869,21 +870,22 @@ namespace GerberView
             int width = 0;
             int height = 0;
 
-            isSelecting = false;
-            if (e.Button == MouseButtons.Left && hasMouse && project.CurrentIndex > -1)
+            if (e.Button == MouseButtons.Left && project.CurrentIndex > -1)
             {
-                Graphics graphics = pcbImagePanel.CreateGraphics();
+                //Graphics graphics = pcbImagePanel.CreateGraphics();
                 ControlPaint.DrawReversibleFrame(selectionRectangle, this.BackColor, FrameStyle.Dashed);
                 Point endPoint = pcbImagePanel.PointToScreen(new Point(e.X, e.Y));
                 //Point endPoint = new Point(e.X, e.Y);
                 width = endPoint.X - startPoint.X;
                 height = endPoint.Y - startPoint.Y;
-                selectionRectangle = new Rectangle(startPoint.X, startPoint.Y, width, height);
+                selectionRectangle.X = startPoint.X;
+                selectionRectangle.Y = startPoint.Y;
+                selectionRectangle.Width = width;
+                selectionRectangle.Height = height;
                 //DrawSelection(graphics, selectionRectangle);
-                // Draw the new rectangle by calling DrawReversibleFrame again.  
+                //Draw the new rectangle by calling DrawReversibleFrame again.  
                 ControlPaint.DrawReversibleFrame(selectionRectangle, this.BackColor, FrameStyle.Dashed);
-                if (Math.Abs(width) > 5 || Math.Abs(height) > 5)
-                    isSelecting = true;
+                isSelecting = true;
             }
         }
 
@@ -902,87 +904,92 @@ namespace GerberView
 
             else if (e.Button == MouseButtons.Left)
             {
+
                 // Note: Selection is only possible on the currently selected visible layer.
-                Graphics graphics = pcbImagePanel.CreateGraphics();
-                graphics.PageUnit = GraphicsUnit.Inch;
-
-                if (project.CurrentIndex > -1 && project.ShowHiddenSelection == true)
+                using (Graphics graphics = pcbImagePanel.CreateGraphics())
                 {
-                    if (hasSelection && selectionFormOpen)
-                        selectionPropertiesFrm.Close();
+                    graphics.PageUnit = GraphicsUnit.Inch;
 
-                    selectionRectangle = new Rectangle(0, 0, 0, 0);
-                    selectionInfo = new SelectionInformation(project.FileInfo[project.CurrentIndex]);
-                    hasSelection = false;
-
-                    // Point selecting.
-                    if (hasMouse && !isSelecting)
+                    if (project.CurrentIndex > -1 || project.ShowHiddenSelection == true)
                     {
-                        selectionInfo.SelectionType = GerberSelection.PointClick;
-                        selectionInfo.LowerLeftX = lastLocationX;
-                        selectionInfo.LowerLeftY = lastLocationY;
+                        if (hasSelection && selectionFormOpen)
+                            selectionPropertiesFrm.Close();
 
-                        int count = selectionInfo.SelectedFileInfo.Image.GerberNetList.Count;
-                        for (int index = 0; index < count; index++)
+                        selectionInfo = new SelectionInformation(project.FileInfo[project.CurrentIndex]);
+                        hasSelection = false;
+
+                        // Point selecting.
+                        if (hasMouse && !isSelecting)
                         {
-                            gerberLib.ObjectInSelectedRegion(graphics, selectionInfo, ref index);
-                            if (selectionInfo.Count > 0)
-                                hasSelection = true;
+                            selectionInfo.SelectionType = GerberSelection.PointClick;
+                            selectionInfo.LowerLeftX = lastLocationX;
+                            selectionInfo.LowerLeftY = lastLocationY;
+
+                            int count = selectionInfo.FileInfo.Image.GerberNetList.Count;
+                            for (int index = 0; index < count; index++)
+                            {
+                                gerberLib.ObjectInSelectedRegion(graphics, selectionInfo, ref index);
+                                if (selectionInfo.Count > 0)
+                                    hasSelection = true;
+                            }
                         }
-                    }
 
-                    // Region selecting.
-                    if (hasMouse && isSelecting)
-                    {
-                        selectionInfo.SelectionType = GerberSelection.DragBox;
-                        selectionInfo.UpperRightX = startLocationX;
-                        selectionInfo.LowerLeftX = lastLocationX;
-                        selectionInfo.UpperRightY = startLocationY;
-                        selectionInfo.LowerLeftY = lastLocationY;
-                        if (startLocationX < lastLocationX)
+                        // Region selecting.
+                        if (hasMouse && isSelecting)
                         {
-                            selectionInfo.UpperRightX = lastLocationX;
+                            ControlPaint.DrawReversibleFrame(selectionRectangle, this.BackColor, FrameStyle.Dashed);
+                            selectionInfo.SelectionType = GerberSelection.DragBox;
                             selectionInfo.LowerLeftX = startLocationX;
+                            selectionInfo.UpperRightX = (float)lastLocationX;
+                            selectionInfo.UpperRightY = startLocationY;
+                            selectionInfo.LowerLeftY = (float)lastLocationY;
+                            if (startLocationX > lastLocationX)
+                            {
+                                selectionInfo.UpperRightX = startLocationX;
+                                selectionInfo.LowerLeftX = lastLocationX;
+                            }
+
+                            if (startLocationY < lastLocationY)
+                            {
+                                selectionInfo.UpperRightY = lastLocationY;
+                                selectionInfo.LowerLeftY = startLocationY;
+                            }
+
+
+                            int count = selectionInfo.FileInfo.Image.GerberNetList.Count;
+                            for (int index = 0; index < count; index++)
+                            {
+                                gerberLib.ObjectInSelectedRegion(graphics, selectionInfo, ref index);
+                                if (selectionInfo.Count > 0)
+                                    hasSelection = true;
+                            }
+
+                            isSelecting = false;
                         }
 
-                        if (startLocationY < lastLocationY)
-                        {
-                            selectionInfo.UpperRightY = lastLocationY;
-                            selectionInfo.LowerLeftY = startLocationY;
-                        }
-
-                        int count = selectionInfo.SelectedFileInfo.Image.GerberNetList.Count;
-                        for (int index = 0; index < count; index++)
-                        {
-                            gerberLib.ObjectInSelectedRegion(graphics, selectionInfo, ref index);
-                            if (selectionInfo.Count > 0)
-                                hasSelection = true;
-                        }
-
+                        hasMouse = false;
+                        selectedObjectsToolStripStatusLabel.Text = selectionInfo.Count.ToString();
+                        UpdateMenus();
+                        pcbImagePanel.Refresh();
                     }
-
-                    hasMouse = false;
-                    selectedObjectsToolStripStatusLabel.Text = selectionInfo.Count.ToString();
-                    UpdateMenus();
-                    pcbImagePanel.Refresh();
-                    graphics.Dispose();
                 }
             }
         }
 
-        /*private void DrawSelection(Graphics graphics, Rectangle sel)
+        private void DrawSelection(Graphics graphics, Rectangle sel)
         {
             graphics.DrawRectangle(new Pen(Color.White, 1), sel);
             pcbImagePanel.Invalidate(Rectangle.Inflate(sel, 1, 1));
-        }*/
+        }
 
         private void ZoomIn()
         {
             if (project.FileInfo.Count == 0 || userScale >= 10.0f)
                 return;
 
-            userScale += 0.25f;
-            UpdateUserTransform();
+            renderInfo.ScaleFactorX += 0.25f;
+            renderInfo.ScaleFactorY += 0.25f;
+            UpdateScale();
             pcbImagePanel.Refresh();
         }
 
@@ -991,27 +998,23 @@ namespace GerberView
             if (project.FileInfo.Count == 0 || userScale <= 0.25f)
                 return;
 
-            userScale -= 0.25f;
-            UpdateUserTransform();
+            renderInfo.ScaleFactorX -= 0.25f;
+            renderInfo.ScaleFactorY -= 0.25f;
+            UpdateScale();
             pcbImagePanel.Refresh();
         }
 
-        // Scale the layers to fit the current view area.
         private void ScaleToFit()
         {
-            BoundingBox projectBounds;
-            double width, height;
-            double scaleX, scaleY;
+            gerberLib.ScaleToFit(project, renderInfo);
+            UpdateScale();
+            pcbImagePanel.Refresh();
+        }
 
-            userScale = 1.0f;
-            UpdateUserTransform();
-            projectBounds = gerberLib.GetProjectBounds(project);
-            width = projectBounds.Right - projectBounds.Left;
-            height = projectBounds.Top - projectBounds.Bottom;
-            scaleX = (float)((renderInfo.DisplayWidth - 0.5) / width);
-            scaleY = (float)((renderInfo.DisplayHeight - 0.5) / height);
-            userScale = (float)Math.Min(scaleX, scaleY);
-            UpdateUserTransform();
+        private void UpdateScale()
+        {
+            int scale = (int)Math.Ceiling(renderInfo.ScaleFactorX * 100);
+            scaleToolStripStatusLabel.Text = scale.ToString() + "%";
         }
 
         #region Layer menu events
@@ -1091,10 +1094,10 @@ namespace GerberView
         #endregion
 
         #region View menu events
+
         private void ScaleToFitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ScaleToFit();
-            pcbImagePanel.Refresh();
         }
 
         private void ZoomInToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1105,6 +1108,13 @@ namespace GerberView
         private void ZoomOutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ZoomOut();
+        }
+
+        private void ScaleToFullSizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            renderInfo.ScaleFactorX = renderInfo.ScaleFactorY = 1.0f;
+            UpdateScale();
+            pcbImagePanel.Refresh();
         }
 
         private void ChangeBackgroundToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1128,6 +1138,9 @@ namespace GerberView
             fullScreen = !fullScreen;
             if (fullScreen)
             {
+                if (this.WindowState == FormWindowState.Maximized)
+                    this.WindowState = FormWindowState.Normal;
+
                 this.FormBorderStyle = FormBorderStyle.None;
                 this.WindowState = FormWindowState.Maximized;
             }
@@ -1179,33 +1192,7 @@ namespace GerberView
             pcbImagePanel.Refresh();
         }
 
-        private void ScaleToFullSizeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            userScale = 1.0f;
-            UpdateUserTransform();
-            pcbImagePanel.Refresh();
-        }
-
         #endregion
-
-        private void PrintGerberImage()
-        {
-            bool isWider = (renderInfo.ImageWidth > renderInfo.ImageHeight);
-            PrintDocument printDocument = new PrintDocument();
-            PrintDialog printDialog = new PrintDialog();
-
-            printDialog.UseEXDialog = true;
-            if (printDialog.ShowDialog() == DialogResult.OK)
-            {
-                printDialog.Document = printDocument;
-                printDocument.DefaultPageSettings.Landscape = isWider;
-                printDocument.PrintPage += new PrintPageEventHandler(this.PrintPage);
-                printDocument.Print();
-            }
-
-            printDialog.Dispose();
-            printDocument.Dispose();
-        }
 
         #region File menu events
 
@@ -1224,9 +1211,9 @@ namespace GerberView
 
         private void NewProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SaveAsGerberProject();
             Initialise();
             UpdateMenus();
-            pcbImagePanel.AutoScroll = false;
             pcbImagePanel.Refresh();
         }
 
@@ -1266,6 +1253,25 @@ namespace GerberView
 
         #endregion
 
+        private void PrintGerberImage()
+        {
+            bool isWider = (renderInfo.ImageWidth > renderInfo.ImageHeight);
+            PrintDocument printDocument = new PrintDocument();
+            PrintDialog printDialog = new PrintDialog();
+
+            printDialog.UseEXDialog = true;
+            if (printDialog.ShowDialog() == DialogResult.OK)
+            {
+                printDialog.Document = printDocument;
+                printDocument.DefaultPageSettings.Landscape = isWider;
+                printDocument.PrintPage += new PrintPageEventHandler(this.PrintPage);
+                printDocument.Print();
+            }
+
+            printDialog.Dispose();
+            printDocument.Dispose();
+        }
+
         private void PrintPage(object sender, PrintPageEventArgs e)
         {
             Graphics graphics = e.Graphics;
@@ -1275,7 +1281,7 @@ namespace GerberView
             float pageHeight = e.PageBounds.Height / 100.0f;
             renderInfo.DisplayWidth = pageWidth;
             renderInfo.DisplayHeight = pageHeight;
-            gerberLib.TranslateToCentreDisplay(project, renderInfo);
+            gerberLib.TranslateToCentre(project, renderInfo);
             gerberLib.RenderAllLayersForVectorOutput(graphics, project, renderInfo);
         }
 
@@ -1320,7 +1326,7 @@ namespace GerberView
                 saveFileDialog.RestoreDirectory = true;
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    GerberVS.ExportGerberRS274X.RS274xFromImage(saveFileDialog.FileName, project.FileInfo[project.CurrentIndex].Image,
+                    GerberVS.ExportGerberRS274X.RS274XFromImage(saveFileDialog.FileName, project.FileInfo[project.CurrentIndex].Image,
                     project.FileInfo[project.CurrentIndex].UserTransform);
                 }
             }
@@ -1356,13 +1362,9 @@ namespace GerberView
                 saveFileDialog.Filter = "PNG Image (.png)|*.png";
                 saveFileDialog.RestoreDirectory = true;
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    renderInfo.DisplayWidth = 0;
-                    renderInfo.DisplayHeight = 0;
-                    gerberLib.TranslateToCentreDisplay(project, renderInfo);
-                    gerberLib.ProjectToPng(saveFileDialog.FileName, project, renderInfo, graphics);
-                }
+                    gerberLib.ExportProjectToPng(saveFileDialog.FileName, project, renderInfo);
             }
         }
+
     }
 }

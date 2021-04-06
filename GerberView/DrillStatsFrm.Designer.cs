@@ -35,6 +35,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.generalTabPage = new System.Windows.Forms.TabPage();
+            this.errorLabel = new System.Windows.Forms.Label();
             this.generalDataGridView = new System.Windows.Forms.DataGridView();
             this.gCodesTabPage = new System.Windows.Forms.TabPage();
             this.gCodeLabel = new System.Windows.Forms.Label();
@@ -48,7 +49,6 @@
             this.drillUseTabPage = new System.Windows.Forms.TabPage();
             this.drillUseLabel = new System.Windows.Forms.Label();
             this.drillUseDataGridView = new System.Windows.Forms.DataGridView();
-            this.errorLabel = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.generalTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.generalDataGridView)).BeginInit();
@@ -86,6 +86,17 @@
             this.generalTabPage.TabIndex = 0;
             this.generalTabPage.Text = "Gerneral";
             this.generalTabPage.UseVisualStyleBackColor = true;
+            // 
+            // errorLabel
+            // 
+            this.errorLabel.AutoSize = true;
+            this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.errorLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.errorLabel.Location = new System.Drawing.Point(0, 5);
+            this.errorLabel.Name = "errorLabel";
+            this.errorLabel.Size = new System.Drawing.Size(39, 13);
+            this.errorLabel.TabIndex = 5;
+            this.errorLabel.Text = "errors";
             // 
             // generalDataGridView
             // 
@@ -301,17 +312,6 @@
             this.drillUseDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.drillUseDataGridView.Size = new System.Drawing.Size(376, 156);
             this.drillUseDataGridView.TabIndex = 1;
-            // 
-            // errorLabel
-            // 
-            this.errorLabel.AutoSize = true;
-            this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.errorLabel.ForeColor = System.Drawing.Color.SeaGreen;
-            this.errorLabel.Location = new System.Drawing.Point(0, 5);
-            this.errorLabel.Name = "errorLabel";
-            this.errorLabel.Size = new System.Drawing.Size(39, 13);
-            this.errorLabel.TabIndex = 5;
-            this.errorLabel.Text = "errors";
             // 
             // DrillStatsForm
             // 

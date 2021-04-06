@@ -61,7 +61,7 @@ namespace GerberView
         private void SelectionListFrm_Load(object sender, EventArgs e)
         {
             textBox1.Text = String.Empty;
-            selectionText.Append("File: " + selectionInfo.SelectedFileInfo.FileName);
+            selectionText.Append("File: " + selectionInfo.FileInfo.FileName);
             foreach (GerberNet net in selectionInfo.SelectedNodeArray.SelectedNetList)
             {
                 if (net.ApertureState == GerberApertureState.On)
@@ -84,12 +84,12 @@ namespace GerberView
                                 selectionText.Append("Object type: Line" + Environment.NewLine);
                                 apertureNumber = net.Aperture;
                                 selectionText.Append("  Aperture used: " + "D" + apertureNumber.ToString() + Environment.NewLine);
-                                apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureType;
+                                apertureType = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].ApertureType;
                                 selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
-                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                parameter0 = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
                                 if (apertureType == GerberApertureType.Rectangle || apertureType == GerberApertureType.Oval)
                                 {
-                                    parameter1 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
+                                    parameter1 = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
                                     selectionText.Append("  Dimension: " + parameter0.ToString("0.000") + " x " + parameter1.ToString("0.000") + Environment.NewLine);
                                 }
 
@@ -135,12 +135,12 @@ namespace GerberView
                                 selectionText.Append("Object type: Arc" + Environment.NewLine);
                                 apertureNumber = net.Aperture;
                                 selectionText.Append("  Aperture used: " + "D" + apertureNumber.ToString() + Environment.NewLine);
-                                apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureType;
+                                apertureType = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].ApertureType;
                                 selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
-                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                parameter0 = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
                                 if (apertureType == GerberApertureType.Rectangle || apertureType == GerberApertureType.Oval)
                                 {
-                                    parameter1 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
+                                    parameter1 = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
                                     selectionText.Append("  Dimension: " + parameter0.ToString("0.000") + " x " + parameter1.ToString("0.000") + Environment.NewLine);
                                 }
 
@@ -193,21 +193,21 @@ namespace GerberView
                     selectionText.Append(Environment.NewLine);
                     selectionText.Append("Object type: Flashed Aperture" + Environment.NewLine);
                     selectionText.Append("  Aperture used: " + "D" + apertureNumber.ToString() + Environment.NewLine);
-                    apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureType;
+                    apertureType = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].ApertureType;
                     if (apertureType != GerberApertureType.Macro)
                     {
                         selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
                         switch (apertureType)
                         {
                             case GerberApertureType.Circle:
-                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                parameter0 = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
                                 selectionText.Append("  Diameter: " + parameter0.ToString("0.000") + Environment.NewLine);
                                 break;
 
                             case GerberApertureType.Rectangle:
                             case GerberApertureType.Oval:
-                                parameter0 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
-                                parameter1 = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
+                                parameter0 = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].Parameters[0] * 1000;
+                                parameter1 = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].Parameters[1] * 1000;
                                 selectionText.Append("  Dimension: " + parameter0.ToString("0.000") + " x " + parameter1.ToString("0.000") + Environment.NewLine);
                                 break;
                         }
@@ -216,9 +216,9 @@ namespace GerberView
 
                     else
                     {
-                        if (selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].ApertureMacro != null)
+                        if (selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].ApertureMacro != null)
                         {
-                            apertureType = selectionInfo.SelectedFileInfo.Image.ApertureArray[apertureNumber].SimplifiedMacroList[0].ApertureType;
+                            apertureType = selectionInfo.FileInfo.Image.ApertureArray[apertureNumber].SimplifiedMacroList[0].ApertureType;
                             selectionText.Append("  Aperture type: " + apertureType.ToString() + Environment.NewLine);
                         }
                     }

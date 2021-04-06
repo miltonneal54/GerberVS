@@ -288,7 +288,7 @@ namespace GerberView
             gCodeDataGridView.Columns["Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             gCodeDataGridView.Columns["Count"].Width = 75;
             gCodeDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            gCodeDataGridView.Columns["Description"].Width = 320;
+            gCodeDataGridView.Columns["Description"].Width = 305;
             gCodeDataGridView.Columns["Description"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -345,7 +345,7 @@ namespace GerberView
             dCodeDataGridView.Columns["Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             dCodeDataGridView.Columns["Count"].Width = 75;
             dCodeDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            dCodeDataGridView.Columns["Description"].Width = 320;
+            dCodeDataGridView.Columns["Description"].Width = 323;
             dCodeDataGridView.Columns["Description"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -398,7 +398,7 @@ namespace GerberView
             mCodeDataGridView.Columns["Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             mCodeDataGridView.Columns["Count"].Width = 75;
             mCodeDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            mCodeDataGridView.Columns["Description"].Width = 320;
+            mCodeDataGridView.Columns["Description"].Width = 323;
             mCodeDataGridView.Columns["Description"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -455,7 +455,7 @@ namespace GerberView
             miscCodeDataGridView.RowTemplate.Resizable = DataGridViewTriState.False;
             miscCodeDataGridView.Columns["Code"].Width = 75;
             miscCodeDataGridView.Columns["Code"].DefaultCellStyle.BackColor = Color.LightGreen;
-            miscCodeDataGridView.Columns["Count"].Width = 395;
+            miscCodeDataGridView.Columns["Count"].Width = 381;
             miscCodeDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -495,15 +495,15 @@ namespace GerberView
             apertureDefinitionGridView.Columns["D Code"].Width = 75;
             apertureDefinitionGridView.Columns["D Code"].DefaultCellStyle.BackColor = Color.LightGreen;
             apertureDefinitionGridView.Columns["D Code"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            apertureDefinitionGridView.Columns["Aperture"].Width = 82;
+            apertureDefinitionGridView.Columns["Aperture"].Width = 85;
             apertureDefinitionGridView.Columns["Aperture"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            apertureDefinitionGridView.Columns["Param[0]"].Width = 75;
+            apertureDefinitionGridView.Columns["Param[0]"].Width = 74;
             apertureDefinitionGridView.Columns["Param[0]"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            apertureDefinitionGridView.Columns["Param[1]"].Width = 75;
+            apertureDefinitionGridView.Columns["Param[1]"].Width = 74;
             apertureDefinitionGridView.Columns["Param[1]"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            apertureDefinitionGridView.Columns["Param[2]"].Width = 75;
+            apertureDefinitionGridView.Columns["Param[2]"].Width = 74;
             apertureDefinitionGridView.Columns["Param[2]"].SortMode = DataGridViewColumnSortMode.NotSortable;
-            apertureDefinitionGridView.Columns["Param[3]"].Width = 75;
+            apertureDefinitionGridView.Columns["Param[3]"].Width = 74;
             apertureDefinitionGridView.Columns["Param[3]"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
@@ -535,7 +535,7 @@ namespace GerberView
             apertureUseDataGridView.RowTemplate.Resizable = DataGridViewTriState.False;
             apertureUseDataGridView.Columns["D Code"].Width = 75;
             apertureUseDataGridView.Columns["D Code"].DefaultCellStyle.BackColor = Color.LightGreen;
-            apertureUseDataGridView.Columns["Count"].Width = 395;
+            apertureUseDataGridView.Columns["Count"].Width = 381;
             apertureUseDataGridView.Columns["Count"].SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 

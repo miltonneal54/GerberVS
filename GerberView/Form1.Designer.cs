@@ -84,17 +84,17 @@
             this.drillLayersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.RenderModeComboBox = new System.Windows.Forms.ComboBox();
             this.fileListBox = new ListBoxControl.CustomListBox();
+            this.RenderModeComboBox = new System.Windows.Forms.ComboBox();
             this.fileListToolStrip = new System.Windows.Forms.ToolStrip();
             this.moveLayerUpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.moveLayerDownToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.addFileToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.unloadLayerToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.pcbImagePanel = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
             this.verticleRuler = new RulerControl.Ruler();
+            this.pcbImagePanel = new System.Windows.Forms.Panel();
+            this.rulerScaleLabel = new System.Windows.Forms.Label();
             this.horizonalRuler = new RulerControl.Ruler();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -592,8 +592,8 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.RenderModeComboBox);
             this.splitContainer1.Panel1.Controls.Add(this.fileListBox);
+            this.splitContainer1.Panel1.Controls.Add(this.RenderModeComboBox);
             this.splitContainer1.Panel1.Controls.Add(this.fileListToolStrip);
             // 
             // splitContainer1.Panel2
@@ -603,6 +603,23 @@
             this.splitContainer1.SplitterDistance = 240;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 7;
+            // 
+            // fileListBox
+            // 
+            this.fileListBox.AllowDrop = true;
+            this.fileListBox.AutoScroll = true;
+            this.fileListBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.fileListBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.fileListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fileListBox.Location = new System.Drawing.Point(0, 25);
+            this.fileListBox.Name = "fileListBox";
+            this.fileListBox.Size = new System.Drawing.Size(240, 348);
+            this.fileListBox.TabIndex = 0;
+            this.fileListBox.CheckBoxSelect += new System.EventHandler(this.FileListBox_CheckBoxClick);
+            this.fileListBox.ColorBoxSelect += new System.EventHandler(this.FileListBox_ColorBoxClick);
+            this.fileListBox.SelectedIndexChanged += new System.EventHandler(this.FileListBox_SelectedIndexChanged);
+            this.fileListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileListBox_DragDrop);
+            this.fileListBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileListBox_DragEnter);
             // 
             // RenderModeComboBox
             // 
@@ -617,25 +634,6 @@
             this.RenderModeComboBox.Size = new System.Drawing.Size(132, 21);
             this.RenderModeComboBox.TabIndex = 0;
             this.RenderModeComboBox.SelectedIndexChanged += new System.EventHandler(this.RenderModeCombobox_SelectedIndexChanged);
-            // 
-            // fileListBox
-            // 
-            this.fileListBox.AllowDrop = true;
-            this.fileListBox.AutoScroll = true;
-            this.fileListBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.fileListBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.fileListBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileListBox.ItemChecked = true;
-            this.fileListBox.ItemColor = System.Drawing.SystemColors.ControlLightLight;
-            this.fileListBox.Location = new System.Drawing.Point(0, 25);
-            this.fileListBox.Name = "fileListBox";
-            this.fileListBox.Size = new System.Drawing.Size(240, 348);
-            this.fileListBox.TabIndex = 0;
-            this.fileListBox.CheckBoxClick += new System.EventHandler(this.FileListBox_CheckBoxClick);
-            this.fileListBox.ColorBoxClick += new System.EventHandler(this.FileListBox_ColorBoxClick);
-            this.fileListBox.SelectedIndexChanged += new System.EventHandler(this.FileListBox_SelectedIndexChanged);
-            this.fileListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileListBox_DragDrop);
-            this.fileListBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileListBox_DragEnter);
             // 
             // fileListToolStrip
             // 
@@ -702,9 +700,9 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.pcbImagePanel, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.verticleRuler, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.pcbImagePanel, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.rulerScaleLabel, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.horizonalRuler, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
@@ -714,6 +712,25 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(694, 373);
             this.tableLayoutPanel1.TabIndex = 0;
+            // 
+            // verticleRuler
+            // 
+            this.verticleRuler.BackColor = System.Drawing.Color.SeaGreen;
+            this.verticleRuler.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.verticleRuler.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.verticleRuler.ForeColor = System.Drawing.Color.Black;
+            this.verticleRuler.Location = new System.Drawing.Point(0, 20);
+            this.verticleRuler.Margin = new System.Windows.Forms.Padding(0);
+            this.verticleRuler.Name = "verticleRuler";
+            this.verticleRuler.Orientation = RulerControl.Orientation.Vertical;
+            this.verticleRuler.ScaleDirection = RulerControl.ScaleDirection.RightToLeft;
+            this.verticleRuler.Size = new System.Drawing.Size(20, 353);
+            this.verticleRuler.StartValue = 0D;
+            this.verticleRuler.TabIndex = 0;
+            this.verticleRuler.TrackLineColor = System.Drawing.Color.Yellow;
+            this.verticleRuler.TrackLineStyle = RulerControl.TrackLineStyle.Arrow;
+            this.verticleRuler.ZoomFactor = 1D;
+            this.verticleRuler.HoverValueChanged += new RulerControl.Ruler.HoverValueChangedEvent(this.VerticalRuler_HoverValue);
             // 
             // pcbImagePanel
             // 
@@ -732,38 +749,17 @@
             this.pcbImagePanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PcbImagePanel_MouseUp);
             this.pcbImagePanel.Resize += new System.EventHandler(this.PcbImagePanel_Resize);
             // 
-            // label2
+            // rulerScaleLabel
             // 
-            this.label2.BackColor = System.Drawing.Color.SeaGreen;
-            this.label2.Location = new System.Drawing.Point(0, 0);
-            this.label2.Margin = new System.Windows.Forms.Padding(0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(20, 20);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "mil";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // verticleRuler
-            // 
-            this.verticleRuler.BackColor = System.Drawing.Color.SeaGreen;
-            this.verticleRuler.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.verticleRuler.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.verticleRuler.ForeColor = System.Drawing.Color.Black;
-            this.verticleRuler.Location = new System.Drawing.Point(0, 20);
-            this.verticleRuler.MajorInterval = 1000;
-            this.verticleRuler.Margin = new System.Windows.Forms.Padding(0);
-            this.verticleRuler.Name = "verticleRuler";
-            this.verticleRuler.Orientation = RulerControl.Orientation.Vertical;
-            this.verticleRuler.ScaleDirection = RulerControl.ScaleDirection.RightToLeft;
-            this.verticleRuler.ScaleMode = RulerControl.ScaleMode.Mils;
-            this.verticleRuler.Size = new System.Drawing.Size(20, 353);
-            this.verticleRuler.StartValue = 0D;
-            this.verticleRuler.TabIndex = 4;
-            this.verticleRuler.TrackLineColor = System.Drawing.Color.Yellow;
-            this.verticleRuler.TrackLineStyle = RulerControl.TrackLineStyle.Arrow;
-            this.verticleRuler.VerticalNumbers = true;
-            this.verticleRuler.ZoomFactor = 1D;
-            this.verticleRuler.HoverValue += new RulerControl.Ruler.HoverValueChangedEvent(this.VerticalRuler_HoverValue);
+            this.rulerScaleLabel.BackColor = System.Drawing.Color.SeaGreen;
+            this.rulerScaleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rulerScaleLabel.Location = new System.Drawing.Point(0, 0);
+            this.rulerScaleLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.rulerScaleLabel.Name = "rulerScaleLabel";
+            this.rulerScaleLabel.Size = new System.Drawing.Size(20, 20);
+            this.rulerScaleLabel.TabIndex = 0;
+            this.rulerScaleLabel.Text = "mils";
+            this.rulerScaleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // horizonalRuler
             // 
@@ -778,11 +774,11 @@
             this.horizonalRuler.ScaleMode = RulerControl.ScaleMode.Mils;
             this.horizonalRuler.Size = new System.Drawing.Size(674, 20);
             this.horizonalRuler.StartValue = 0D;
-            this.horizonalRuler.TabIndex = 3;
+            this.horizonalRuler.TabIndex = 5;
             this.horizonalRuler.TrackLineColor = System.Drawing.Color.Yellow;
             this.horizonalRuler.TrackLineStyle = RulerControl.TrackLineStyle.Arrow;
             this.horizonalRuler.ZoomFactor = 1D;
-            this.horizonalRuler.HoverValue += new RulerControl.Ruler.HoverValueChangedEvent(this.HorizontalRuler_HoverValue);
+            this.horizonalRuler.HoverValueChanged += new RulerControl.Ruler.HoverValueChangedEvent(this.HorizontalRuler_HoverValue);
             // 
             // statusStrip1
             // 
@@ -1007,6 +1003,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "GerberView (Beta)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.PcbImagePanel_MouseWheel);
             this.menuStrip1.ResumeLayout(false);
@@ -1053,8 +1050,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel pcbImagePanel;
-        private RulerControl.Ruler horizonalRuler;
-        private RulerControl.Ruler verticleRuler;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel LayerNameToolStripStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
@@ -1062,7 +1057,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel4;
         private System.Windows.Forms.ToolStripStatusLabel yLocationToolStripStatusLabel;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label rulerScaleLabel;
         private System.Windows.Forms.ToolStrip fileListToolStrip;
         private System.Windows.Forms.ToolStripButton moveLayerDownToolStripButton;
         private System.Windows.Forms.ToolStripButton moveLayerUpToolStripButton;
@@ -1071,7 +1066,6 @@
         private System.Windows.Forms.ToolStripMenuItem statisticsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gerberLayersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem drillLayersToolStripMenuItem;
-        private ListBoxControl.CustomListBox fileListBox;
         private System.Windows.Forms.ComboBox RenderModeComboBox;
         private System.Windows.Forms.ToolStripStatusLabel scaleToolStripStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
@@ -1121,6 +1115,9 @@
         private System.Windows.Forms.ToolStripMenuItem rS274XGerberToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem excellonDrillFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pngImageToolStripMenuItem1;
+        private RulerControl.Ruler verticleRuler;
+        private RulerControl.Ruler horizonalRuler;
+        private ListBoxControl.CustomListBox fileListBox;
     }
 }
 

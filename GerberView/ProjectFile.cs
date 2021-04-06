@@ -75,9 +75,9 @@ namespace GerberView
         { }
 
     }
+
     class ProjectFile
     {
-
         /// <summary>
         /// Writes a gerber project file in Xml format.
         /// </summary>
@@ -95,7 +95,6 @@ namespace GerberView
             {
                 using (XmlWriter writer = XmlWriter.Create(filePath, settings))
                 {
-
                     // Project.
                     writer.WriteStartDocument();
                     writer.WriteStartElement("ProjectInformation");
@@ -157,7 +156,6 @@ namespace GerberView
             {
                 using (XmlReader reader = XmlReader.Create(projectFile))
                 {
-
                     while (reader.Read())
                     {
                         if (reader.NodeType == XmlNodeType.Element)
@@ -309,17 +307,7 @@ namespace GerberView
                                     reader.Read();
                                 }
 
-                                if (reader.Name == "Inverted")
-                                {
-                                    while (reader.NodeType != XmlNodeType.EndElement)
-                                    {
-                                        reader.Read();
-                                        if (reader.NodeType == XmlNodeType.Text)
-                                            fileInfo.UserTransform.Inverted = bool.Parse(reader.Value);
-                                    }
-
-                                    reader.Read();
-                                }
+                                
 
                                 if (reader.Name == "TranslateX")
                                 {
@@ -400,6 +388,18 @@ namespace GerberView
                                         reader.Read();
                                         if (reader.NodeType == XmlNodeType.Text)
                                             fileInfo.UserTransform.MirrorAroundY = bool.Parse(reader.Value);
+                                    }
+
+                                    reader.Read();
+                                }
+
+                                if (reader.Name == "Inverted")
+                                {
+                                    while (reader.NodeType != XmlNodeType.EndElement)
+                                    {
+                                        reader.Read();
+                                        if (reader.NodeType == XmlNodeType.Text)
+                                            fileInfo.UserTransform.Inverted = bool.Parse(reader.Value);
                                     }
 
                                     reader.Read();
