@@ -65,3 +65,11 @@ LibGerberVS Version 1.0.5.1
 
 GerberView Version 1.3.2.1
 	Code audits for GUI.
+
+06/04/2021
+LibGerberVS Version 1.0.5.2
+	In file Gerber.cs, fix issue with processing Format Statement (FS command)
+
+GerberView Version 1.3.3.0
+	GUI updates.
+	Bug fix Drag n Drop on to FileListBox;
