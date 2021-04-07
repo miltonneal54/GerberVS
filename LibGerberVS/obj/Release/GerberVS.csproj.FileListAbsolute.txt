@@ -1,0 +1,17 @@
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\LibGerberVS\obj\Release\GerberVS.csprojResolveAssemblyReference.cache
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.dll
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.XML
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.dll
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.pdb
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.pdb
+F:\LibGerberVS\LibGerberVS\obj\Release\GerberVS.csprojResolveAssemblyReference.cache
+F:\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.dll
+F:\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.XML
+F:\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.dll
+F:\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.pdb
+F:\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.XML
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.pdb
