@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-//using System.IO;
-//using System.Runtime.Serialization.Formatters.Binary;
 
 namespace GerberVS
 {
@@ -65,22 +63,22 @@ namespace GerberVS
         }
 
         /// <summary>
+        /// Gets the file information list.
+        /// </summary>
+        public Collection<GerberFileInformation> FileInfo
+        {
+            get { return fileInfo; }
+        }
+
+        /// <summary>
         /// Creates a new instance of the gerber project type class.
         /// </summary>
         public GerberProject()
         {
             fileInfo = new Collection<GerberFileInformation>();
             CheckBeforeDelete = true;
-            ShowHiddenSelection = true;
+            ShowHiddenSelection = false;
             RenderQuality = GerberRenderQuality.Default;
-        }
-
-        /// <summary>
-        /// Gets the file information list.
-        /// </summary>
-        public Collection<GerberFileInformation> FileInfo
-        {
-            get { return fileInfo; }
         }
     }
 
@@ -121,24 +119,14 @@ namespace GerberVS
         public double ScaleFactorY { get; set; }
 
         /// <summary>
-        /// Gets or sets the X translate value.
-        /// </summary>
-        public double TranslateX { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Y translate value.
-        /// </summary>
-        public double TranslateY { get; set; }
-
-        /// <summary>
         /// Gets or sets the X scroll value.
         /// </summary>
-        public double ScrollValueX { get; set; }
+        //public double ScrollValueX { get; set; }
 
         /// <summary>
         /// Gets or sets the Y scroll value.
         /// </summary>
-        public double ScrollValueY { get; set; }    // Current Y scroll value.
+        //public double ScrollValueY { get; set; }    // Current Y scroll value.
 
         /// <summary>
         /// The X coordinate of the lower left corner (in real world coordinates, in inches).
@@ -160,8 +148,8 @@ namespace GerberVS
         /// </summary>
         public GerberRenderInformation()
         {
-            ScaleFactorX = 1.0;
-            ScaleFactorY = 1.0;
+            ScaleFactorX = 1.0f;
+            ScaleFactorY = 1.0f;
             RenderQuality = GerberRenderQuality.Default;
         }
     }
@@ -174,7 +162,7 @@ namespace GerberVS
         /// <summary>
         /// The image holding all the geometry of the layer.
         /// </summary>
-        public GerberImage Image { get; set; }
+        public GerberImage Image { get; internal set; }
 
         /// <summary>
         /// The color to render this layer with.
@@ -209,7 +197,7 @@ namespace GerberVS
         /// <summary>
         /// User specified transformation for the layer.
         /// </summary>
-        public GerberUserTransform UserTransform { get; set; }
+        public UserTransform UserTransform { get; set; }
 
         /// <summary>
         /// Creates a new instance of gerber file information type.
@@ -218,7 +206,7 @@ namespace GerberVS
         {
             Image = null;
             IsVisible = true;
-            UserTransform = new GerberUserTransform();
+            UserTransform = new UserTransform();
         }
     }
 
@@ -291,7 +279,7 @@ namespace GerberVS
     /// <summary>
     /// Defines the tranformations set by the user.
     /// </summary>
-    public class GerberUserTransform
+    public class UserTransform
     {
         /// <summary>
         /// Gets or sets the X translation (in inches).
@@ -336,13 +324,24 @@ namespace GerberVS
         /// <summary>
         /// Creates a new instance of the user transformation type class.
         /// </summary>
-        public GerberUserTransform()
+        public UserTransform()
         {
             ScaleX = 1.0;
             ScaleY = 1.0;
         }
 
-        public GerberUserTransform(double translateX, Double translateY, double scaleX, double scaleY, double rotation,
+        /// <summary>
+        /// Creates a new instance of the user transformation type class with supplied parameters.
+        /// </summary>
+        /// <param name="translateX"></param>
+        /// <param name="translateY"></param>
+        /// <param name="scaleX"></param>
+        /// <param name="scaleY"></param>
+        /// <param name="rotation"></param>
+        /// <param name="mirrorArroundX"></param>
+        /// <param name="mirrorAroundY"></param>
+        /// <param name="Inverted"></param>
+        public UserTransform(double translateX, Double translateY, double scaleX, double scaleY, double rotation,
                                    bool mirrorArroundX, bool mirrorAroundY, bool Inverted)
         {
             TranslateX = translateX;

@@ -1,4 +1,34 @@
-﻿using System;
+﻿/* LibGerberVS.cs - Main Library file. */
+
+/*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
+    *** Acknowledgments to Gerbv Authors and Contributors. ***
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. Neither the name of the project nor the names of its contributors
+       may be used to endorse or promote products derived from this software
+       without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+ */
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -18,6 +48,7 @@ namespace GerberVS
         //private RectangleF rect;
         private const int NumberOfDefaultColors = 18;
         private static int defaultColorIndex = 0;
+        private static Color backgroundColor;
         private static int[,] defaultColors = {
 	        {177, 115, 115, 222},
 	        {177, 255, 127, 115},
@@ -38,8 +69,6 @@ namespace GerberVS
 	        {177, 253, 238, 197},
 	        {177, 226, 226, 226} };
 
-        private static Color backgroundColor;
-
         /// <summary>
         /// Creates a new Gerber Project.
         /// </summary>
@@ -48,6 +77,7 @@ namespace GerberVS
         {
             GerberProject project = new GerberProject();
             project.Path = Directory.GetCurrentDirectory();
+            defaultColorIndex = 0;
             project.FileCount = 0;
             project.CurrentIndex = -1;
             project.ProjectName = String.Empty;
@@ -165,7 +195,7 @@ namespace GerberVS
         /// Reloads an existing layer within a project.
         /// </summary>
         /// <param name="project">project</param>
-        /// <param name="index">project file index</param>
+        /// <param name="index">project file index to reload</param>
         public void ReloadLayer(GerberProject project, int index)
         {
             bool reload = true;
@@ -186,7 +216,7 @@ namespace GerberVS
         /// <summary>
         /// Reloads all existing layers within a project.
         /// </summary>
-        /// <param name="project"></param>
+        /// <param name="project">gerber project</param>
         public void ReloadAllLayers(GerberProject project)
         {
             for (int i = 0; i < project.FileCount; i++)
@@ -251,66 +281,12 @@ namespace GerberVS
             }
 
             BoundingBox boundingbox = new BoundingBox(x1, y2, x2, y1);
+            RectangleF projectRectangle = new RectangleF((float)x1, (float)y2, (float)(x2 - x1), (float)(y2 - y1));
             return boundingbox;
         }
 
         /// <summary>
-        /// Translates the rendered image to the centre of the visible display area.
-        /// </summary>
-        /// <param name="project">project details</param>
-        /// <param name="renderInfo">render information</param>
-        public void TranslateToCentreDisplay(GerberProject project, GerberRenderInformation renderInfo)
-        {
-            BoundingBox projectBounds = GetProjectBounds(project);
-            if (!projectBounds.IsValid())
-                return;
-
-            double left = projectBounds.Left - 0.25f;
-            double bottom = projectBounds.Bottom - 0.25f;
-            double right = projectBounds.Right + 0.25f;
-            double top = projectBounds.Top + 0.25f;
-            double imageWidth = right - left;
-            double imageHeight = top - bottom;
-
-            renderInfo.ImageWidth = imageWidth;
-            renderInfo.ImageHeight = imageHeight;
-            renderInfo.Left = ((renderInfo.DisplayWidth - imageWidth) / 2) - left;
-            renderInfo.Bottom = -((renderInfo.DisplayHeight + imageHeight) / 2) - bottom;
-            if (imageWidth > renderInfo.DisplayWidth)
-                renderInfo.Left = -left;
-
-            if (imageHeight > renderInfo.DisplayHeight)
-                renderInfo.Bottom = -(imageHeight + bottom);
-        }
-
-        /// <summary>
-        /// Translates the rendered image to the top left of the display area.
-        /// </summary>
-        /// <param name="project">project information</param>
-        /// <param name="renderInfo">render information</param>
-        public void TranslateToFitDisplay(GerberProject project, GerberRenderInformation renderInfo)
-        {
-            double width, height;
-
-            BoundingBox projectBounds = GetProjectBounds(project);
-            if (!projectBounds.IsValid())
-                return;
-
-            double left = projectBounds.Left - 0.25f;
-            double bottom = projectBounds.Bottom - 0.25f;
-            double right = projectBounds.Right + 0.25f;
-            double top = projectBounds.Top + 0.25f;
-
-            width = right - left;
-            height = top - bottom;
-            renderInfo.ImageWidth = width;
-            renderInfo.ImageHeight = height;
-            renderInfo.Left = left;
-            renderInfo.Bottom = right;
-        }
-
-        /// <summary>
-        /// Creates the Gerber image holding all the geometry of the layer.
+        /// Creates the Gerber image holding all the geometry for the layer.
         /// </summary>
         /// <param name="filePath">filename containing the layer geometry</param>
         /// <returns>gerber image</returns>
@@ -332,7 +308,7 @@ namespace GerberVS
         {
             bool inSelect = false;
             bool done = false;
-            GerberImage image = selectionInfo.SelectedFileInfo.Image;
+            GerberImage image = selectionInfo.FileInfo.Image;
             GerberNet currentNet = image.GerberNetList[index];
             GraphicsPath path = null;
             // If a point click, lower left x1 and y1 hold the click co-ordinates
@@ -341,6 +317,7 @@ namespace GerberVS
             float x2 = (float)selectionInfo.UpperRightX, y2 = (float)selectionInfo.UpperRightY;
             float startX, startY, stopX, stopY;
 
+            PointD offSet = GetImageOffsets(image);
             // Use point selection.
             if (selectionInfo.SelectionType == GerberSelection.PointClick)
             {
@@ -351,10 +328,10 @@ namespace GerberVS
                     {
                         float stepAndRepeatX = rx * (float)currentNet.Level.StepAndRepeat.DistanceX;
                         float stepAndRepeatY = ry * (float)currentNet.Level.StepAndRepeat.DistanceY;
-                        startX = (float)currentNet.StartX + stepAndRepeatX;
-                        startY = (float)currentNet.StartY + stepAndRepeatY;
-                        stopX = (float)currentNet.StopX + stepAndRepeatX;
-                        stopY = (float)currentNet.StopY + stepAndRepeatY;
+                        startX = (float)(currentNet.StartX + stepAndRepeatX + offSet.X);
+                        startY = (float)(currentNet.StartY + stepAndRepeatY + offSet.Y);
+                        stopX = (float)(currentNet.StopX + stepAndRepeatX + offSet.X);
+                        stopY = (float)(currentNet.StopY + stepAndRepeatY + offSet.Y);
 
                         if (currentNet.BoundingBox != null)
                         {
@@ -493,6 +470,77 @@ namespace GerberVS
         }
 
         /// <summary>
+        /// Applies offsets to move the image within the display area.
+        /// </summary>
+        /// <param name="project">project data</param>
+        /// <param name="renderInfo">rendering information</param>
+        public void TranslateToFitDisplay(GerberProject project, GerberRenderInformation renderInfo)
+        {
+            BoundingBox bb = GetProjectBounds(project);
+            if (!bb.IsValid())
+                return;
+
+            double left = (bb.Left * renderInfo.ScaleFactorX) - 0.25f;
+            double bottom = (bb.Bottom * renderInfo.ScaleFactorY) - 0.25f;
+            double right = (bb.Right * renderInfo.ScaleFactorX) + 0.25f;
+            double top = (bb.Top * renderInfo.ScaleFactorY) + 0.25f;
+
+            renderInfo.ImageWidth = right - left;
+            renderInfo.ImageHeight = top - bottom;
+            renderInfo.Left = -left;
+            renderInfo.Bottom = -((top - bottom) + bottom);
+        }
+
+        /// <summary>
+        /// Scales the image to display maximised within the display area.
+        /// </summary>
+        /// <param name="project">project data</param>
+        /// <param name="renderInfo">rendering information</param>
+        public void ScaleToFit(GerberProject project, GerberRenderInformation renderInfo)
+        {
+            double width, height;
+            double scaleX, scaleY;
+
+            BoundingBox bb = GetProjectBounds(project);
+            if (!bb.IsValid())
+                return;
+
+            width = bb.Right - bb.Left;
+            height = bb.Top - bb.Bottom;
+            scaleX = (float)((renderInfo.DisplayWidth - 0.3) / width);
+            scaleY = (float)((renderInfo.DisplayHeight - 0.3) / height);
+            renderInfo.ScaleFactorX = renderInfo.ScaleFactorY = (float)Math.Min(scaleX, scaleY);
+            TranslateToCentre(project, renderInfo);
+        }
+
+        /// <summary>
+        /// Applies offsets to centre the image within the display area.
+        /// </summary>
+        /// <param name="project">project data</param>
+        /// <param name="renderInfo">rendering information</param>
+        public void TranslateToCentre(GerberProject project, GerberRenderInformation renderInfo)
+        {
+            BoundingBox bb = GetProjectBounds(project);
+            if (!bb.IsValid())
+                return;
+
+            double left = (bb.Left * renderInfo.ScaleFactorX) - 0.15;
+            double bottom = (bb.Bottom * renderInfo.ScaleFactorY) - 0.15;
+            double right = (bb.Right * renderInfo.ScaleFactorX) + 0.15;
+            double top = (bb.Top * renderInfo.ScaleFactorY) + 0.15;
+
+            renderInfo.ImageWidth = right - left;
+            renderInfo.ImageHeight = top - bottom;
+            renderInfo.Left = ((renderInfo.DisplayWidth - renderInfo.ImageWidth) / 2) - left;
+            renderInfo.Bottom = -((renderInfo.DisplayHeight + renderInfo.ImageHeight) / 2) - bottom;
+            if (renderInfo.ImageWidth > renderInfo.DisplayWidth)
+                renderInfo.Left = -left;
+
+            if (renderInfo.ImageHeight > renderInfo.DisplayHeight)
+                renderInfo.Bottom = -(renderInfo.ImageHeight + bottom);
+        }
+
+        /// <summary>
         /// Creates a selection information object for the user selection layer data.
         /// </summary>
         /// <param name="fileInfo">file information</param>
@@ -500,7 +548,7 @@ namespace GerberVS
         public SelectionInformation CreateSelectionLayer(GerberFileInformation fileInfo)
         {
             SelectionInformation selectionInfo = new SelectionInformation(fileInfo);
-            selectionInfo.SelectedFileInfo.Image = GerberImage.Copy(fileInfo.Image);
+            selectionInfo.FileInfo.Image = GerberImage.Copy(fileInfo.Image);
             return selectionInfo;
         }
 
@@ -512,27 +560,29 @@ namespace GerberVS
         /// <param name="renderInfo">information for positioning, scaling and translating</param>
         public void RenderAllLayers(Graphics graphics, GerberProject project, GerberRenderInformation renderInfo)
         {
-            int fileIndex = project.FileInfo.Count - 1;
-
+            int fileCount = project.FileInfo.Count;
             backgroundColor = project.BackgroundColor;
             graphics.Clear(backgroundColor);
 
-            for (int i = fileIndex; i >= 0; i--)
+            for (int i = fileCount - 1; i >= 0; i--)
             {
                 if (project.FileInfo[i] != null && project.FileInfo[i].IsVisible)
-                    RenderLayer(graphics, project.FileInfo[i], renderInfo, project);
+                    RenderLayer(graphics, project.FileInfo[i], null, renderInfo);
             }
         }
 
         /// <summary>
-        /// Renders the user selection layer.
+        /// Renders the layer containing the user selected objects.
         /// </summary>
         /// <param name="graphics">surface to render the image</param>
         /// <param name="selectionInfo">selection info of nets to render</param>
         /// <param name="renderInfo">information for positioning, scaling and translating</param>
         public void RenderSelectionLayer(Graphics graphics, SelectionInformation selectionInfo, GerberRenderInformation renderInfo)
         {
-            RenderLayer(graphics, selectionInfo, renderInfo);
+            if (selectionInfo == null)
+                return;
+
+            RenderLayer(graphics, selectionInfo.FileInfo, selectionInfo, renderInfo);
         }
 
         /// <summary>
@@ -552,7 +602,7 @@ namespace GerberVS
                 {
                     GraphicsState state = graphics.Save();
                     graphics.CompositingMode = CompositingMode.SourceCopy;
-                    RenderLayerToTarget(graphics, project.FileInfo[i]);
+                    RenderLayerToTarget(graphics, project.FileInfo[i], null);
                     graphics.Restore(state);
                 }
             }
@@ -564,22 +614,22 @@ namespace GerberVS
         /// <param name="filePath">Full path name to write file to</param>
         /// <param name="project">project info</param>
         /// <param name="renderInfo">render information</param>
-        public void ProjectToPng(string filePath, GerberProject project, GerberRenderInformation renderInfo, Graphics g)
+        public void ExportProjectToPng(string filePath, GerberProject project, GerberRenderInformation renderInfo)
         {
             try
             {
                 int fileIndex = project.FileInfo.Count - 1;
-                int width = (int)(renderInfo.ImageWidth * g.DpiX);
-                int height = (int)(renderInfo.ImageHeight * g.DpiY);
+                int width = (int)(renderInfo.ImageWidth * 96);
+                int height = (int)(renderInfo.ImageHeight * 96);
 
                 using (Bitmap bitmap = new Bitmap(width, height))
                 using (Graphics graphics = Graphics.FromImage(bitmap))
                 {
-                    graphics.Clear(Color.Black);
+                    graphics.Clear(backgroundColor);
                     for (int i = fileIndex; i >= 0; i--)
                     {
                         if (project.FileInfo[i] != null && project.FileInfo[i].IsVisible)
-                            RenderLayer(graphics, project.FileInfo[i], renderInfo, project);
+                            RenderLayer(graphics, project.FileInfo[i], null, renderInfo);
                     }
 
                     bitmap.Save(filePath, ImageFormat.Png);
@@ -592,9 +642,10 @@ namespace GerberVS
             }
         }
 
-        internal void RenderLayer(Graphics graphics, GerberFileInformation fileInfo, GerberRenderInformation renderInfo, GerberProject project)
+        private void RenderLayer(Graphics graphics, GerberFileInformation fileInfo, SelectionInformation selectionInfo, GerberRenderInformation renderInfo)
         {
             Size bmSize = GetBitmapSize(graphics, renderInfo);
+            //bmSize = new Size((int)(renderInfo.ImageWidth * graphics.DpiX), (int)(renderInfo.ImageHeight * graphics.DpiY));
             // Create a back buffer and draw to it with no alpha level.
             using (Bitmap bitmap = new Bitmap(bmSize.Width, bmSize.Height, graphics))
             using (Graphics backBuffer = Graphics.FromImage(bitmap))
@@ -610,31 +661,8 @@ namespace GerberVS
                 path.AddLine((float)bb.Right, (float)bb.Top, (float)bb.Right, (float)bb.Bottom);
                 path.AddLine((float)bb.Right, (float)bb.Bottom, (float)bb.Left, (float)bb.Bottom);
                 backBuffer.DrawPath(new Pen(Color.FromArgb(117, 200, 0, 0), 0.015f), path);*/
-                RenderLayerToTarget(backBuffer, fileInfo);
+                RenderLayerToTarget(backBuffer, fileInfo, selectionInfo);
                 // Copy the back buffer to the visible surface with alpha transparency level.
-                graphics.CompositingMode = CompositingMode.SourceOver;
-                graphics.DrawImage(bitmap, 0, 0);
-            }
-        }
-
-        /// <summary>
-        /// Draw the user selection layer.
-        /// </summary>
-        /// <param name="graphics">surface to render the image</param>
-        /// <param name="selectionInfo">information about the users selection area</param>
-        /// <param name="renderInfo">information for positioning, scaling and translating</param>
-        internal void RenderLayer(Graphics graphics, SelectionInformation selectionInfo, GerberRenderInformation renderInfo)
-        {
-            Size bmSize = GetBitmapSize(graphics, renderInfo);
-
-            // Create a back buffer and draw to it with no alpha level.
-            using (Bitmap bitmap = new Bitmap(bmSize.Width, bmSize.Height, graphics))
-            using (Graphics backBuffer = Graphics.FromImage(bitmap))
-            {
-                backBuffer.CompositingMode = CompositingMode.SourceOver;
-                ScaleAndTranslate(backBuffer, renderInfo);
-                RenderLayerToTarget(backBuffer, selectionInfo);
-                // Copy the back buffer to the visible surface with alpha level.
                 graphics.CompositingMode = CompositingMode.SourceOver;
                 graphics.DrawImage(bitmap, 0, 0);
             }
@@ -710,18 +738,14 @@ namespace GerberVS
             defaultColorIndex++;
         }
 
-        private static void RenderLayerToTarget(Graphics graphics, GerberFileInformation fileInfo)
+        private static void RenderLayerToTarget(Graphics graphics, GerberFileInformation fileInfo, SelectionInformation selectionInfo)
         {
             // Add transparency to the rendering color.
             Color foregroundColor = Color.FromArgb(fileInfo.Alpha, fileInfo.Color);
-            GerberDraw.DrawImageToTarget(graphics, fileInfo, foregroundColor, backgroundColor);
-        }
+            if (selectionInfo != null)
+                foregroundColor = Color.FromArgb(200, Color.White);
 
-        private static void RenderLayerToTarget(Graphics graphics, SelectionInformation selectionInfo)
-        {
-            // Add transparency to the rendering color.
-            Color foregroundColor = Color.FromArgb(200, Color.White);
-            GerberDraw.DrawImageToTarget(graphics, selectionInfo, foregroundColor, backgroundColor);
+            GerberDraw.RenderImageToTarget(graphics, fileInfo.Image, selectionInfo, fileInfo.UserTransform, foregroundColor, backgroundColor);
         }
 
         private static void ScaleAndTranslate(Graphics graphics, GerberRenderInformation renderInfo)
@@ -736,14 +760,10 @@ namespace GerberVS
                 graphics.SmoothingMode = SmoothingMode.HighSpeed;
 
             graphics.PageUnit = GraphicsUnit.Inch;
-            double translateX = (renderInfo.Left * renderInfo.ScaleFactorX);
-            double translateY = (renderInfo.Bottom * renderInfo.ScaleFactorY);
-            //  Translate the draw area before drawing. We must translate the whole drawing down
-            //  an additional displayHeight to account for the negative y flip done later.
+            //  Translate the draw area before drawing. We must translate the whole drawing down.
             graphics.ScaleTransform(1, -1);
-            graphics.TranslateTransform((float)(translateX + renderInfo.ScrollValueX), (float)(translateY - renderInfo.ScrollValueY));
-            //graphics.TranslateTransform(-(float)(translateX - renderInfo.ScrollValueX), (float)(translateY + renderInfo.ImageHeight + renderInfo.ScrollValueY));
-            //graphics.ScaleTransform((float)renderInfo.ScaleFactorY, -(float)renderInfo.ScaleFactorY);
+            graphics.TranslateTransform((float)renderInfo.Left, (float)renderInfo.Bottom);
+            graphics.ScaleTransform((float)renderInfo.ScaleFactorX, (float)renderInfo.ScaleFactorY);
         }
 
         // Calculate how big to make the bitmap back buffer.
@@ -766,8 +786,22 @@ namespace GerberVS
             return bmSize;
         }
 
+        // Image justify and image offset are depreciated, but still supporting it for now.
+        private static PointD GetImageOffsets(GerberImage image)
+        {
+            double offSetX = 0.0;
+            double offSetY = 0.0;
+
+            offSetX = image.ImageInfo.ImageJustifyOffsetActualA;
+            offSetY = (float)image.ImageInfo.ImageJustifyOffsetActualB;
+            offSetX += image.ImageInfo.OffsetA;
+            offSetY += image.ImageInfo.OffsetB;
+
+            return new PointD(offSetX, offSetY);
+        }
+
         // Check for a valid value.
-        private bool IsNormal(double value)
+        private static bool IsNormal(double value)
         {
             return (!double.IsInfinity(value) && !double.IsNaN(value));
         }

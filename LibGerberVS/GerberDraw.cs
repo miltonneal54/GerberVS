@@ -1,6 +1,6 @@
 ﻿// GerberDraw.cs - Handles rendering of gerber and drill images.
 
-/*  Copyright (C) 2015-2019 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
     *** Acknowledgments to Gerbv Authors and Contributors. ***
 
     Redistribution and use in source and binary forms, with or without
@@ -44,24 +44,8 @@ namespace GerberVS
 {
     internal static class GerberDraw
     {
-        private static bool invert;
-
-        internal static void DrawImageToTarget(Graphics graphics, SelectionInformation selectionInfo, Color foreGroundColor, Color backGroundColor)
-        {
-            invert = false;
-            GerberFileInformation fileInfo = selectionInfo.SelectedFileInfo;
-            RenderToTarget(graphics, fileInfo.Image, selectionInfo.SelectedNodeArray.SelectedNetList, fileInfo.UserTransform, foreGroundColor, backGroundColor);
-        }
-
-
-        internal static void DrawImageToTarget(Graphics graphics, GerberFileInformation fileInfo, Color foreGroundColor, Color backGroundColor)
-        {
-            invert = fileInfo.UserTransform.Inverted;
-            RenderToTarget(graphics, fileInfo.Image, fileInfo.Image.GerberNetList, fileInfo.UserTransform, foreGroundColor, backGroundColor);
-        }
-
         // Renders a gerber image to the specified graphics target.
-        private static void RenderToTarget(Graphics graphics, GerberImage gerberImage, Collection<GerberNet> gerberNetList, GerberUserTransform userTransform,
+        internal static void RenderImageToTarget(Graphics graphics, GerberImage gerberImage, SelectionInformation selectionInfo, UserTransform userTransform,
             Color foreGroundColor, Color backGroundColor)
         {
             float dx, dy;
@@ -71,19 +55,31 @@ namespace GerberVS
             float repeatDistanceX = 0.0f, repeatDistanceY = 0.0f;
 
             Collection<SimplifiedApertureMacro> simplifiedMacroList;
+            Collection<GerberNet> gerberNetList = null;
             PointF startPoint, endPoint;
             RectangleF apertureRectangle;
 
             GerberNet currentNet = null;
             GerberLevel oldLevel = null;
-            GerberNetState oldState = null;
-            bool invertPolarity = false;
+            GerberNetState oldNetState = null;
+            bool invertPolarity = userTransform.Inverted;
             int netListIndex = 0;
 
             SolidBrush brush = new SolidBrush(foreGroundColor);
             Pen pen = new Pen(foreGroundColor);
 
-            // Apply user supplied transforations.
+            if (selectionInfo == null)
+                gerberNetList = gerberImage.GerberNetList;
+
+            else
+            {
+                // Rendering the user selection.
+                gerberNetList = selectionInfo.SelectedNodeArray.SelectedNetList;
+                invertPolarity = false; // Don't allow inverted polarity when rendering selected objects.
+            }
+
+
+            // Apply user supplied transformations.
             double scaleX = userTransform.ScaleX;
             double scaleY = userTransform.ScaleY;
             if (userTransform.MirrorAroundX)
@@ -101,7 +97,6 @@ namespace GerberVS
             graphics.TranslateTransform((float)gerberImage.ImageInfo.OffsetA, (float)gerberImage.ImageInfo.OffsetB);
             graphics.RotateTransform((float)gerberImage.ImageInfo.ImageRotation);
 
-            invertPolarity = invert;
             if (gerberImage.ImageInfo.Polarity == GerberPolarity.Negative)
                 invertPolarity = !invertPolarity;
 
@@ -115,7 +110,7 @@ namespace GerberVS
                 if (currentNet.Level != oldLevel)
                 {
                     graphics.Restore(gState);
-                    // Set the current net transformation and polarity.
+                    // Set the current level transformation and polarity.
                     graphics.RotateTransform((float)currentNet.Level.Rotation);
                     if (currentNet.Level.Polarity == GerberPolarity.Clear ^ invertPolarity)
                         pen.Color = brush.Color = backGroundColor;
@@ -132,7 +127,6 @@ namespace GerberVS
                     // Draw any knockout areas.
                     if (currentNet.Level.Knockout.FirstInstance == true)
                     {
-                        Color oldColor = foreGroundColor;
                         if (currentNet.Level.Knockout.Polarity == GerberPolarity.Clear)
                             pen.Color = brush.Color = backGroundColor;
 
@@ -150,24 +144,20 @@ namespace GerberVS
                         knockoutPath.AddLines(points);
                         knockoutPath.CloseFigure();
                         graphics.FillPath(brush, knockoutPath);
-
                         // Restore the polarity.
-                        pen.Color = brush.Color = oldColor;
+                        pen.Color = brush.Color = foreGroundColor;
                     }
 
                     oldLevel = currentNet.Level;
-                    ApplyNetStateTransformation(graphics, currentNet.NetState);
-                    oldState = currentNet.NetState;
                 }
 
                 // Check if this is a new netstate.
-                if (currentNet.NetState != oldState)
+                if (currentNet.NetState != oldNetState)
                 {
                     // A new state, so recalculate the new transformation matrix.
                     graphics.Restore(gState);
-                    graphics.RotateTransform((float)currentNet.Level.Rotation);
                     ApplyNetStateTransformation(graphics, currentNet.NetState);
-                    oldState = currentNet.NetState;
+                    oldNetState = currentNet.NetState;
                 }
 
                 for (int rx = 0; rx < repeatX; rx++)
@@ -344,8 +334,6 @@ namespace GerberVS
             graphics.Restore(gState);
         }
 
-        
-
         private static bool DrawApertureMacro(Graphics graphics, Collection<SimplifiedApertureMacro> simplifiedApertureList, Color layerColor, Color backColor)
         {
             //Debug.WriteLine("Drawing simplified Aperture macros:");
@@ -368,7 +356,6 @@ namespace GerberVS
                         float radius = diameter / 2.0f;
 
                         RectangleF objectRectangle = new RectangleF(centreX - radius, centreY - radius, diameter, diameter);
-
                         if (exposure > 0)
                             graphicsPath.FillMode = FillMode.Winding;
 
@@ -392,7 +379,7 @@ namespace GerberVS
                         }
 
                         if (rotation != 0)
-                            ApertureTransformPoints(points, rotation);
+                            TransformPoints(points, rotation);
 
                         if (exposure > 0)
                             graphicsPath.FillMode = FillMode.Winding;
@@ -432,7 +419,7 @@ namespace GerberVS
                                                          new PointF(centreX, centreY - halfCrossHairLength), new PointF(centreX, centreY + halfCrossHairLength) };
 
                         if (rotation != 0)
-                            ApertureTransformPoints(points, rotation);
+                            TransformPoints(points, rotation);
 
                         using (Pen pen = new Pen(layerColor))
                         {
@@ -478,7 +465,7 @@ namespace GerberVS
                                                          new PointF(centreX, centreY + (innerDiameter / 2)), new PointF(centreX, centreY + gap)};
 
                         if (rotation != 0)
-                            ApertureTransformPoints(points, rotation);
+                            TransformPoints(points, rotation);
 
                         using (Pen pen = new Pen(backColor))
                         {
@@ -505,7 +492,7 @@ namespace GerberVS
                         PointF[] points = new PointF[] { new PointF(startX, startY), new PointF(endX, endY) };
 
                         if (rotation != 0)
-                            ApertureTransformPoints(points, rotation);
+                            TransformPoints(points, rotation);
 
                         if (exposure > 0)
                             graphicsPath.FillMode = FillMode.Winding;
@@ -534,7 +521,7 @@ namespace GerberVS
                                                          new PointF(centreX - halfWidth, centreY + halfHeight) };
 
                         if (rotation != 0)
-                            ApertureTransformPoints(points, rotation);
+                            TransformPoints(points, rotation);
 
                         if (exposure > 0)
                             graphicsPath.FillMode = FillMode.Winding;
@@ -557,7 +544,7 @@ namespace GerberVS
                                                          new PointF(lowerLeftX, height) };
 
                         if (rotation != 0)
-                            ApertureTransformPoints(points, rotation);
+                            TransformPoints(points, rotation);
 
                         if (exposure > 0)
                             graphicsPath.FillMode = FillMode.Winding;
@@ -628,7 +615,7 @@ namespace GerberVS
             }
 
             if (rotation != 0)
-                ApertureTransformPoints(points, rotation);
+                TransformPoints(points, rotation);
 
             path.AddPolygon(points);
         }
@@ -739,24 +726,6 @@ namespace GerberVS
             currentIndex++;
         }
 
-        /*private static void UpdateMacroExposure(ref Color apertureColor, Color backColor, Color layerColor, double exposureSetting)
-        {
-            if (exposureSetting == 0.0)
-                apertureColor = backColor;
-
-            else if (exposureSetting == 1.0)
-                apertureColor = layerColor;
-
-            else
-            {
-                if (apertureColor == backColor)
-                    apertureColor = layerColor;
-
-                else
-                    apertureColor = backColor;
-            }
-        }*/
-
         private static void ApplyNetStateTransformation(Graphics graphics, GerberNetState netState)
         {
             // Apply scale factor.
@@ -782,7 +751,7 @@ namespace GerberVS
                     break;
             }
 
-            // Finally, apply axis select.
+            // Apply axis select.
             if (netState.AxisSelect == GerberAxisSelect.SwapAB)
             {
                 // Do this by rotating 270 degrees counterclockwise, then mirroring the Y axis.
@@ -791,15 +760,14 @@ namespace GerberVS
             }
         }
 
-        private static void ApertureTransformPoints(PointF[] points, double rotation)
+        private static void TransformPoints(PointF[] points, double rotation, double offsetX = 0.0, double offsetY = 0.0)
         {
             using (Matrix apertureMatrix = new Matrix())
             {
-
+                apertureMatrix.Translate((float)offsetX, (float)offsetY);
                 apertureMatrix.Rotate((float)rotation);
                 apertureMatrix.TransformPoints(points);
             }
-            //apertureMatrix.Dispose();
         }
     }
 }

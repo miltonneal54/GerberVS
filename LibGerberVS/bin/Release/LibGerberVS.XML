@@ -187,7 +187,7 @@
             <param name="inputImage">gerber image to export</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.ExportExcellonDrill.DrillFileFromImage(System.String,GerberVS.GerberImage,GerberVS.GerberUserTransform)">
+        <member name="M:GerberVS.ExportExcellonDrill.DrillFileFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
             <summary>
             Export a gerber image to NC file format with user tranformations.
             </summary>
@@ -201,7 +201,7 @@
             Create a RS274X file from a gerber image.
             </summary>
         </member>
-        <member name="M:GerberVS.ExportGerberRS274X.RS274xFromImage(System.String,GerberVS.GerberImage)">
+        <member name="M:GerberVS.ExportGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage)">
             <summary>
             Export a gerber image to RS274X file format.
             </summary>
@@ -209,7 +209,7 @@
             <param name="inputImage">gerber image to export</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.ExportGerberRS274X.RS274xFromImage(System.String,GerberVS.GerberImage,GerberVS.GerberUserTransform)">
+        <member name="M:GerberVS.ExportGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
             <summary>
             Export a gerber image to RS274X file format with user tranformations.
             </summary>
@@ -318,26 +318,6 @@
             Gets or sets the Y direction scale factor.
             </summary>
         </member>
-        <member name="P:GerberVS.GerberRenderInformation.TranslateX">
-            <summary>
-            Gets or sets the X translate value.
-            </summary>
-        </member>
-        <member name="P:GerberVS.GerberRenderInformation.TranslateY">
-            <summary>
-            Gets or sets the Y translate value.
-            </summary>
-        </member>
-        <member name="P:GerberVS.GerberRenderInformation.ScrollValueX">
-            <summary>
-            Gets or sets the X scroll value.
-            </summary>
-        </member>
-        <member name="P:GerberVS.GerberRenderInformation.ScrollValueY">
-            <summary>
-            Gets or sets the Y scroll value.
-            </summary>
-        </member>
         <member name="P:GerberVS.GerberRenderInformation.Left">
             <summary>
             The X coordinate of the lower left corner (in real world coordinates, in inches).
@@ -403,52 +383,65 @@
             User specified transformation for the layer.
             </summary>
         </member>
-        <member name="T:GerberVS.GerberUserTransform">
+        <member name="T:GerberVS.UserTransform">
             <summary>
             Defines the tranformations set by the user.
             </summary>
         </member>
-        <member name="M:GerberVS.GerberUserTransform.#ctor">
+        <member name="M:GerberVS.UserTransform.#ctor">
             <summary>
             Creates a new instance of the user transformation type class.
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.TranslateX">
+        <member name="M:GerberVS.UserTransform.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Creates a new instance of the user transformation type class with supplied parameters.
+            </summary>
+            <param name="translateX"></param>
+            <param name="translateY"></param>
+            <param name="scaleX"></param>
+            <param name="scaleY"></param>
+            <param name="rotation"></param>
+            <param name="mirrorArroundX"></param>
+            <param name="mirrorAroundY"></param>
+            <param name="Inverted"></param>
+        </member>
+        <member name="P:GerberVS.UserTransform.TranslateX">
             <summary>
             Gets or sets the X translation (in inches).
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.TranslateY">
+        <member name="P:GerberVS.UserTransform.TranslateY">
             <summary>
             Gets or sets the Y translation (in inches).
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.ScaleX">
+        <member name="P:GerberVS.UserTransform.ScaleX">
             <summary>
             Gets or sets the X direction scale.
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.ScaleY">
+        <member name="P:GerberVS.UserTransform.ScaleY">
             <summary>
             Gets or sets the Y direction scale.
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.Rotation">
+        <member name="P:GerberVS.UserTransform.Rotation">
             <summary>
             The rotation of the layer around the origin (in degrees).
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.MirrorAroundX">
+        <member name="P:GerberVS.UserTransform.MirrorAroundX">
             <summary>
             True if the layer is mirrored around the X axis (horizonal flip).
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.MirrorAroundY">
+        <member name="P:GerberVS.UserTransform.MirrorAroundY">
             <summary>
             True if the layer is mirrored around the Y axis (vertical flip).
             </summary>
         </member>
-        <member name="P:GerberVS.GerberUserTransform.Inverted">
+        <member name="P:GerberVS.UserTransform.Inverted">
             <summary>
             Set true if the layer should be rendered inverted.
             </summary>
@@ -1029,7 +1022,7 @@
             Class for defining a gerber level.
             </summary>
             <remarks>
-            Construct name "Level" replaces "Layer" in the later Gerber specifications.
+            Constructor name "Level" replaces "Layer" in the later Gerber specifications.
             </remarks>
         </member>
         <member name="M:GerberVS.GerberLevel.#ctor(GerberVS.GerberImage)">
@@ -1105,7 +1098,7 @@
             <summary>
             Reads the stream up to but not including the first occurance of a specified character.
             </summary>
-            <param name="value">cheracter to read to</param>
+            <param name="value">character to read to</param>
             <returns>the resulting string</returns>
         </member>
         <member name="M:GerberVS.GerberLineReader.SkipWhiteSpaces">
@@ -1173,12 +1166,12 @@
         </member>
         <member name="P:GerberVS.GerberNet.Interpolation">
             <summary>
-            Path interpolation method (linear/etc).
+            Path interpolation method (linear/circular/etc).
             </summary>
         </member>
         <member name="P:GerberVS.GerberNet.CircleSegment">
             <summary>
-            Information for arc nets.
+            Data for circular nets.
             </summary>
         </member>
         <member name="P:GerberVS.GerberNet.Label">
@@ -1242,7 +1235,7 @@
         </member>
         <member name="T:GerberVS.SelectionItem">
             <summary>
-            Maintains a list of selected objects and their associated indexes.
+            Maintains a list of selected objects and their associated net index.
             </summary>
         </member>
         <member name="M:GerberVS.SelectionItem.#ctor">
@@ -1276,9 +1269,9 @@
             </summary>
             <param name="index">index within the net list</param>
         </member>
-        <member name="P:GerberVS.SelectionInformation.SelectedFileInfo">
+        <member name="P:GerberVS.SelectionInformation.FileInfo">
             <summary>
-            The current layer of the user selection.
+            File information on the  current selection layer.
             </summary>
         </member>
         <member name="P:GerberVS.SelectionInformation.SelectionType">
@@ -1433,13 +1426,13 @@
             Reloads an existing layer within a project.
             </summary>
             <param name="project">project</param>
-            <param name="index">project file index</param>
+            <param name="index">project file index to reload</param>
         </member>
         <member name="M:GerberVS.LibGerberVS.ReloadAllLayers(GerberVS.GerberProject)">
             <summary>
             Reloads all existing layers within a project.
             </summary>
-            <param name="project"></param>
+            <param name="project">gerber project</param>
         </member>
         <member name="M:GerberVS.LibGerberVS.GetProjectBounds(GerberVS.GerberProject)">
             <summary>
@@ -1447,23 +1440,9 @@
             </summary>
             <param name="project">project containing file list</param>
         </member>
-        <member name="M:GerberVS.LibGerberVS.TranslateToCentreDisplay(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
-            <summary>
-            Translates the rendered image to the centre of the visible display area.
-            </summary>
-            <param name="project">project details</param>
-            <param name="renderInfo">render information</param>
-        </member>
-        <member name="M:GerberVS.LibGerberVS.TranslateToFitDisplay(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
-            <summary>
-            Translates the rendered image to the top left of the display area.
-            </summary>
-            <param name="project">project information</param>
-            <param name="renderInfo">render information</param>
-        </member>
         <member name="M:GerberVS.LibGerberVS.CreateRS274XImageFromFile(System.String)">
             <summary>
-            Creates the Gerber image holding all the geometry of the layer.
+            Creates the Gerber image holding all the geometry for the layer.
             </summary>
             <param name="filePath">filename containing the layer geometry</param>
             <returns>gerber image</returns>
@@ -1475,6 +1454,27 @@
             <param name="graphics">surface where the image is rendered</param>
             <param name="selectionInfo">current selection info</param>
             <param name="index">index of the gerber net to test</param>
+        </member>
+        <member name="M:GerberVS.LibGerberVS.TranslateToFitDisplay(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
+            <summary>
+            Applies offsets to move the image within the display area.
+            </summary>
+            <param name="project">project data</param>
+            <param name="renderInfo">rendering information</param>
+        </member>
+        <member name="M:GerberVS.LibGerberVS.ScaleToFit(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
+            <summary>
+            Scales the image to display maximised within the display area.
+            </summary>
+            <param name="project">project data</param>
+            <param name="renderInfo">rendering information</param>
+        </member>
+        <member name="M:GerberVS.LibGerberVS.TranslateToCentre(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
+            <summary>
+            Applies offsets to centre the image within the display area.
+            </summary>
+            <param name="project">project data</param>
+            <param name="renderInfo">rendering information</param>
         </member>
         <member name="M:GerberVS.LibGerberVS.CreateSelectionLayer(GerberVS.GerberFileInformation)">
             <summary>
@@ -1493,7 +1493,7 @@
         </member>
         <member name="M:GerberVS.LibGerberVS.RenderSelectionLayer(System.Drawing.Graphics,GerberVS.SelectionInformation,GerberVS.GerberRenderInformation)">
             <summary>
-            Renders the user selection layer.
+            Renders the layer containing the user selected objects.
             </summary>
             <param name="graphics">surface to render the image</param>
             <param name="selectionInfo">selection info of nets to render</param>
@@ -1507,21 +1507,13 @@
             <param name="project">project containing the files to render</param>
             <param name="renderInfo">information for positioning, scaling and translating</param>
         </member>
-        <member name="M:GerberVS.LibGerberVS.ProjectToPng(System.String,GerberVS.GerberProject,GerberVS.GerberRenderInformation,System.Drawing.Graphics)">
+        <member name="M:GerberVS.LibGerberVS.ExportProjectToPng(System.String,GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
             <summary>
             Exports a gerber project to a Png image.
             </summary>
             <param name="filePath">Full path name to write file to</param>
             <param name="project">project info</param>
             <param name="renderInfo">render information</param>
-        </member>
-        <member name="M:GerberVS.LibGerberVS.RenderLayer(System.Drawing.Graphics,GerberVS.SelectionInformation,GerberVS.GerberRenderInformation)">
-            <summary>
-            Draw the user selection layer.
-            </summary>
-            <param name="graphics">surface to render the image</param>
-            <param name="selectionInfo">information about the users selection area</param>
-            <param name="renderInfo">information for positioning, scaling and translating</param>
         </member>
         <member name="T:GerberVS.GerberOpCode">
             <summary>
@@ -1546,6 +1538,21 @@
         <member name="F:GerberVS.GerberApertureType.Circle">
             <summary>
             A round aperture.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberUnit.Inch">
+            <summary>
+            Inches.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberUnit.Millimeter">
+            <summary>
+            Millimeters.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberUnit.Unspecified">
+            <summary>
+            Unspecified, use default units.
             </summary>
         </member>
         <member name="T:GerberVS.GerberOmitZero">

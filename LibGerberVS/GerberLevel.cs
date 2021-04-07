@@ -10,7 +10,7 @@ namespace GerberVS
     /// Class for defining a gerber level.
     /// </summary>
     /// <remarks>
-    /// Construct name "Level" replaces "Layer" in the later Gerber specifications.
+    /// Constructor name "Level" replaces "Layer" in the later Gerber specifications.
     /// </remarks>
     public class GerberLevel
     {

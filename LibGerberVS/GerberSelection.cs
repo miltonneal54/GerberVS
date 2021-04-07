@@ -1,6 +1,6 @@
 ﻿/* GerberSelection.cs - Type classes for maintaining a user selection. */
 
-/*  Copyright (C) 2015-2019 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
     *** Acknowledgments to Gerbv Authors and Contributors. ***
 
     Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ using System.Threading.Tasks;
 namespace GerberVS
 {
     /// <summary>
-    /// Maintains a list of selected objects and their associated indexes.
+    /// Maintains a list of selected objects and their associated net index.
     /// </summary>
     public class SelectionItem
     {
@@ -79,9 +79,9 @@ namespace GerberVS
         private SelectionItem selectedNodeArray;
 
         /// <summary>
-        /// The current layer of the user selection.
+        /// File information on the  current selection layer.
         /// </summary>
-        public GerberFileInformation SelectedFileInfo { get; set;}
+        public GerberFileInformation FileInfo { get; set;}
 
         /// <summary>
         /// Indicates whether a point or region type selection is used.
@@ -137,7 +137,7 @@ namespace GerberVS
             selectedNodeArray = new SelectionItem();
             SelectionType = GerberSelection.None;
             PolygonAreaStartIndex = -1;
-            SelectedFileInfo = fileInfo;
+            FileInfo = fileInfo;
         }
 
         /// <summary>
