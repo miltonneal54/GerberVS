@@ -111,7 +111,7 @@ namespace GerberVS
         /// <summary>
         /// Reads in digits from the current file position and converts them to an integer.
         /// </summary>
-        /// <param name="length">numberof digit in the integer</param>
+        /// <param name="length">number of digit in the integer</param>
         /// <returns>the value as an integer</returns>
         public int GetIntegerValue(ref int length)
         {
@@ -121,16 +121,18 @@ namespace GerberVS
             SkipWhiteSpaces();
             isFirst = true;
             char nextCharacter = Read();
-            while (char.IsNumber(nextCharacter) || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
+            while (Char.IsDigit(nextCharacter) || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
             {
+                if(Char.IsDigit(nextCharacter))
+                    length++;   // Exclude any prefixed sign.
+
                 numberString += nextCharacter;
-                length++;
                 isFirst = false;
                 nextCharacter = Read();
             }
 
             Position--;
-            if (!string.IsNullOrEmpty(numberString))
+            if (!String.IsNullOrEmpty(numberString))
                 result = int.TryParse(numberString, out rtnValue);
 
             return rtnValue;
@@ -148,7 +150,7 @@ namespace GerberVS
             SkipWhiteSpaces();
             isFirst = true;
             char nextCharacter = Read();
-            while ((char.IsNumber(nextCharacter) || nextCharacter == '.') || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
+            while ((Char.IsDigit(nextCharacter) || nextCharacter == '.') || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
             {
                 doubleString += nextCharacter;
                 nextCharacter = Read();
@@ -175,13 +177,13 @@ namespace GerberVS
             SkipWhiteSpaces();
             isFirst = true;
             char nextCharacter = Read();
-            while ((char.IsNumber(nextCharacter) || nextCharacter == '.') || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
+            while ((Char.IsDigit(nextCharacter) || nextCharacter == '.') || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
             {
+                if (Char.IsDigit(nextCharacter) || nextCharacter == '.')
+                    length++;
+
                 doubleString += nextCharacter;
                 isFirst = false;
-                if (nextCharacter != '-' && nextCharacter != '+')
-                    length++;   // Exclude any prefixed sign.
-
                 nextCharacter = Read();
             }
 

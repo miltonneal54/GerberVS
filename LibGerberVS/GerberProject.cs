@@ -170,11 +170,6 @@ namespace GerberVS
         public Color Color { get; set; }
 
         /// <summary>
-        /// The alpha level (transparency) of the layer color.
-        /// </summary>
-        public int Alpha { get; set; }
-
-        /// <summary>
         /// Set true if this layer file should be rendered with the project.
         /// </summary>
         public bool IsVisible { get; set; }

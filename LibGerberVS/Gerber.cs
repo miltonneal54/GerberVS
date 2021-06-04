@@ -1727,7 +1727,6 @@ namespace GerberVS
 
                     // Here should be a T defined, but I don't know what it represents.
                 }
-
             }
 
             else

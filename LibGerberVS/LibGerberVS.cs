@@ -45,7 +45,6 @@ namespace GerberVS
     /// </summary>
     public class LibGerberVS
     {
-        //private RectangleF rect;
         private const int NumberOfDefaultColors = 18;
         private static int defaultColorIndex = 0;
         private static Color backgroundColor;
@@ -171,8 +170,7 @@ namespace GerberVS
         /// <param name="project">project</param>
         /// <param name="fullPathName">file path</param>
         /// <param name="color">layer color</param>
-        /// <param name="alpha">alpha level</param>
-        public void OpenLayerFromFilenameAndColor(GerberProject project, string fullPathName, Color color, int alpha)
+        public void OpenLayerFromFilenameAndColor(GerberProject project, string fullPathName, Color color)
         {
             bool reload = false;
             int fileIndex;
@@ -181,8 +179,7 @@ namespace GerberVS
                 OpenImage(project, fullPathName, reload, -1);
                 fileIndex = project.FileCount - 1;
                 project.FileInfo[fileIndex].LayerDirty = false;
-                project.FileInfo[fileIndex].Color = Color.FromArgb(color.A, color.R, color.G, color.B);
-                project.FileInfo[fileIndex].Alpha = alpha;
+                project.FileInfo[fileIndex].Color = color;
             }
 
             catch (Exception ex)
@@ -496,7 +493,7 @@ namespace GerberVS
         /// </summary>
         /// <param name="project">project data</param>
         /// <param name="renderInfo">rendering information</param>
-        public void ScaleToFit(GerberProject project, GerberRenderInformation renderInfo)
+        public void ZoomToFit(GerberProject project, GerberRenderInformation renderInfo)
         {
             double width, height;
             double scaleX, scaleY;
@@ -733,7 +730,6 @@ namespace GerberVS
             colorIndex = defaultColorIndex % NumberOfDefaultColors;
             fileInfo.Color = Color.FromArgb(defaultColors[colorIndex, 0], defaultColors[colorIndex, 1],
                                                            defaultColors[colorIndex, 2], defaultColors[colorIndex, 3]);
-            fileInfo.Alpha = defaultColors[colorIndex, 0];
             fileInfo.IsVisible = true;
             defaultColorIndex++;
         }
@@ -741,7 +737,7 @@ namespace GerberVS
         private static void RenderLayerToTarget(Graphics graphics, GerberFileInformation fileInfo, SelectionInformation selectionInfo)
         {
             // Add transparency to the rendering color.
-            Color foregroundColor = Color.FromArgb(fileInfo.Alpha, fileInfo.Color);
+            Color foregroundColor = fileInfo.Color;
             if (selectionInfo != null)
                 foregroundColor = Color.FromArgb(200, Color.White);
 

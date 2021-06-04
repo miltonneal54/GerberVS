@@ -24,7 +24,7 @@ namespace GerberVS
         /// <returns></returns>
         public static bool RS274xFromImage(string fullPathName, GerberImage inputImage)
         {
-            GerberUserTransform transform = new GerberUserTransform(0, 0, 1, 1, 0, false, false, false);
+            UserTransform transform = new UserTransform(0, 0, 1, 1, 0, false, false, false);
             return DrillFileFromImage(fullPathName, inputImage, transform);
         }
 
@@ -35,7 +35,7 @@ namespace GerberVS
         /// <param name="inputImage">gerber image to export</param>
         /// <param name="transform">apply the user transformations</param>
         /// <returns></returns>
-        public static bool DrillFileFromImage(string fullPathName, GerberImage inputImage, GerberUserTransform transform)
+        public static bool DrillFileFromImage(string fullPathName, GerberImage inputImage, UserTransform transform)
         {
             List<int> apertureTable = new List<int>();
             GerberNet currentNet;

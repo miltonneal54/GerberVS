@@ -1,6 +1,6 @@
-﻿/* BoundingBox.cs - Class for creating a bounding area */
+﻿/* BoundingBox.cs - Class for creating a bounding area. */
 
-/*  Copyright (C) 2015-2018 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions

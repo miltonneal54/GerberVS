@@ -1,6 +1,6 @@
 ﻿/* Drill.cs - Class for processing Excellon Drill files. */
 
-/*  Copyright (C) 2015-2018 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
     *** Acknowledgments to Gerbv Authors and Contributors. ***
 
     Redistribution and use in source and binary forms, with or without
@@ -295,7 +295,7 @@ namespace GerberVS
                                 drillState.CurrentSection = DrillFileSection.Data;
                                 if (image.Format.OmitZeros == GerberOmitZero.OmitZerosUnspecified)
                                 {
-                                    errorMessage = "Unspecifies format, assuming leading zeros.";
+                                    errorMessage = "Unspecified format, assuming leading zeros.";
                                     stats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.LineNumber, drillFileName);
                                 }
 
@@ -306,10 +306,9 @@ namespace GerberVS
                                 if (drillState.Unit == GerberUnit.Unspecified && drillState.CurrentSection != DrillFileSection.Header)
                                 {
                                     errorMessage = "M71 code found with no METRIC specification in header.\n";
-                                    stats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.LineNumber, drillFileName);
-
+                                    stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, drillFileName);
                                     errorMessage = "Assuming all tool sizes are in millimeters.\n";
-                                    stats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning);
+                                    stats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.LineNumber, drillFileName);
 
                                     for (int toolNumber = ToolMin; toolNumber < ToolMax; toolNumber++)
                                     {

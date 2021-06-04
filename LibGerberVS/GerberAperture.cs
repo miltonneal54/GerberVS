@@ -1,6 +1,6 @@
 ﻿/* GerberAperture.cs - Classes for handling gerber apertures. */
 
-/*  Copyright (C) 2015-2018 Milton Neal <milton200954@gmail.com>
+/*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
     *** Acknowledgments to Gerbv Authors and Contributors. ***
 
     Redistribution and use in source and binary forms, with or without
