@@ -2,4 +2,3 @@ C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberV
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Debug\LibGerberVS.pdb
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Debug\LibGerberVS.dll
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Debug\LibGerberVS.pdb
-C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Debug\GerberVS.csprojResolveAssemblyReference.cache
