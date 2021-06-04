@@ -353,11 +353,6 @@
             The color to render this layer with.
             </summary>
         </member>
-        <member name="P:GerberVS.GerberFileInformation.Alpha">
-            <summary>
-            The alpha level (transparency) of the layer color.
-            </summary>
-        </member>
         <member name="P:GerberVS.GerberFileInformation.IsVisible">
             <summary>
             Set true if this layer file should be rendered with the project.
@@ -1071,7 +1066,7 @@
             <summary>
             Reads in digits from the current file position and converts them to an integer.
             </summary>
-            <param name="length">numberof digit in the integer</param>
+            <param name="length">number of digit in the integer</param>
             <returns>the value as an integer</returns>
         </member>
         <member name="M:GerberVS.GerberLineReader.GetDoubleValue">
@@ -1412,14 +1407,13 @@
             <param name="fullPathName">file to open</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.LibGerberVS.OpenLayerFromFilenameAndColor(GerberVS.GerberProject,System.String,System.Drawing.Color,System.Int32)">
+        <member name="M:GerberVS.LibGerberVS.OpenLayerFromFilenameAndColor(GerberVS.GerberProject,System.String,System.Drawing.Color)">
             <summary>
             Opens a layer and appends it to the project using the specified color and alpha level.
             </summary>
             <param name="project">project</param>
             <param name="fullPathName">file path</param>
             <param name="color">layer color</param>
-            <param name="alpha">alpha level</param>
         </member>
         <member name="M:GerberVS.LibGerberVS.ReloadLayer(GerberVS.GerberProject,System.Int32)">
             <summary>
@@ -1462,7 +1456,7 @@
             <param name="project">project data</param>
             <param name="renderInfo">rendering information</param>
         </member>
-        <member name="M:GerberVS.LibGerberVS.ScaleToFit(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
+        <member name="M:GerberVS.LibGerberVS.ZoomToFit(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
             <summary>
             Scales the image to display maximised within the display area.
             </summary>
