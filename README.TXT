@@ -73,3 +73,11 @@ LibGerberVS Version 1.0.5.2
 GerberView Version 1.3.3.0
 	GUI updates.
 	Bug fix Drag n Drop on to FileListBox;
+
+14/08/2021
+GerberView 1.3.4.0
+	GUI updates.
+	Form usercontrol updates:
+	1. Ruler Control
+	2. FileList Control.
+	3. Color Dialog with transparecy support.
