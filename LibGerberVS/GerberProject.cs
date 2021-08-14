@@ -119,16 +119,6 @@ namespace GerberVS
         public double ScaleFactorY { get; set; }
 
         /// <summary>
-        /// Gets or sets the X scroll value.
-        /// </summary>
-        //public double ScrollValueX { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Y scroll value.
-        /// </summary>
-        //public double ScrollValueY { get; set; }    // Current Y scroll value.
-
-        /// <summary>
         /// The X coordinate of the lower left corner (in real world coordinates, in inches).
         /// </summary>
         public double Left { get; set; } 

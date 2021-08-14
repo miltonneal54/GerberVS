@@ -16,7 +16,7 @@ namespace GerberVS
     /// <summary>
     /// Create a RS274X file from a gerber image.
     /// </summary>
-    public static class ExportGerberRS274X
+    public static class WriteGerberRS274X
     {
         const double GERBV_PRECISION_ANGLE_RAD = 1e-6;
         const double GERBV_PRECISION_LINEAR_INCH = 1e-6;
@@ -226,8 +226,6 @@ namespace GerberVS
                             default:
                                 break;
                         }
-
-
                     }
 
                     streamWriter.WriteLine("M02*");

@@ -14,7 +14,7 @@ namespace GerberVS
     /// <summary>
     /// Create a Excellon drill file from a gerber image.
     /// </summary>
-    public static class ExportExcellonDrill
+    public static class WriteExcellonDrill
     {
         /// <summary>
         /// Export a gerber image to NC drill file format.

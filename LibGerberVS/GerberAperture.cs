@@ -151,7 +151,7 @@ namespace GerberVS
             int primitive = 0;
             int mathOperationIndex = 0;
             int equate = 0;
-            bool continueLoop = true;
+            bool done = false;
             bool comma = false;                // Just read an operator (one of '*+X/)
             bool isNegative = false;           // Negative numbers succeeding ','
             bool foundPrimitive = false;
@@ -159,14 +159,14 @@ namespace GerberVS
 
             // Get macro name
             apertureMacro.Name = reader.GetStringValue('*');
-            characterRead = reader.Read();	    // skip '*'
+            characterRead = reader.Read();	    // Skip '*'
 
             // The first instruction in all programs will be NOP.
             instruction = new GerberInstruction();
             instruction.Opcode = GerberOpCode.Nop;
             apertureMacro.InstructionList.Add(instruction);
 
-            while (continueLoop && !reader.EndOfFile)
+            while (!done && !reader.EndOfFile)
             {
                 length = 0;
                 characterRead = reader.Read();
@@ -348,7 +348,7 @@ namespace GerberVS
 
                     case '%':
                         reader.Position--;      // Must return with % first in string since the main parser needs it.
-                        continueLoop = false;   // Reached the end of the macro.
+                        done = true;            // Reached the end of the macro.
                         break;
 
                     default:
@@ -445,31 +445,31 @@ namespace GerberVS
                         break;
 
                     case GerberOpCode.PopParameter:
-                        MacroStack.Pop(ref temp[0]);
+                        temp[0] = MacroStack.Pop();
                         localParameters[instruction.Data.IntValue - 1] = temp[0];
                         break;
 
                     case GerberOpCode.Add:
-                        MacroStack.Pop(ref temp[0]);
-                        MacroStack.Pop(ref temp[1]);
+                        temp[0] = MacroStack.Pop();
+                        temp[1] = MacroStack.Pop();
                         MacroStack.Push(temp[1] + temp[0]);
                         break;
 
                     case GerberOpCode.Subtract:
-                        MacroStack.Pop(ref temp[0]);
-                        MacroStack.Pop(ref temp[1]);
+                        temp[0] = MacroStack.Pop();
+                        temp[1] = MacroStack.Pop();
                         MacroStack.Push(temp[1] - temp[0]);
                         break;
 
                     case GerberOpCode.Multiple:
-                        MacroStack.Pop(ref temp[0]);
-                        MacroStack.Pop(ref temp[1]);
+                        temp[0] = MacroStack.Pop();
+                        temp[1] = MacroStack.Pop();
                         MacroStack.Push(temp[1] * temp[0]);
                         break;
 
                     case GerberOpCode.Divide:
-                        MacroStack.Pop(ref temp[0]);
-                        MacroStack.Pop(ref temp[1]);
+                        temp[0] = MacroStack.Pop();
+                        temp[1] = MacroStack.Pop();
                         MacroStack.Push(temp[1] / temp[0]);
                         break;
 
@@ -635,7 +635,7 @@ namespace GerberVS
                             //Debug.WriteLine(")");
                         }
 
-                        MacroStack.Reset();
+                        MacroStack.Clear();
                         break;
 
                     default:
@@ -664,12 +664,15 @@ namespace GerberVS
             // Pushes a value onto the stack.
             public static void Push(double value)
             {
+                if(Count == Values.Length)
+                    throw new MacroStackOverflowException("Attempt to push a full stack.");
+
                 Values[Count++] = value;
                 return;
             }
 
             // Pops a value off the stack.
-            public static bool Pop(ref double value)
+           /* public static bool Pop(ref double value)
             {
                 // Check if we try to pop an empty stack.
                 if (Count == 0)
@@ -677,10 +680,19 @@ namespace GerberVS
 
                 value = Values[--Count];
                 return true;
+            }*/
+
+            // Pops a value off the stack.
+            public static double Pop()
+            {
+                if (Count == 0)
+                    throw new MacroStackOverflowException("Attempt to pop an empty stack.");
+
+                return Values[--Count];
             }
 
             // Reset the stack.
-            public static void Reset()
+            public static void Clear()
             {
                 for (int i = 0; i < Values.Length; i++)
                     Values[i] = 0.0;
