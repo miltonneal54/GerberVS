@@ -174,12 +174,12 @@
             Sets work zero relative to absolute zero.
             </summary>
         </member>
-        <member name="T:GerberVS.ExportExcellonDrill">
+        <member name="T:GerberVS.WriteExcellonDrill">
             <summary>
             Create a Excellon drill file from a gerber image.
             </summary>
         </member>
-        <member name="M:GerberVS.ExportExcellonDrill.RS274xFromImage(System.String,GerberVS.GerberImage)">
+        <member name="M:GerberVS.WriteExcellonDrill.RS274xFromImage(System.String,GerberVS.GerberImage)">
             <summary>
             Export a gerber image to NC drill file format.
             </summary>
@@ -187,7 +187,7 @@
             <param name="inputImage">gerber image to export</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.ExportExcellonDrill.DrillFileFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
+        <member name="M:GerberVS.WriteExcellonDrill.DrillFileFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
             <summary>
             Export a gerber image to NC file format with user tranformations.
             </summary>
@@ -196,12 +196,12 @@
             <param name="transform">apply the user transformations</param>
             <returns></returns>
         </member>
-        <member name="T:GerberVS.ExportGerberRS274X">
+        <member name="T:GerberVS.WriteGerberRS274X">
             <summary>
             Create a RS274X file from a gerber image.
             </summary>
         </member>
-        <member name="M:GerberVS.ExportGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage)">
+        <member name="M:GerberVS.WriteGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage)">
             <summary>
             Export a gerber image to RS274X file format.
             </summary>
@@ -209,7 +209,7 @@
             <param name="inputImage">gerber image to export</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.ExportGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
+        <member name="M:GerberVS.WriteGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
             <summary>
             Export a gerber image to RS274X file format with user tranformations.
             </summary>
