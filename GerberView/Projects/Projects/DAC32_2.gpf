@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectInformation>
+  <ProjectName>DAC2</ProjectName>
+  <Path>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\Projects\DAC2.gpf</Path>
+  <FileCount>5</FileCount>
+  <CurrentIndex>3</CurrentIndex>
+  <BackgroundColor>-16777216</BackgroundColor>
+  <CheckBeforeDelete>True</CheckBeforeDelete>
+  <ShowHiddenSelection>True</ShowHiddenSelection>
+  <LayerInformation>
+    <FileName>TopPrint.GBX</FileName>
+    <FilePath>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberFiles\DAC32_2_2-0\TopPrint.GBX</FilePath>
+    <LayerColor>-1308623104</LayerColor>
+    <LayerAlpha>177</LayerAlpha>
+    <LayerVisible>True</LayerVisible>
+    <TranslateX>0</TranslateX>
+    <TranslateY>0</TranslateY>
+    <ScaleX>2.75</ScaleX>
+    <ScaleY>2.75</ScaleY>
+    <Rotation>0</Rotation>
+    <MirrorAroundX>False</MirrorAroundX>
+    <MirrorAroundY>False</MirrorAroundY>
+    <Inverted>False</Inverted>
+  </LayerInformation>
+  <LayerInformation>
+    <FileName>Drill_Plated_01-02.nc</FileName>
+    <FilePath>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberFiles\DAC32_2_2-0\Drill_Plated_01-02.nc</FilePath>
+    <LayerColor>-1325400064</LayerColor>
+    <LayerAlpha>177</LayerAlpha>
+    <LayerVisible>True</LayerVisible>
+    <TranslateX>0</TranslateX>
+    <TranslateY>0</TranslateY>
+    <ScaleX>2.75</ScaleX>
+    <ScaleY>2.75</ScaleY>
+    <Rotation>0</Rotation>
+    <MirrorAroundX>False</MirrorAroundX>
+    <MirrorAroundY>False</MirrorAroundY>
+    <Inverted>False</Inverted>
+  </LayerInformation>
+  <LayerInformation>
+    <FileName>DrillMap.GBX</FileName>
+    <FilePath>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberFiles\DAC32_2_2-0\DrillMap.GBX</FilePath>
+    <LayerColor>-1308655757</LayerColor>
+    <LayerAlpha>177</LayerAlpha>
+    <LayerVisible>False</LayerVisible>
+    <TranslateX>0</TranslateX>
+    <TranslateY>0</TranslateY>
+    <ScaleX>2.75</ScaleX>
+    <ScaleY>2.75</ScaleY>
+    <Rotation>0</Rotation>
+    <MirrorAroundX>False</MirrorAroundX>
+    <MirrorAroundY>False</MirrorAroundY>
+    <Inverted>False</Inverted>
+  </LayerInformation>
+  <LayerInformation>
+    <FileName>L01_TOP.GBX</FileName>
+    <FilePath>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberFiles\DAC32_2_2-0\L01_TOP.GBX</FilePath>
+    <LayerColor>-1325367168</LayerColor>
+    <LayerAlpha>177</LayerAlpha>
+    <LayerVisible>True</LayerVisible>
+    <TranslateX>0</TranslateX>
+    <TranslateY>0</TranslateY>
+    <ScaleX>2.75</ScaleX>
+    <ScaleY>2.75</ScaleY>
+    <Rotation>0</Rotation>
+    <MirrorAroundX>False</MirrorAroundX>
+    <MirrorAroundY>False</MirrorAroundY>
+    <Inverted>False</Inverted>
+  </LayerInformation>
+  <LayerInformation>
+    <FileName>L02_BOT.GBX</FileName>
+    <FilePath>C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberFiles\DAC32_2_2-0\L02_BOT.GBX</FilePath>
+    <LayerColor>-1317670297</LayerColor>
+    <LayerAlpha>177</LayerAlpha>
+    <LayerVisible>False</LayerVisible>
+    <TranslateX>0</TranslateX>
+    <TranslateY>0</TranslateY>
+    <ScaleX>2.75</ScaleX>
+    <ScaleY>2.75</ScaleY>
+    <Rotation>0</Rotation>
+    <MirrorAroundX>False</MirrorAroundX>
+    <MirrorAroundY>False</MirrorAroundY>
+    <Inverted>False</Inverted>
+  </LayerInformation>
+</ProjectInformation>
