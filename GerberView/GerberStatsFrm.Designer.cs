@@ -105,7 +105,7 @@
             // 
             this.errorLabel.AutoSize = true;
             this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.errorLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.errorLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.errorLabel.Location = new System.Drawing.Point(0, 5);
             this.errorLabel.Name = "errorLabel";
             this.errorLabel.Size = new System.Drawing.Size(39, 13);
@@ -133,7 +133,7 @@
             this.generalDataGridView.ReadOnly = true;
             this.generalDataGridView.RowHeadersVisible = false;
             this.generalDataGridView.RowHeadersWidth = 40;
-            this.generalDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.generalDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.generalDataGridView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             this.generalDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.generalDataGridView.Size = new System.Drawing.Size(476, 156);
@@ -155,7 +155,7 @@
             // 
             this.gCodeLabel.AutoSize = true;
             this.gCodeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gCodeLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.gCodeLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.gCodeLabel.Location = new System.Drawing.Point(0, 5);
             this.gCodeLabel.Name = "gCodeLabel";
             this.gCodeLabel.Size = new System.Drawing.Size(54, 13);
@@ -204,7 +204,7 @@
             // 
             this.dCodeLabel.AutoSize = true;
             this.dCodeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dCodeLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.dCodeLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.dCodeLabel.Location = new System.Drawing.Point(0, 5);
             this.dCodeLabel.Name = "dCodeLabel";
             this.dCodeLabel.Size = new System.Drawing.Size(54, 13);
@@ -231,7 +231,7 @@
             this.dCodeDataGridView.ReadOnly = true;
             this.dCodeDataGridView.RowHeadersVisible = false;
             this.dCodeDataGridView.RowHeadersWidth = 40;
-            this.dCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.dCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.dCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             this.dCodeDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dCodeDataGridView.Size = new System.Drawing.Size(476, 156);
@@ -252,7 +252,7 @@
             // 
             this.mCodeLabel.AutoSize = true;
             this.mCodeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.mCodeLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.mCodeLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.mCodeLabel.Location = new System.Drawing.Point(0, 5);
             this.mCodeLabel.Name = "mCodeLabel";
             this.mCodeLabel.Size = new System.Drawing.Size(54, 13);
@@ -277,7 +277,7 @@
             this.mCodeDataGridView.MinimumSize = new System.Drawing.Size(0, 26);
             this.mCodeDataGridView.Name = "mCodeDataGridView";
             this.mCodeDataGridView.ReadOnly = true;
-            this.mCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.mCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.mCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             this.mCodeDataGridView.Size = new System.Drawing.Size(476, 156);
             this.mCodeDataGridView.TabIndex = 0;
@@ -297,7 +297,7 @@
             // 
             this.miscLabel.AutoSize = true;
             this.miscLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.miscLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.miscLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.miscLabel.Location = new System.Drawing.Point(0, 5);
             this.miscLabel.Name = "miscLabel";
             this.miscLabel.Size = new System.Drawing.Size(54, 13);
@@ -321,7 +321,7 @@
             this.miscCodeDataGridView.Location = new System.Drawing.Point(0, 30);
             this.miscCodeDataGridView.Name = "miscCodeDataGridView";
             this.miscCodeDataGridView.ReadOnly = true;
-            this.miscCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.miscCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.miscCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             this.miscCodeDataGridView.Size = new System.Drawing.Size(476, 156);
             this.miscCodeDataGridView.TabIndex = 0;
@@ -341,7 +341,7 @@
             // 
             this.apDefLabel.AutoSize = true;
             this.apDefLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.apDefLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.apDefLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.apDefLabel.Location = new System.Drawing.Point(0, 5);
             this.apDefLabel.Name = "apDefLabel";
             this.apDefLabel.Size = new System.Drawing.Size(54, 13);
@@ -365,7 +365,7 @@
             this.apertureDefinitionGridView.Location = new System.Drawing.Point(0, 30);
             this.apertureDefinitionGridView.Name = "apertureDefinitionGridView";
             this.apertureDefinitionGridView.ReadOnly = true;
-            this.apertureDefinitionGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.apertureDefinitionGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.apertureDefinitionGridView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             this.apertureDefinitionGridView.Size = new System.Drawing.Size(476, 156);
             this.apertureDefinitionGridView.TabIndex = 0;
@@ -385,7 +385,7 @@
             // 
             this.apUseLabel.AutoSize = true;
             this.apUseLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.apUseLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.apUseLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.apUseLabel.Location = new System.Drawing.Point(0, 5);
             this.apUseLabel.Name = "apUseLabel";
             this.apUseLabel.Size = new System.Drawing.Size(54, 13);
@@ -409,7 +409,7 @@
             this.apertureUseDataGridView.Location = new System.Drawing.Point(0, 30);
             this.apertureUseDataGridView.Name = "apertureUseDataGridView";
             this.apertureUseDataGridView.ReadOnly = true;
-            this.apertureUseDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.apertureUseDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.apertureUseDataGridView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             this.apertureUseDataGridView.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.apertureUseDataGridView.Size = new System.Drawing.Size(476, 156);

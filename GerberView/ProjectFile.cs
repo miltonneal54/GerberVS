@@ -112,7 +112,6 @@ namespace GerberView
                         writer.WriteElementString("FileName", project.FileInfo[i].FileName);
                         writer.WriteElementString("FilePath", project.FileInfo[i].FullPathName);
                         writer.WriteElementString("LayerColor", (Convert.ToInt32(project.FileInfo[i].Color.ToArgb())).ToString());
-                        writer.WriteElementString("LayerAlpha", project.FileInfo[i].Alpha.ToString());
                         writer.WriteElementString("LayerVisible", project.FileInfo[i].IsVisible.ToString());
 
                         // User transform.
@@ -278,18 +277,6 @@ namespace GerberView
                                         reader.Read();
                                         if (reader.NodeType == XmlNodeType.Text)
                                             fileInfo.Color = Color.FromArgb(int.Parse(reader.Value));
-                                    }
-
-                                    reader.Read();
-                                }
-
-                                if (reader.Name == "LayerAlpha")
-                                {
-                                    while (reader.NodeType != XmlNodeType.EndElement)
-                                    {
-                                        reader.Read();
-                                        if (reader.NodeType == XmlNodeType.Text)
-                                            fileInfo.Alpha = int.Parse(reader.Value);
                                     }
 
                                     reader.Read();

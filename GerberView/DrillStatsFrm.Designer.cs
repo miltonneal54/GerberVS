@@ -91,7 +91,7 @@
             // 
             this.errorLabel.AutoSize = true;
             this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.errorLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.errorLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.errorLabel.Location = new System.Drawing.Point(0, 5);
             this.errorLabel.Name = "errorLabel";
             this.errorLabel.Size = new System.Drawing.Size(39, 13);
@@ -118,7 +118,7 @@
             this.generalDataGridView.MultiSelect = false;
             this.generalDataGridView.Name = "generalDataGridView";
             this.generalDataGridView.ReadOnly = true;
-            this.generalDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.generalDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.generalDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.generalDataGridView.Size = new System.Drawing.Size(376, 156);
             this.generalDataGridView.TabIndex = 1;
@@ -139,7 +139,7 @@
             // 
             this.gCodeLabel.AutoSize = true;
             this.gCodeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gCodeLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.gCodeLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.gCodeLabel.Location = new System.Drawing.Point(0, 5);
             this.gCodeLabel.Name = "gCodeLabel";
             this.gCodeLabel.Size = new System.Drawing.Size(54, 13);
@@ -167,7 +167,7 @@
             this.gCodeDataGridView.MultiSelect = false;
             this.gCodeDataGridView.Name = "gCodeDataGridView";
             this.gCodeDataGridView.ReadOnly = true;
-            this.gCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.gCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.gCodeDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gCodeDataGridView.Size = new System.Drawing.Size(376, 156);
             this.gCodeDataGridView.TabIndex = 1;
@@ -187,7 +187,7 @@
             // 
             this.mCodeLabel.AutoSize = true;
             this.mCodeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.mCodeLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.mCodeLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.mCodeLabel.Location = new System.Drawing.Point(0, 5);
             this.mCodeLabel.Name = "mCodeLabel";
             this.mCodeLabel.Size = new System.Drawing.Size(54, 13);
@@ -214,7 +214,7 @@
             this.mCodeDataGridView.MultiSelect = false;
             this.mCodeDataGridView.Name = "mCodeDataGridView";
             this.mCodeDataGridView.ReadOnly = true;
-            this.mCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.mCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.mCodeDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.mCodeDataGridView.Size = new System.Drawing.Size(376, 156);
             this.mCodeDataGridView.TabIndex = 1;
@@ -234,7 +234,7 @@
             // 
             this.miscLabel.AutoSize = true;
             this.miscLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.miscLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.miscLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.miscLabel.Location = new System.Drawing.Point(0, 5);
             this.miscLabel.Name = "miscLabel";
             this.miscLabel.Size = new System.Drawing.Size(54, 13);
@@ -261,7 +261,7 @@
             this.miscCodeDataGridView.MultiSelect = false;
             this.miscCodeDataGridView.Name = "miscCodeDataGridView";
             this.miscCodeDataGridView.ReadOnly = true;
-            this.miscCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.miscCodeDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.miscCodeDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.miscCodeDataGridView.Size = new System.Drawing.Size(376, 156);
             this.miscCodeDataGridView.TabIndex = 1;
@@ -281,7 +281,7 @@
             // 
             this.drillUseLabel.AutoSize = true;
             this.drillUseLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.drillUseLabel.ForeColor = System.Drawing.Color.SeaGreen;
+            this.drillUseLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
             this.drillUseLabel.Location = new System.Drawing.Point(0, 5);
             this.drillUseLabel.Name = "drillUseLabel";
             this.drillUseLabel.Size = new System.Drawing.Size(54, 13);
@@ -308,7 +308,7 @@
             this.drillUseDataGridView.MultiSelect = false;
             this.drillUseDataGridView.Name = "drillUseDataGridView";
             this.drillUseDataGridView.ReadOnly = true;
-            this.drillUseDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.SeaGreen;
+            this.drillUseDataGridView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.MediumSeaGreen;
             this.drillUseDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.drillUseDataGridView.Size = new System.Drawing.Size(376, 156);
             this.drillUseDataGridView.TabIndex = 1;

@@ -79,7 +79,7 @@ namespace GerberView
 
         private void GerberStatsForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
         }
 
         private void GeneralDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)

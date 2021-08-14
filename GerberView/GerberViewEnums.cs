@@ -22,6 +22,5 @@ namespace GerberView
         /// Scale maximised to fit display area.
         /// </summary>
         ScaleToFit
-
     }
 }

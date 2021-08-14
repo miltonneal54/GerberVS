@@ -34,23 +34,23 @@
     </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>TraxPrint1.ico</ApplicationIcon>
+    <ApplicationIcon>GerberView.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AlphaColorDiolog">
-      <HintPath>..\..\MyAlphaColorDiolog\AlphaColorDiolog\bin\Release\AlphaColorDiolog.dll</HintPath>
+    <Reference Include="CustomColorDialog">
+      <HintPath>..\..\Controls\CustomColorDialog\CustomColorDialog\bin\Release\CustomColorDialog.dll</HintPath>
+    </Reference>
+    <Reference Include="FileListBox">
+      <HintPath>..\..\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
     </Reference>
     <Reference Include="LibGerberVS, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\LibGerberVS\bin\Release\LibGerberVS.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualC" />
-    <Reference Include="MyListBox, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Ruler, Version=2.1.7800.38883, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Release\MyListBox.dll</HintPath>
-    </Reference>
-    <Reference Include="RulerControl">
-      <HintPath>..\..\RulerControl\RulerControl\bin\Release\RulerControl.dll</HintPath>
+      <HintPath>..\..\Controls\Ruler\Ruler\bin\Release\Ruler.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -92,6 +92,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="ProjectFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SelectionPropertiesFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -123,11 +128,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -138,23 +138,26 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\DownArrow.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\UpArrow.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Minus.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Plus.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\Delete.bmp" />
-    <Content Include="Resources\List.bmp" />
-    <Content Include="Resources\ZoomOut1.bmp" />
-    <Content Include="Resources\ZoomToFit.bmp" />
+    <None Include="Bitmaps\Plus16.bmp" />
+    <None Include="Bitmaps\DownArrow16.bmp" />
+    <None Include="Bitmaps\UpArrow16.bmp" />
+    <None Include="Bitmaps\ZoomIn16.bmp" />
+    <None Include="Bitmaps\ZoomOut16.bmp" />
+    <None Include="Bitmaps\ZoomToFit16.bmp" />
+    <Content Include="Bitmaps\Delete16.bmp" />
+    <None Include="Bitmaps\List16.bmp" />
+    <None Include="Bitmaps\Folder16.bmp" />
+    <Content Include="Bitmaps\Minus16.bmp" />
+    <None Include="Bitmaps\Save16.bmp" />
+    <None Include="Bitmaps\Print16.bmp" />
+    <None Include="Bitmaps\PrintPreview16.bmp" />
+    <None Include="Bitmaps\Reload16.bmp" />
+    <None Include="Bitmaps\New16.bmp" />
+    <Content Include="GerberView.ico" />
     <Content Include="TraxPrint1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -52,7 +52,6 @@
             this.printPreviewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fullScreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showToolbarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -64,6 +63,7 @@
             this.scaleToFullSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.changeBackgroundToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.layerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showAllLayersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hideAllLayersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,7 +84,7 @@
             this.drillLayersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.fileListBox = new ListBoxControl.CustomListBox();
+            this.fileListBox = new FileListBox.FileListBoxControl();
             this.RenderModeComboBox = new System.Windows.Forms.ComboBox();
             this.fileListToolStrip = new System.Windows.Forms.ToolStrip();
             this.moveLayerUpToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -92,10 +92,8 @@
             this.addFileToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.unloadLayerToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.verticleRuler = new RulerControl.Ruler();
             this.pcbImagePanel = new System.Windows.Forms.Panel();
             this.rulerScaleLabel = new System.Windows.Forms.Label();
-            this.horizonalRuler = new RulerControl.Ruler();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.LayerNameToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -108,18 +106,19 @@
             this.toolStripStatusLabel6 = new System.Windows.Forms.ToolStripStatusLabel();
             this.selectedObjectsToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.openToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.printToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.zoomInToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.zoomOutToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.zoomTofitToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.zoomToFitToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.selectedObjectsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.displaySelectedOjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteSelectedObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.horizonalRuler = new Ruler.Ruler();
+            this.verticleRuler = new Ruler.Ruler();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -136,8 +135,8 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.editToolStripMenuItem,
             this.viewToolStripMenuItem,
+            this.editToolStripMenuItem,
             this.layerToolStripMenuItem,
             this.statisticsToolStripMenuItem,
             this.toolsToolStripMenuItem});
@@ -173,8 +172,7 @@
             // 
             // openLayerToolStripMenuItem
             // 
-            this.openLayerToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("openLayerToolStripMenuItem.Image")));
-            this.openLayerToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.openLayerToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.openLayerToolStripMenuItem.Name = "openLayerToolStripMenuItem";
             this.openLayerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.openLayerToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
@@ -184,13 +182,12 @@
             // saveLayerToolStripMenuItem
             // 
             this.saveLayerToolStripMenuItem.Enabled = false;
-            this.saveLayerToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveLayerToolStripMenuItem.Image")));
-            this.saveLayerToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveLayerToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.saveLayerToolStripMenuItem.Name = "saveLayerToolStripMenuItem";
             this.saveLayerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.saveLayerToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.saveLayerToolStripMenuItem.Text = "&Save Selected Layer";
-            this.saveLayerToolStripMenuItem.Visible = false;
+            this.saveLayerToolStripMenuItem.Click += new System.EventHandler(this.SaveLayerToolStripMenuItem_Click);
             // 
             // saveLayerAsToolStripMenuItem
             // 
@@ -207,6 +204,7 @@
             // 
             // reloadAllLayersoolStripMenuItem
             // 
+            this.reloadAllLayersoolStripMenuItem.Image = global::GerberView.Properties.Resources.Reload16;
             this.reloadAllLayersoolStripMenuItem.Name = "reloadAllLayersoolStripMenuItem";
             this.reloadAllLayersoolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.reloadAllLayersoolStripMenuItem.Text = "Reload All Layers";
@@ -219,6 +217,7 @@
             // 
             // newProjectToolStripMenuItem
             // 
+            this.newProjectToolStripMenuItem.Image = global::GerberView.Properties.Resources.New16;
             this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
             this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.newProjectToolStripMenuItem.Text = "New Project";
@@ -226,6 +225,7 @@
             // 
             // openProjectToolStripMenuItem
             // 
+            this.openProjectToolStripMenuItem.Image = global::GerberView.Properties.Resources.Folder16;
             this.openProjectToolStripMenuItem.Name = "openProjectToolStripMenuItem";
             this.openProjectToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.openProjectToolStripMenuItem.Text = "Open Project";
@@ -233,6 +233,7 @@
             // 
             // saveProjectToolStripMenuItem
             // 
+            this.saveProjectToolStripMenuItem.Image = global::GerberView.Properties.Resources.Save16;
             this.saveProjectToolStripMenuItem.Name = "saveProjectToolStripMenuItem";
             this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.saveProjectToolStripMenuItem.Text = "Save Project";
@@ -288,8 +289,8 @@
             // 
             // printToolStripMenuItem
             // 
-            this.printToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("printToolStripMenuItem.Image")));
-            this.printToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.printToolStripMenuItem.Image = global::GerberView.Properties.Resources.Print16;
+            this.printToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
             this.printToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
             this.printToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
@@ -298,8 +299,8 @@
             // 
             // printPreviewToolStripMenuItem
             // 
-            this.printPreviewToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("printPreviewToolStripMenuItem.Image")));
-            this.printPreviewToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.printPreviewToolStripMenuItem.Image = global::GerberView.Properties.Resources.PrintPreview16;
+            this.printPreviewToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.printPreviewToolStripMenuItem.Name = "printPreviewToolStripMenuItem";
             this.printPreviewToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.printPreviewToolStripMenuItem.Text = "Print Pre&view";
@@ -316,13 +317,6 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
-            // 
-            // editToolStripMenuItem
-            // 
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            this.editToolStripMenuItem.Text = "&Edit";
-            this.editToolStripMenuItem.Visible = false;
             // 
             // viewToolStripMenuItem
             // 
@@ -380,7 +374,7 @@
             // 
             // zoomInToolStripMenuItem
             // 
-            this.zoomInToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("zoomInToolStripMenuItem.Image")));
+            this.zoomInToolStripMenuItem.Image = global::GerberView.Properties.Resources.ZoomIn16;
             this.zoomInToolStripMenuItem.Name = "zoomInToolStripMenuItem";
             this.zoomInToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.Z)));
@@ -390,7 +384,7 @@
             // 
             // zoomOutToolStripMenuItem
             // 
-            this.zoomOutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("zoomOutToolStripMenuItem.Image")));
+            this.zoomOutToolStripMenuItem.Image = global::GerberView.Properties.Resources.ZoomOut16;
             this.zoomOutToolStripMenuItem.Name = "zoomOutToolStripMenuItem";
             this.zoomOutToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Z)));
             this.zoomOutToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
@@ -399,21 +393,21 @@
             // 
             // scaleToFitToolStripMenuItem
             // 
-            this.scaleToFitToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("scaleToFitToolStripMenuItem.Image")));
+            this.scaleToFitToolStripMenuItem.Image = global::GerberView.Properties.Resources.ZoomToFit16;
             this.scaleToFitToolStripMenuItem.Name = "scaleToFitToolStripMenuItem";
             this.scaleToFitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F)));
             this.scaleToFitToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-            this.scaleToFitToolStripMenuItem.Text = "Scale To Fit";
+            this.scaleToFitToolStripMenuItem.Text = "Zoom To Fit";
             this.scaleToFitToolStripMenuItem.ToolTipText = "Scale layers to fit display area.";
-            this.scaleToFitToolStripMenuItem.Click += new System.EventHandler(this.ScaleToFitToolStripMenuItem_Click);
+            this.scaleToFitToolStripMenuItem.Click += new System.EventHandler(this.ZoomToFitToolStripMenuItem_Click);
             // 
             // scaleToFullSizeToolStripMenuItem
             // 
             this.scaleToFullSizeToolStripMenuItem.Name = "scaleToFullSizeToolStripMenuItem";
             this.scaleToFullSizeToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-            this.scaleToFullSizeToolStripMenuItem.Text = "Scale To Full Size";
+            this.scaleToFullSizeToolStripMenuItem.Text = "Zoom To Full Size";
             this.scaleToFullSizeToolStripMenuItem.ToolTipText = "Scale to 100 percent.";
-            this.scaleToFullSizeToolStripMenuItem.Click += new System.EventHandler(this.ScaleToFullSizeToolStripMenuItem_Click);
+            this.scaleToFullSizeToolStripMenuItem.Click += new System.EventHandler(this.ZoomToFullSizeToolStripMenuItem_Click);
             // 
             // toolStripSeparator9
             // 
@@ -426,6 +420,13 @@
             this.changeBackgroundToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.changeBackgroundToolStripMenuItem.Text = "Change Background Color";
             this.changeBackgroundToolStripMenuItem.Click += new System.EventHandler(this.ChangeBackgroundToolStripMenuItem_Click);
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Text = "&Edit";
+            this.editToolStripMenuItem.Visible = false;
             // 
             // layerToolStripMenuItem
             // 
@@ -583,11 +584,9 @@
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer1.Location = new System.Drawing.Point(5, 52);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 49);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -599,7 +598,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tableLayoutPanel1);
-            this.splitContainer1.Size = new System.Drawing.Size(939, 373);
+            this.splitContainer1.Size = new System.Drawing.Size(951, 379);
             this.splitContainer1.SplitterDistance = 240;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 7;
@@ -608,15 +607,14 @@
             // 
             this.fileListBox.AllowDrop = true;
             this.fileListBox.AutoScroll = true;
-            this.fileListBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.fileListBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.fileListBox.BackColor = System.Drawing.SystemColors.ControlLight;
             this.fileListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileListBox.Location = new System.Drawing.Point(0, 25);
             this.fileListBox.Name = "fileListBox";
-            this.fileListBox.Size = new System.Drawing.Size(240, 348);
+            this.fileListBox.Size = new System.Drawing.Size(240, 354);
             this.fileListBox.TabIndex = 0;
-            this.fileListBox.CheckBoxSelect += new System.EventHandler(this.FileListBox_CheckBoxClick);
-            this.fileListBox.ColorBoxSelect += new System.EventHandler(this.FileListBox_ColorBoxClick);
+            this.fileListBox.CheckBoxClick += new FileListBox.FileListBoxControl.CheckBoxClickEvent(this.FileListBox_CheckBoxClick);
+            this.fileListBox.ColorBoxClick += new FileListBox.FileListBoxControl.CheckBoxClickEvent(this.FileListBox_ColorBoxClick);
             this.fileListBox.SelectedIndexChanged += new System.EventHandler(this.FileListBox_SelectedIndexChanged);
             this.fileListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileListBox_DragDrop);
             this.fileListBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileListBox_DragEnter);
@@ -637,7 +635,7 @@
             // 
             // fileListToolStrip
             // 
-            this.fileListToolStrip.BackColor = System.Drawing.Color.SeaGreen;
+            this.fileListToolStrip.BackColor = System.Drawing.SystemColors.Control;
             this.fileListToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.fileListToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.moveLayerUpToolStripButton,
@@ -653,8 +651,9 @@
             // moveLayerUpToolStripButton
             // 
             this.moveLayerUpToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.moveLayerUpToolStripButton.Image = global::GerberView.Properties.Resources.UpArrow;
-            this.moveLayerUpToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.moveLayerUpToolStripButton.Image = global::GerberView.Properties.Resources.UpArrow16;
+            this.moveLayerUpToolStripButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.moveLayerUpToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.moveLayerUpToolStripButton.Name = "moveLayerUpToolStripButton";
             this.moveLayerUpToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.moveLayerUpToolStripButton.Text = "up";
@@ -663,10 +662,11 @@
             // 
             // moveLayerDownToolStripButton
             // 
-            this.moveLayerDownToolStripButton.BackColor = System.Drawing.Color.SeaGreen;
+            this.moveLayerDownToolStripButton.BackColor = System.Drawing.SystemColors.Control;
             this.moveLayerDownToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.moveLayerDownToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("moveLayerDownToolStripButton.Image")));
-            this.moveLayerDownToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.moveLayerDownToolStripButton.Image = global::GerberView.Properties.Resources.DownArrow16;
+            this.moveLayerDownToolStripButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.moveLayerDownToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.moveLayerDownToolStripButton.Name = "moveLayerDownToolStripButton";
             this.moveLayerDownToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.moveLayerDownToolStripButton.Text = "down";
@@ -676,8 +676,9 @@
             // addFileToolStripButton
             // 
             this.addFileToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.addFileToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("addFileToolStripButton.Image")));
-            this.addFileToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.addFileToolStripButton.Image = global::GerberView.Properties.Resources.Plus16;
+            this.addFileToolStripButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.addFileToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.addFileToolStripButton.Name = "addFileToolStripButton";
             this.addFileToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.addFileToolStripButton.Text = "toolStripButton1";
@@ -686,9 +687,11 @@
             // 
             // unloadLayerToolStripButton
             // 
+            this.unloadLayerToolStripButton.BackColor = System.Drawing.SystemColors.Control;
             this.unloadLayerToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.unloadLayerToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("unloadLayerToolStripButton.Image")));
-            this.unloadLayerToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.unloadLayerToolStripButton.Image = global::GerberView.Properties.Resources.Minus16;
+            this.unloadLayerToolStripButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.unloadLayerToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.unloadLayerToolStripButton.Name = "unloadLayerToolStripButton";
             this.unloadLayerToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.unloadLayerToolStripButton.Text = "toolStripButton1";
@@ -698,7 +701,7 @@
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.verticleRuler, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.pcbImagePanel, 1, 1);
@@ -708,39 +711,20 @@
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(694, 373);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(706, 379);
             this.tableLayoutPanel1.TabIndex = 0;
-            // 
-            // verticleRuler
-            // 
-            this.verticleRuler.BackColor = System.Drawing.Color.SeaGreen;
-            this.verticleRuler.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.verticleRuler.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.verticleRuler.ForeColor = System.Drawing.Color.Black;
-            this.verticleRuler.Location = new System.Drawing.Point(0, 20);
-            this.verticleRuler.Margin = new System.Windows.Forms.Padding(0);
-            this.verticleRuler.Name = "verticleRuler";
-            this.verticleRuler.Orientation = RulerControl.Orientation.Vertical;
-            this.verticleRuler.ScaleDirection = RulerControl.ScaleDirection.RightToLeft;
-            this.verticleRuler.Size = new System.Drawing.Size(20, 353);
-            this.verticleRuler.StartValue = 0D;
-            this.verticleRuler.TabIndex = 0;
-            this.verticleRuler.TrackLineColor = System.Drawing.Color.Yellow;
-            this.verticleRuler.TrackLineStyle = RulerControl.TrackLineStyle.Arrow;
-            this.verticleRuler.ZoomFactor = 1D;
-            this.verticleRuler.HoverValueChanged += new RulerControl.Ruler.HoverValueChangedEvent(this.VerticalRuler_HoverValue);
             // 
             // pcbImagePanel
             // 
             this.pcbImagePanel.BackColor = System.Drawing.Color.Black;
             this.pcbImagePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pcbImagePanel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.pcbImagePanel.Location = new System.Drawing.Point(20, 20);
+            this.pcbImagePanel.Location = new System.Drawing.Point(22, 22);
             this.pcbImagePanel.Margin = new System.Windows.Forms.Padding(0);
             this.pcbImagePanel.Name = "pcbImagePanel";
-            this.pcbImagePanel.Size = new System.Drawing.Size(674, 353);
+            this.pcbImagePanel.Size = new System.Drawing.Size(684, 357);
             this.pcbImagePanel.TabIndex = 2;
             this.pcbImagePanel.Scroll += new System.Windows.Forms.ScrollEventHandler(this.PcbImagePanel_Scroll);
             this.pcbImagePanel.Paint += new System.Windows.Forms.PaintEventHandler(this.PcbImagePanel_Paint);
@@ -751,34 +735,15 @@
             // 
             // rulerScaleLabel
             // 
-            this.rulerScaleLabel.BackColor = System.Drawing.Color.SeaGreen;
+            this.rulerScaleLabel.BackColor = System.Drawing.Color.MediumSeaGreen;
             this.rulerScaleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rulerScaleLabel.Location = new System.Drawing.Point(0, 0);
             this.rulerScaleLabel.Margin = new System.Windows.Forms.Padding(0);
             this.rulerScaleLabel.Name = "rulerScaleLabel";
-            this.rulerScaleLabel.Size = new System.Drawing.Size(20, 20);
+            this.rulerScaleLabel.Size = new System.Drawing.Size(22, 22);
             this.rulerScaleLabel.TabIndex = 0;
             this.rulerScaleLabel.Text = "mils";
             this.rulerScaleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // horizonalRuler
-            // 
-            this.horizonalRuler.BackColor = System.Drawing.Color.SeaGreen;
-            this.horizonalRuler.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.horizonalRuler.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.horizonalRuler.ForeColor = System.Drawing.Color.Black;
-            this.horizonalRuler.Location = new System.Drawing.Point(20, 0);
-            this.horizonalRuler.MajorInterval = 1000;
-            this.horizonalRuler.Margin = new System.Windows.Forms.Padding(0);
-            this.horizonalRuler.Name = "horizonalRuler";
-            this.horizonalRuler.ScaleMode = RulerControl.ScaleMode.Mils;
-            this.horizonalRuler.Size = new System.Drawing.Size(674, 20);
-            this.horizonalRuler.StartValue = 0D;
-            this.horizonalRuler.TabIndex = 5;
-            this.horizonalRuler.TrackLineColor = System.Drawing.Color.Yellow;
-            this.horizonalRuler.TrackLineStyle = RulerControl.TrackLineStyle.Arrow;
-            this.horizonalRuler.ZoomFactor = 1D;
-            this.horizonalRuler.HoverValueChanged += new RulerControl.Ruler.HoverValueChangedEvent(this.HorizontalRuler_HoverValue);
             // 
             // statusStrip1
             // 
@@ -849,8 +814,8 @@
             // toolStripStatusLabel3
             // 
             this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
-            this.toolStripStatusLabel3.Size = new System.Drawing.Size(37, 19);
-            this.toolStripStatusLabel3.Text = "Scale:";
+            this.toolStripStatusLabel3.Size = new System.Drawing.Size(42, 19);
+            this.toolStripStatusLabel3.Text = "Zoom:";
             this.toolStripStatusLabel3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // scaleToolStripStatusLabel
@@ -878,48 +843,52 @@
             // 
             // toolStrip1
             // 
-            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newToolStripButton,
             this.openToolStripButton,
             this.saveToolStripButton,
-            this.printToolStripButton,
             this.toolStripSeparator6,
             this.zoomInToolStripButton,
             this.zoomOutToolStripButton,
-            this.zoomTofitToolStripButton,
-            this.toolStripSeparator10});
+            this.zoomToFitToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(162, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(951, 25);
             this.toolStrip1.TabIndex = 9;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // newToolStripButton
+            // 
+            this.newToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.newToolStripButton.Image = global::GerberView.Properties.Resources.New16;
+            this.newToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
+            this.newToolStripButton.Name = "newToolStripButton";
+            this.newToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.newToolStripButton.Text = "&Print";
+            this.newToolStripButton.ToolTipText = "New project";
+            this.newToolStripButton.Click += new System.EventHandler(this.NewToolStripButton_Click);
             // 
             // openToolStripButton
             // 
             this.openToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.openToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("openToolStripButton.Image")));
-            this.openToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.openToolStripButton.Image = global::GerberView.Properties.Resources.Folder16;
+            this.openToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.openToolStripButton.Name = "openToolStripButton";
             this.openToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.openToolStripButton.Text = "&Open";
+            this.openToolStripButton.ToolTipText = "Open project";
+            this.openToolStripButton.Click += new System.EventHandler(this.OpenToolStripButton_Click);
             // 
             // saveToolStripButton
             // 
             this.saveToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.saveToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("saveToolStripButton.Image")));
-            this.saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveToolStripButton.Image = global::GerberView.Properties.Resources.Save16;
+            this.saveToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.saveToolStripButton.Name = "saveToolStripButton";
             this.saveToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.saveToolStripButton.Text = "&Save";
-            // 
-            // printToolStripButton
-            // 
-            this.printToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.printToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("printToolStripButton.Image")));
-            this.printToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.printToolStripButton.Name = "printToolStripButton";
-            this.printToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.printToolStripButton.Text = "&Print";
+            this.saveToolStripButton.ToolTipText = "Save project";
+            this.saveToolStripButton.Click += new System.EventHandler(this.SaveToolStripButton_Click);
             // 
             // toolStripSeparator6
             // 
@@ -929,7 +898,7 @@
             // zoomInToolStripButton
             // 
             this.zoomInToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.zoomInToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("zoomInToolStripButton.Image")));
+            this.zoomInToolStripButton.Image = global::GerberView.Properties.Resources.ZoomIn16;
             this.zoomInToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.zoomInToolStripButton.Name = "zoomInToolStripButton";
             this.zoomInToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -940,7 +909,7 @@
             // zoomOutToolStripButton
             // 
             this.zoomOutToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.zoomOutToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("zoomOutToolStripButton.Image")));
+            this.zoomOutToolStripButton.Image = global::GerberView.Properties.Resources.ZoomOut16;
             this.zoomOutToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
             this.zoomOutToolStripButton.Name = "zoomOutToolStripButton";
             this.zoomOutToolStripButton.Size = new System.Drawing.Size(23, 22);
@@ -948,21 +917,16 @@
             this.zoomOutToolStripButton.ToolTipText = "Zoom out.";
             this.zoomOutToolStripButton.Click += new System.EventHandler(this.ZoomOutToolStripButton_Click);
             // 
-            // zoomTofitToolStripButton
+            // zoomToFitToolStripButton
             // 
-            this.zoomTofitToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.zoomTofitToolStripButton.Image = global::GerberView.Properties.Resources.ZoomToFit;
-            this.zoomTofitToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
-            this.zoomTofitToolStripButton.Name = "zoomTofitToolStripButton";
-            this.zoomTofitToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.zoomTofitToolStripButton.Text = "toolStripButton3";
-            this.zoomTofitToolStripButton.ToolTipText = "Scale layers to fit display area.";
-            this.zoomTofitToolStripButton.Click += new System.EventHandler(this.ZoomToFitToolStripButton_Click);
-            // 
-            // toolStripSeparator10
-            // 
-            this.toolStripSeparator10.Name = "toolStripSeparator10";
-            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 25);
+            this.zoomToFitToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.zoomToFitToolStripButton.Image = global::GerberView.Properties.Resources.ZoomToFit16;
+            this.zoomToFitToolStripButton.ImageTransparentColor = System.Drawing.Color.White;
+            this.zoomToFitToolStripButton.Name = "zoomToFitToolStripButton";
+            this.zoomToFitToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.zoomToFitToolStripButton.Text = "toolStripButton3";
+            this.zoomToFitToolStripButton.ToolTipText = "Scale layers to fit display area.";
+            this.zoomToFitToolStripButton.Click += new System.EventHandler(this.ZoomToFitToolStripButton_Click);
             // 
             // selectedObjectsContextMenuStrip
             // 
@@ -974,7 +938,7 @@
             // 
             // displaySelectedOjectsToolStripMenuItem
             // 
-            this.displaySelectedOjectsToolStripMenuItem.Image = global::GerberView.Properties.Resources.List;
+            this.displaySelectedOjectsToolStripMenuItem.Image = global::GerberView.Properties.Resources.List16;
             this.displaySelectedOjectsToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.displaySelectedOjectsToolStripMenuItem.Name = "displaySelectedOjectsToolStripMenuItem";
             this.displaySelectedOjectsToolStripMenuItem.Size = new System.Drawing.Size(258, 22);
@@ -983,22 +947,57 @@
             // 
             // deleteSelectedObjectsToolStripMenuItem
             // 
-            this.deleteSelectedObjectsToolStripMenuItem.Image = global::GerberView.Properties.Resources.Delete;
+            this.deleteSelectedObjectsToolStripMenuItem.Image = global::GerberView.Properties.Resources.Delete16;
             this.deleteSelectedObjectsToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.White;
             this.deleteSelectedObjectsToolStripMenuItem.Name = "deleteSelectedObjectsToolStripMenuItem";
             this.deleteSelectedObjectsToolStripMenuItem.Size = new System.Drawing.Size(258, 22);
             this.deleteSelectedObjectsToolStripMenuItem.Text = "Delete Selected Objects";
             this.deleteSelectedObjectsToolStripMenuItem.Click += new System.EventHandler(this.DeleteSelectedObjectsToolStripMenuItem_Click);
             // 
+            // horizonalRuler
+            // 
+            this.horizonalRuler.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.horizonalRuler.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.horizonalRuler.Location = new System.Drawing.Point(22, 0);
+            this.horizonalRuler.MajorInterval = 1000;
+            this.horizonalRuler.Margin = new System.Windows.Forms.Padding(0);
+            this.horizonalRuler.Name = "horizonalRuler";
+            this.horizonalRuler.ScaleMode = Ruler.ScaleMode.Mils;
+            this.horizonalRuler.Size = new System.Drawing.Size(684, 22);
+            this.horizonalRuler.StartValue = 0D;
+            this.horizonalRuler.TabIndex = 3;
+            this.horizonalRuler.TrackLineColor = System.Drawing.Color.Yellow;
+            this.horizonalRuler.TrackLineStyle = Ruler.TrackLineStyle.Arrow;
+            this.horizonalRuler.HoverValueChanged += new System.EventHandler<Ruler.HoverValueChangedEventArgs>(this.HorizonalRuler_HoverValueChanged);
+            // 
+            // verticleRuler
+            // 
+            this.verticleRuler.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.verticleRuler.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.verticleRuler.Location = new System.Drawing.Point(0, 22);
+            this.verticleRuler.MajorInterval = 1000;
+            this.verticleRuler.Margin = new System.Windows.Forms.Padding(0);
+            this.verticleRuler.Name = "verticleRuler";
+            this.verticleRuler.Orientation = Ruler.Orientation.Vertical;
+            this.verticleRuler.ScaleDirection = Ruler.ScaleDirection.Reversed;
+            this.verticleRuler.ScaleMode = Ruler.ScaleMode.Mils;
+            this.verticleRuler.Size = new System.Drawing.Size(22, 357);
+            this.verticleRuler.StartValue = 0D;
+            this.verticleRuler.TabIndex = 0;
+            this.verticleRuler.TrackLineColor = System.Drawing.Color.Yellow;
+            this.verticleRuler.TrackLineStyle = Ruler.TrackLineStyle.Arrow;
+            this.verticleRuler.VerticalNumbers = true;
+            this.verticleRuler.HoverValueChanged += new System.EventHandler<Ruler.HoverValueChangedEventArgs>(this.VerticleRuler_HoverValueChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(951, 452);
-            this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -1046,7 +1045,7 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton openToolStripButton;
         private System.Windows.Forms.ToolStripButton saveToolStripButton;
-        private System.Windows.Forms.ToolStripButton printToolStripButton;
+        private System.Windows.Forms.ToolStripButton newToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel pcbImagePanel;
@@ -1098,8 +1097,7 @@
         private System.Windows.Forms.ToolStripMenuItem showSidepaneToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton zoomInToolStripButton;
         private System.Windows.Forms.ToolStripButton zoomOutToolStripButton;
-        private System.Windows.Forms.ToolStripButton zoomTofitToolStripButton;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
+        private System.Windows.Forms.ToolStripButton zoomToFitToolStripButton;
         private System.Windows.Forms.ToolStripMenuItem scaleToFullSizeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openProjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newProjectToolStripMenuItem;
@@ -1115,9 +1113,11 @@
         private System.Windows.Forms.ToolStripMenuItem rS274XGerberToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem excellonDrillFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pngImageToolStripMenuItem1;
-        private RulerControl.Ruler verticleRuler;
-        private RulerControl.Ruler horizonalRuler;
-        private ListBoxControl.CustomListBox fileListBox;
+        //private Ruler.RulerControl verticleRuler;
+        //private Ruler.RulerControl horizonalRuler;
+        private FileListBox.FileListBoxControl fileListBox;
+        private Ruler.Ruler verticleRuler;
+        private Ruler.Ruler horizonalRuler;
     }
 }
 
