@@ -3,7 +3,8 @@ Gerber and Drill file processor with a Gerber viewer.
 The C# project consists of a GUI viewer app and a core library for
 parsing and displaying gerber RS-274X and NC drill files.
 The core library LibGerberVS.dll is based on the Gerbv Library.
-Acknowledgments go to Gerbv Authors and Contributors
+
+** Acknowledgments go to Gerbv Authors and Contributors **
 
 Features:
 
