@@ -68,7 +68,7 @@ namespace GerberView
                 {
                     switch (net.Interpolation)
                     {
-                        case GerberInterpolation.PolygonAreaStart:
+                        case GerberInterpolation.RegionStart:
                             selectionText.Append(Environment.NewLine);
                             selectionText.Append("Object type: Polygon");
                             break;
@@ -101,8 +101,8 @@ namespace GerberView
                                 PointD start = new PointD(x, y);
                                 selectionText.Append("  Start: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                                 selectionText.Append(Environment.NewLine);
-                                x = net.StopX * 1000;
-                                y = net.StopY * 1000;
+                                x = net.EndX * 1000;
+                                y = net.EndY * 1000;
                                 PointD stop = new PointD(x, y);
                                 selectionText.Append("  Stop: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                                 selectionText.Append(Environment.NewLine);
@@ -151,8 +151,8 @@ namespace GerberView
                                 y = net.StartY * 1000;
                                 selectionText.Append("  Start: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                                 selectionText.Append(Environment.NewLine);
-                                x = net.StopX * 1000;
-                                y = net.StopY * 1000;
+                                x = net.EndX * 1000;
+                                y = net.EndY * 1000;
                                 selectionText.Append("  Stop: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                                 selectionText.Append(Environment.NewLine);
                                 x = net.CircleSegment.CenterX * 1000;
@@ -223,8 +223,8 @@ namespace GerberView
                         }
                     }
 
-                    x = net.StopX * 1000;
-                    y = net.StopY * 1000;
+                    x = net.EndX * 1000;
+                    y = net.EndY * 1000;
                     selectionText.Append("  Location: (" + x.ToString("0.000") + ", " + y.ToString("0.000") + ")");
                     selectionText.Append(Environment.NewLine);
                     selectionText.Append("  Level Name: ");

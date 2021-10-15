@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GerberView</RootNamespace>
     <AssemblyName>GerberView</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,17 +41,17 @@
     <Reference Include="CustomColorDialog">
       <HintPath>..\..\Controls\CustomColorDialog\CustomColorDialog\bin\Release\CustomColorDialog.dll</HintPath>
     </Reference>
-    <Reference Include="FileListBox">
-      <HintPath>..\..\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
-    </Reference>
-    <Reference Include="LibGerberVS, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FileListBox, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\LibGerberVS\bin\Release\LibGerberVS.dll</HintPath>
+      <HintPath>..\..\..\..\..\Visual Studio 2013\Projects\CSharp Projects\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
+    </Reference>
+    <Reference Include="LibGerberVS">
+      <HintPath>..\LibGerberVS\bin\Debug\LibGerberVS.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualC" />
-    <Reference Include="Ruler, Version=2.1.7800.38883, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Ruler, Version=2.3.7877.28652, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Controls\Ruler\Ruler\bin\Release\Ruler.dll</HintPath>
+      <HintPath>..\..\..\..\..\Visual Studio 2013\Projects\CSharp Projects\Controls\Ruler\Ruler\bin\Release\Ruler.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -154,7 +155,6 @@
     <None Include="Bitmaps\Reload16.bmp" />
     <None Include="Bitmaps\New16.bmp" />
     <Content Include="GerberView.ico" />
-    <Content Include="TraxPrint1.ico" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

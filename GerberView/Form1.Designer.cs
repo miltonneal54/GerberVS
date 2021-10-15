@@ -92,8 +92,10 @@
             this.addFileToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.unloadLayerToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.verticleRuler = new Ruler.RulerControl();
             this.pcbImagePanel = new System.Windows.Forms.Panel();
             this.rulerScaleLabel = new System.Windows.Forms.Label();
+            this.horizonalRuler = new Ruler.RulerControl();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.LayerNameToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -117,8 +119,6 @@
             this.selectedObjectsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.displaySelectedOjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteSelectedObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.horizonalRuler = new Ruler.Ruler();
-            this.verticleRuler = new Ruler.Ruler();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -716,6 +716,25 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(706, 379);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
+            // verticleRuler
+            // 
+            this.verticleRuler.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.verticleRuler.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.verticleRuler.Location = new System.Drawing.Point(0, 22);
+            this.verticleRuler.MajorInterval = 1000;
+            this.verticleRuler.Margin = new System.Windows.Forms.Padding(0);
+            this.verticleRuler.Name = "verticleRuler";
+            this.verticleRuler.Orientation = Ruler.Orientation.Vertical;
+            this.verticleRuler.ScaleDirection = Ruler.ScaleDirection.Reversed;
+            this.verticleRuler.ScaleMode = Ruler.ScaleMode.Mils;
+            this.verticleRuler.Size = new System.Drawing.Size(22, 357);
+            this.verticleRuler.StartValue = 0D;
+            this.verticleRuler.TabIndex = 0;
+            this.verticleRuler.TrackLineColor = System.Drawing.Color.Yellow;
+            this.verticleRuler.TrackLineStyle = Ruler.TrackLineStyle.Arrow;
+            this.verticleRuler.VerticalNumbers = true;
+            this.verticleRuler.HoverValueChanged += new System.EventHandler<Ruler.HoverValueChangedEventArgs>(this.VerticleRuler_HoverValueChanged);
+            // 
             // pcbImagePanel
             // 
             this.pcbImagePanel.BackColor = System.Drawing.Color.Black;
@@ -744,6 +763,22 @@
             this.rulerScaleLabel.TabIndex = 0;
             this.rulerScaleLabel.Text = "mils";
             this.rulerScaleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // horizonalRuler
+            // 
+            this.horizonalRuler.BackColor = System.Drawing.Color.MediumSeaGreen;
+            this.horizonalRuler.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.horizonalRuler.Location = new System.Drawing.Point(22, 0);
+            this.horizonalRuler.MajorInterval = 1000;
+            this.horizonalRuler.Margin = new System.Windows.Forms.Padding(0);
+            this.horizonalRuler.Name = "horizonalRuler";
+            this.horizonalRuler.ScaleMode = Ruler.ScaleMode.Mils;
+            this.horizonalRuler.Size = new System.Drawing.Size(684, 22);
+            this.horizonalRuler.StartValue = 0D;
+            this.horizonalRuler.TabIndex = 3;
+            this.horizonalRuler.TrackLineColor = System.Drawing.Color.Yellow;
+            this.horizonalRuler.TrackLineStyle = Ruler.TrackLineStyle.Arrow;
+            this.horizonalRuler.HoverValueChanged += new System.EventHandler<Ruler.HoverValueChangedEventArgs>(this.HorizonalRuler_HoverValueChanged);
             // 
             // statusStrip1
             // 
@@ -954,41 +989,6 @@
             this.deleteSelectedObjectsToolStripMenuItem.Text = "Delete Selected Objects";
             this.deleteSelectedObjectsToolStripMenuItem.Click += new System.EventHandler(this.DeleteSelectedObjectsToolStripMenuItem_Click);
             // 
-            // horizonalRuler
-            // 
-            this.horizonalRuler.BackColor = System.Drawing.Color.MediumSeaGreen;
-            this.horizonalRuler.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.horizonalRuler.Location = new System.Drawing.Point(22, 0);
-            this.horizonalRuler.MajorInterval = 1000;
-            this.horizonalRuler.Margin = new System.Windows.Forms.Padding(0);
-            this.horizonalRuler.Name = "horizonalRuler";
-            this.horizonalRuler.ScaleMode = Ruler.ScaleMode.Mils;
-            this.horizonalRuler.Size = new System.Drawing.Size(684, 22);
-            this.horizonalRuler.StartValue = 0D;
-            this.horizonalRuler.TabIndex = 3;
-            this.horizonalRuler.TrackLineColor = System.Drawing.Color.Yellow;
-            this.horizonalRuler.TrackLineStyle = Ruler.TrackLineStyle.Arrow;
-            this.horizonalRuler.HoverValueChanged += new System.EventHandler<Ruler.HoverValueChangedEventArgs>(this.HorizonalRuler_HoverValueChanged);
-            // 
-            // verticleRuler
-            // 
-            this.verticleRuler.BackColor = System.Drawing.Color.MediumSeaGreen;
-            this.verticleRuler.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.verticleRuler.Location = new System.Drawing.Point(0, 22);
-            this.verticleRuler.MajorInterval = 1000;
-            this.verticleRuler.Margin = new System.Windows.Forms.Padding(0);
-            this.verticleRuler.Name = "verticleRuler";
-            this.verticleRuler.Orientation = Ruler.Orientation.Vertical;
-            this.verticleRuler.ScaleDirection = Ruler.ScaleDirection.Reversed;
-            this.verticleRuler.ScaleMode = Ruler.ScaleMode.Mils;
-            this.verticleRuler.Size = new System.Drawing.Size(22, 357);
-            this.verticleRuler.StartValue = 0D;
-            this.verticleRuler.TabIndex = 0;
-            this.verticleRuler.TrackLineColor = System.Drawing.Color.Yellow;
-            this.verticleRuler.TrackLineStyle = Ruler.TrackLineStyle.Arrow;
-            this.verticleRuler.VerticalNumbers = true;
-            this.verticleRuler.HoverValueChanged += new System.EventHandler<Ruler.HoverValueChangedEventArgs>(this.VerticleRuler_HoverValueChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1113,11 +1113,9 @@
         private System.Windows.Forms.ToolStripMenuItem rS274XGerberToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem excellonDrillFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pngImageToolStripMenuItem1;
-        //private Ruler.RulerControl verticleRuler;
-        //private Ruler.RulerControl horizonalRuler;
         private FileListBox.FileListBoxControl fileListBox;
-        private Ruler.Ruler verticleRuler;
-        private Ruler.Ruler horizonalRuler;
+        private Ruler.RulerControl verticleRuler;
+        private Ruler.RulerControl horizonalRuler;
     }
 }
 
