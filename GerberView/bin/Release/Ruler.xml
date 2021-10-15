@@ -1,0 +1,447 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Ruler</name>
+    </assembly>
+    <members>
+        <member name="T:Ruler.Orientation">
+            <summary>
+            Orientation of the ruler.
+            </summary>
+        </member>
+        <member name="F:Ruler.Orientation.Horizontal">
+            <summary>
+            Draws a horizonal ruler.
+            </summary>
+        </member>
+        <member name="F:Ruler.Orientation.Vertical">
+            <summary>
+            Draws a vertical ruler.
+            </summary>
+        </member>
+        <member name="T:Ruler.ScaleMode">
+            <summary>
+            Scale mode values.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleMode.Points">
+            <summary>
+            Points, 72 per inch.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleMode.Pixels">
+            <summary>
+            Pixels, normally 96 per inch.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleMode.Centimeters">
+            <summary>
+            Centimetres, 2.54 per inch.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleMode.Millimeters">
+            <summary>
+            Millimetres, 25.4 per inch.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleMode.Inches">
+            <summary>
+            Inch
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleMode.Mils">
+            <summary>
+            Mils, 1000 per inch.
+            </summary>
+        </member>
+        <member name="T:Ruler.ScaleAlignment">
+            <summary>
+            Alignment of the ruler scale markings.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleAlignment.TopOrLeft">
+            <summary>
+            Draws the scale on the top for a horizontal ruler or on the left for a verticle ruler.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleAlignment.Middle">
+            <summary>
+            Draws the scale centred on horizonal and vertical rulers.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleAlignment.BottomOrRight">
+            <summary>
+            Draws the scale on the bottom for a horizontal ruler or on the right on a verticle ruler.
+            </summary>
+        </member>
+        <member name="T:Ruler.ScaleDirection">
+            <summary>
+            Direction the rule scale is rendered.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleDirection.Normal">
+            <summary>
+            Left to right on a horizonal ruler and top to bottom on a verticle ruler.
+            </summary>
+        </member>
+        <member name="F:Ruler.ScaleDirection.Reversed">
+            <summary>
+            Right to left on a horizonal ruler and bottom to top on a verticle ruler.
+            </summary>
+        </member>
+        <member name="T:Ruler.TrackLineStyle">
+            <summary>
+            Trackline style.
+            </summary>
+        </member>
+        <member name="F:Ruler.TrackLineStyle.Line">
+            <summary>
+            Line
+            </summary>
+        </member>
+        <member name="F:Ruler.TrackLineStyle.Arrow">
+            <summary>
+            Arrow
+            </summary>
+        </member>
+        <member name="T:Ruler.HoverValueChangedEventArgs">
+            <summary>
+            Event arguments for the HoverValueChanged event.
+            </summary>
+        </member>
+        <member name="M:Ruler.HoverValueChangedEventArgs.#ctor(System.Double)">
+            <summary>
+            Arguements for HoverValueChanged.
+            </summary>
+            <param name="value">arguement value (double)</param>
+        </member>
+        <member name="P:Ruler.HoverValueChangedEventArgs.Value">
+            <summary>
+            Hover value
+            </summary>
+        </member>
+        <member name="T:Ruler.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Ruler.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Ruler.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Ruler.Properties.Resources.ArrowDown">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Ruler.Properties.Resources.ArrowLeft">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Ruler.Properties.Resources.ArrowRight">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Ruler.Properties.Resources.ArrowUp">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="T:Ruler.RulerControl">
+            <summary>
+            Ruler Control.
+            </summary>
+        </member>
+        <member name="M:Ruler.RulerControl.#ctor">
+            <summary>
+            Creates a new instance of the Ruler control.
+            </summary>
+        </member>
+        <member name="M:Ruler.RulerControl.PreFilterMessage(System.Windows.Forms.Message@)">
+            <summary>
+            Hook into the windows message system.
+            </summary>
+            <param name="m">windows message</param>
+            <returns>false if the message is not comsumed</returns>
+        </member>
+        <member name="M:Ruler.RulerControl.OnResize(System.EventArgs)">
+            <summary>
+            Overrides the base OnResize event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnPaint(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Overrides the base OnPaint event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnHandleDestroyed(System.EventArgs)">
+            <summary>
+            Overrides the base OnHandleDestroyed event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnControlRemoved(System.Windows.Forms.ControlEventArgs)">
+            <summary>
+            Overrides the base OnControlRemoved event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnEnter(System.EventArgs)">
+            <summary>
+            Overrides the base OnEnter event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnLeave(System.EventArgs)">
+            <summary>
+            Overrides the base OnLeave event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnHoverValueChanged(Ruler.HoverValueChangedEventArgs)">
+            <summary>
+            Raises the HoverValue event
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnOrientationChanged(System.EventArgs)">
+            <summary>
+            Raises the OrientationChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnBorderStyleChanged(System.EventArgs)">
+            <summary>
+            Raises the BorderStyleChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnScaleDirectionChanged(System.EventArgs)">
+            <summary>
+            Raises the ScaleDirectionChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnScaleModeChanged(System.EventArgs)">
+            <summary>
+            Raises the ScaleModeChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnStartValueChanged(System.EventArgs)">
+            <summary>
+            Raises the StartValueChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnMajorIntervalChanged(System.EventArgs)">
+            <summary>
+            Raises the MajorIntervalChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnMouseTrackingChanged(System.EventArgs)">
+            <summary>
+            Raises the MouseTrackingChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnZoomFactorChanged(System.EventArgs)">
+            <summary>
+            Raises the ZoomChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="F:Ruler.RulerControl.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Ruler.RulerControl.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.HoverValueChanged">
+            <summary>
+            Occurs when the mouse hover value has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.BorderStyleChanged">
+            <summary>
+            Occurs when the border style has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.OrientationChanged">
+            <summary>
+            Occurs when the orientation has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.ScaleDirectionChanged">
+            <summary>
+            Occurs when the scale direction has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.ScaleModeChanged">
+            <summary>
+            Occurs when the scale mode has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.StartValueChanged">
+            <summary>
+            Occurs when the start value has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.MajorIntervalChanged">
+            <summary>
+            Occurs when the major interval has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.MouseTrackingChanged">
+            <summary>
+            Occurs when the mouse tracking state has changed.
+            </summary>
+        </member>
+        <member name="E:Ruler.RulerControl.ZoomFactorChanged">
+            <summary>
+            Occurs when the mouse zoom value has changed.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.BorderStyle">
+            <summary>
+            Gets or sets the ruler border style.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.Orientation">
+            <summary>
+            Gets or sets ruler layout to horizonal or vertical.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.ScaleDirection">
+            <summary>
+            Gets or sets the direction the scale will be drawn on the ruler.
+            </summary>
+            <remarks>
+            Normal: will draw the scale left to right or top to bottom.
+            Reversed: will draw the scale right to left or bottom to top
+            </remarks>
+        </member>
+        <member name="P:Ruler.RulerControl.ScaleMode">
+            <summary>
+            Gets or sets the ruler scale units.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.StartValue">
+            <summary>
+            Gets or sets the the ruler start value in scale units.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.MajorInterval">
+            <summary>
+            Gets or sets the value of the major interval.
+            </summary>
+            <remarks>
+             When displaying inches, 1 is a typical value. When displaying Points, 36 or 72 might good values.
+            </remarks>
+        </member>
+        <member name="P:Ruler.RulerControl.Divisions">
+            <summary>
+            Gets or sets the number of divisions between each major interval.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.DivisionMarkFactor">
+            <summary>
+            Gets or sets the value used to calculate the size of the division markers.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.MiddleMarkFactor">
+            <summary>
+            Gets or sets value used to calculate the size of the middle markers.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.MouseTracking">
+            <summary>
+            Gets or sets the mouse tracking flag.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.TrackLineColor">
+            <summary>
+            Gets or sets the color of the track marker.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.TrackLineStyle">
+            <summary>
+            Gets or sets the style of track marker.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.VerticalNumbers">
+            <summary>
+            Gets or sets whether the numbers are displayed vertically on the ruler.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.ZoomFactor">
+            <summary>
+            Gets or sets the factor by which the ruler scale is zoomed.
+            </summary>
+            <remarks>
+            a value between 0.1 and 100
+            </remarks>
+        </member>
+        <member name="P:Ruler.RulerControl.ScaleAlignment">
+            <summary>
+            Gets or sets the position the scale is drawn on the ruler.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.MouseLocation">
+            <summary>
+            Returns the position of the mouse in pixels. Returns -1 the mouse is out of the tracking area.
+            </summary>
+            <remarks>
+            X position for horizonal ruler and Y position for a verticle ruler.
+            </remarks>
+        </member>
+        <member name="P:Ruler.RulerControl.ScaleValue">
+            <summary>
+            Gets the value at the current mouse position expressed in units of the current ruler scale.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.Font">
+            <summary>
+            Gets or sets the font to use for the division number.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.ForeColor">
+            <summary>
+            Gets or sets the ruler fore ground color.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.BackColor">
+            <summary>
+            Gets or sets the ruler back ground color.
+            </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.RightToLeft">
+            <summary>
+            Hide RightLeft as not to confuse with the scale direction.
+            </summary>
+        </member>
+    </members>
+</doc>

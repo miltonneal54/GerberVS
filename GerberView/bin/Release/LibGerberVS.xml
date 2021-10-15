@@ -174,12 +174,12 @@
             Sets work zero relative to absolute zero.
             </summary>
         </member>
-        <member name="T:GerberVS.ExportExcellonDrill">
+        <member name="T:GerberVS.WriteExcellonDrill">
             <summary>
             Create a Excellon drill file from a gerber image.
             </summary>
         </member>
-        <member name="M:GerberVS.ExportExcellonDrill.RS274xFromImage(System.String,GerberVS.GerberImage)">
+        <member name="M:GerberVS.WriteExcellonDrill.RS274xFromImage(System.String,GerberVS.GerberImage)">
             <summary>
             Export a gerber image to NC drill file format.
             </summary>
@@ -187,7 +187,7 @@
             <param name="inputImage">gerber image to export</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.ExportExcellonDrill.DrillFileFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
+        <member name="M:GerberVS.WriteExcellonDrill.DrillFileFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
             <summary>
             Export a gerber image to NC file format with user tranformations.
             </summary>
@@ -196,12 +196,12 @@
             <param name="transform">apply the user transformations</param>
             <returns></returns>
         </member>
-        <member name="T:GerberVS.ExportGerberRS274X">
+        <member name="T:GerberVS.WriteGerberRS274X">
             <summary>
             Create a RS274X file from a gerber image.
             </summary>
         </member>
-        <member name="M:GerberVS.ExportGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage)">
+        <member name="M:GerberVS.WriteGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage)">
             <summary>
             Export a gerber image to RS274X file format.
             </summary>
@@ -209,7 +209,7 @@
             <param name="inputImage">gerber image to export</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.ExportGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
+        <member name="M:GerberVS.WriteGerberRS274X.RS274XFromImage(System.String,GerberVS.GerberImage,GerberVS.UserTransform)">
             <summary>
             Export a gerber image to RS274X file format with user tranformations.
             </summary>
@@ -218,14 +218,15 @@
             <param name="transform">apply the user transformations</param>
             <returns></returns>
         </member>
+        <member name="T:GerberVS.GerberDraw">
+            <summary>
+            Render the gerber image to the target graphics object.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:GerberVS.GerberDraw.CreatePolygonPath(System.Drawing.Drawing2D.GraphicsPath,System.Single,System.Single,System.Single)" -->
         <member name="T:GerberVS.GerberProject">
             <summary>
             Maintains information about the current file group.
-            </summary>
-        </member>
-        <member name="M:GerberVS.GerberProject.#ctor">
-            <summary>
-            Creates a new instance of the gerber project type class.
             </summary>
         </member>
         <member name="P:GerberVS.GerberProject.BackgroundColor">
@@ -278,14 +279,14 @@
             Gets the file information list.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberProject.#ctor">
+            <summary>
+            Creates a new instance of the gerber project type class.
+            </summary>
+        </member>
         <member name="T:GerberVS.GerberRenderInformation">
             <summary>
             Holds the rendering infomation for the gerber image.
-            </summary>
-        </member>
-        <member name="M:GerberVS.GerberRenderInformation.#ctor">
-            <summary>
-            Creates a new RenderInformation type class.
             </summary>
         </member>
         <member name="P:GerberVS.GerberRenderInformation.ImageWidth">
@@ -333,14 +334,14 @@
             The quality of rendering to use when drawing layers.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberRenderInformation.#ctor">
+            <summary>
+            Creates a new RenderInformation type class.
+            </summary>
+        </member>
         <member name="T:GerberVS.GerberFileInformation">
             <summary>
             Holds information related to an individual layer that is part of a project.
-            </summary>
-        </member>
-        <member name="M:GerberVS.GerberFileInformation.#ctor">
-            <summary>
-            Creates a new instance of gerber file information type.
             </summary>
         </member>
         <member name="P:GerberVS.GerberFileInformation.Image">
@@ -351,11 +352,6 @@
         <member name="P:GerberVS.GerberFileInformation.Color">
             <summary>
             The color to render this layer with.
-            </summary>
-        </member>
-        <member name="P:GerberVS.GerberFileInformation.Alpha">
-            <summary>
-            The alpha level (transparency) of the layer color.
             </summary>
         </member>
         <member name="P:GerberVS.GerberFileInformation.IsVisible">
@@ -383,28 +379,15 @@
             User specified transformation for the layer.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberFileInformation.#ctor">
+            <summary>
+            Creates a new instance of gerber file information type.
+            </summary>
+        </member>
         <member name="T:GerberVS.UserTransform">
             <summary>
             Defines the tranformations set by the user.
             </summary>
-        </member>
-        <member name="M:GerberVS.UserTransform.#ctor">
-            <summary>
-            Creates a new instance of the user transformation type class.
-            </summary>
-        </member>
-        <member name="M:GerberVS.UserTransform.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Boolean,System.Boolean,System.Boolean)">
-            <summary>
-            Creates a new instance of the user transformation type class with supplied parameters.
-            </summary>
-            <param name="translateX"></param>
-            <param name="translateY"></param>
-            <param name="scaleX"></param>
-            <param name="scaleY"></param>
-            <param name="rotation"></param>
-            <param name="mirrorArroundX"></param>
-            <param name="mirrorAroundY"></param>
-            <param name="Inverted"></param>
         </member>
         <member name="P:GerberVS.UserTransform.TranslateX">
             <summary>
@@ -445,6 +428,24 @@
             <summary>
             Set true if the layer should be rendered inverted.
             </summary>
+        </member>
+        <member name="M:GerberVS.UserTransform.#ctor">
+            <summary>
+            Creates a new instance of the user transformation type class.
+            </summary>
+        </member>
+        <member name="M:GerberVS.UserTransform.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Creates a new instance of the user transformation type class with supplied parameters.
+            </summary>
+            <param name="translateX"></param>
+            <param name="translateY"></param>
+            <param name="scaleX"></param>
+            <param name="scaleY"></param>
+            <param name="rotation"></param>
+            <param name="mirrorArroundX"></param>
+            <param name="mirrorAroundY"></param>
+            <param name="Inverted"></param>
         </member>
         <member name="T:GerberVS.DrillInfo">
             <summary>
@@ -697,8 +698,8 @@
             <param name="boundingBox">current net's bounding box</param>
             <param name="x"></param>
             <param name="y"></param>
-            <param name="apertureSizeX1"></param>
-            <param name="apertureSizeY1"></param>
+            <param name="width"></param>
+            <param name="height"></param>
         </member>
         <member name="M:GerberVS.Gerber.AddTrailingZeros(System.Int32,System.Int32,System.Int32,System.Int32@)">
             <summary>
@@ -712,11 +713,6 @@
         <member name="T:GerberVS.GerberApertureInfo">
             <summary>
             Type class containing information on an aperture.
-            </summary>
-        </member>
-        <member name="M:GerberVS.GerberApertureInfo.#ctor">
-            <summary>
-            Creates a new instance of the aperture information type class.
             </summary>
         </member>
         <member name="P:GerberVS.GerberApertureInfo.Number">
@@ -744,14 +740,14 @@
             Aperture parameter list.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberApertureInfo.#ctor">
+            <summary>
+            Creates a new instance of the aperture information type class.
+            </summary>
+        </member>
         <member name="T:GerberVS.Aperture">
             <summary>
             Type class for defining an aperture.
-            </summary>
-        </member>
-        <member name="M:GerberVS.Aperture.#ctor">
-            <summary>
-            Creates a new instance of an aperture definition type class.
             </summary>
         </member>
         <member name="P:GerberVS.Aperture.SimplifiedMacroList">
@@ -759,9 +755,19 @@
             Gets the simplified macro list.
             </summary>
         </member>
+        <member name="M:GerberVS.Aperture.#ctor">
+            <summary>
+            Creates a new instance of an aperture definition type class.
+            </summary>
+        </member>
         <member name="T:GerberVS.ApertureMacro">
             <summary>
             Type class for defining an aperture macro.
+            </summary>
+        </member>
+        <member name="P:GerberVS.ApertureMacro.InstructionList">
+            <summary>
+            Gets the macro instruction list.
             </summary>
         </member>
         <member name="M:GerberVS.ApertureMacro.#ctor">
@@ -783,11 +789,6 @@
             <param name="opcode">operater code</param>
             <returns>value indicating precedence</returns>
         </member>
-        <member name="P:GerberVS.ApertureMacro.InstructionList">
-            <summary>
-            Gets the macro instruction list.
-            </summary>
-        </member>
         <member name="T:GerberVS.SimplifiedApertureMacro">
             <summary>
             Type class for defining a simplified aperture macro.
@@ -805,22 +806,6 @@
             <summary>
             Type class for defining gerber circle segments.
             </summary>
-        </member>
-        <member name="M:GerberVS.CircleSegment.#ctor">
-            <summary>
-            Create a new instance of the circle segment type class.
-            </summary>
-        </member>
-        <member name="M:GerberVS.CircleSegment.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
-            <summary>
-            Create a new instance of the circle segment type class with parameters.
-            </summary>
-            <param name="centerX">center x coordinate</param>
-            <param name="centerY">center y coordinate</param>
-            <param name="width">rectanglar width</param>
-            <param name="height">retangular height</param>
-            <param name="startAngle">circle segment start angle in degrees</param>
-            <param name="endAngle">circle segment end angle in degrees</param>
         </member>
         <member name="P:GerberVS.CircleSegment.CenterX">
             <summary>
@@ -857,6 +842,22 @@
             Gets the sweep angle based on the start and end angles.
             </summary>
         </member>
+        <member name="M:GerberVS.CircleSegment.#ctor">
+            <summary>
+            Create a new instance of the circle segment type class.
+            </summary>
+        </member>
+        <member name="M:GerberVS.CircleSegment.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Create a new instance of the circle segment type class with parameters.
+            </summary>
+            <param name="centerX">center x coordinate</param>
+            <param name="centerY">center y coordinate</param>
+            <param name="width">rectanglar width</param>
+            <param name="height">retangular height</param>
+            <param name="startAngle">circle segment start angle in degrees</param>
+            <param name="endAngle">circle segment end angle in degrees</param>
+        </member>
         <member name="T:GerberVS.GerberError">
             <summary>
             Maintains a list of errors encounted during parsing of the gerber file.
@@ -875,11 +876,6 @@
         <member name="T:GerberVS.GerberImageInfo">
             <summary>
             Class defining the information about an image.
-            </summary>
-        </member>
-        <member name="M:GerberVS.GerberImageInfo.#ctor">
-            <summary>
-            Creates a new instance of the gerber image information type.
             </summary>
         </member>
         <member name="P:GerberVS.GerberImageInfo.ImageName">
@@ -932,40 +928,15 @@
             Rotation angle of the image.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberImageInfo.#ctor">
+            <summary>
+            Creates a new instance of the gerber image information type.
+            </summary>
+        </member>
         <member name="T:GerberVS.GerberImage">
             <summary>
             Creates a new gerber image and initializes its members
             </summary>
-        </member>
-        <member name="M:GerberVS.GerberImage.#ctor">
-            <summary>
-            Creates a new instance of the gerber image type.
-            </summary>
-        </member>
-        <member name="M:GerberVS.GerberImage.#ctor(System.String)">
-            <summary>
-            Creates a new instance of the gerber image type.
-            </summary>
-            <param name="fileTypeName">type of file, eg rs274-x, drill</param>
-        </member>
-        <member name="M:GerberVS.GerberImage.ImageVerify">
-            <summary>
-            Perform some basic integrity checks on the gerber image.
-            </summary>
-            <returns>error status</returns>
-        </member>
-        <member name="M:GerberVS.GerberImage.DeleteNet(System.Int32)">
-            <summary>
-            Remove a net from the image.
-            </summary>
-            <param name="index">index within the net list</param>
-        </member>
-        <member name="M:GerberVS.GerberImage.Copy(GerberVS.GerberImage)">
-            <summary>
-            Creates a copy of the gerber image.
-            </summary>
-            <param name="sourceImage">image to be copied</param>
-            <returns>a deep copy of the source image</returns>
         </member>
         <member name="P:GerberVS.GerberImage.ApertureMacroList">
             <summary>
@@ -1017,6 +988,36 @@
             Excellon drill statistics for the layer.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberImage.#ctor">
+            <summary>
+            Creates a new instance of the gerber image type.
+            </summary>
+        </member>
+        <member name="M:GerberVS.GerberImage.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the gerber image type.
+            </summary>
+            <param name="fileTypeName">type of file, eg rs274-x, drill</param>
+        </member>
+        <member name="M:GerberVS.GerberImage.ImageVerify">
+            <summary>
+            Perform some basic integrity checks on the gerber image.
+            </summary>
+            <returns>error status</returns>
+        </member>
+        <member name="M:GerberVS.GerberImage.DeleteNet(System.Int32)">
+            <summary>
+            Remove a net from the image.
+            </summary>
+            <param name="index">index within the net list</param>
+        </member>
+        <member name="M:GerberVS.GerberImage.Copy(GerberVS.GerberImage)">
+            <summary>
+            Creates a copy of the gerber image.
+            </summary>
+            <param name="sourceImage">image to be copied</param>
+            <returns>a deep copy of the source image</returns>
+        </member>
         <member name="T:GerberVS.GerberLevel">
             <summary>
             Class for defining a gerber level.
@@ -1025,14 +1026,29 @@
             Constructor name "Level" replaces "Layer" in the later Gerber specifications.
             </remarks>
         </member>
-        <member name="M:GerberVS.GerberLevel.#ctor(GerberVS.GerberImage)">
+        <member name="P:GerberVS.GerberLevel.StepAndRepeat">
             <summary>
-            Creates a new Gerber Level.
+            The current step and repeat group for this level.
+            </summary>
+        </member>
+        <member name="P:GerberVS.GerberLevel.Rotation">
+            <summary>
+            The current rotation around the origin.
+            </summary>
+        </member>
+        <member name="P:GerberVS.GerberLevel.Polarity">
+            <summary>
+            Dark or clear polarity for this level.
             </summary>
         </member>
         <member name="P:GerberVS.GerberLevel.LevelName">
             <summary>
             The level name.
+            </summary>
+        </member>
+        <member name="M:GerberVS.GerberLevel.#ctor(GerberVS.GerberImage)">
+            <summary>
+            Creates a new Gerber Level.
             </summary>
         </member>
         <member name="M:GerberVS.GerberKnockout.#ctor">
@@ -1071,7 +1087,7 @@
             <summary>
             Reads in digits from the current file position and converts them to an integer.
             </summary>
-            <param name="length">numberof digit in the integer</param>
+            <param name="length">number of digit in the integer</param>
             <returns>the value as an integer</returns>
         </member>
         <member name="M:GerberVS.GerberLineReader.GetDoubleValue">
@@ -1110,21 +1126,6 @@
             <summary>
             Class for defining the gerber net.
             </summary>
-        </member>
-        <member name="M:GerberVS.GerberNet.#ctor(GerberVS.GerberImage)">
-            <summary>
-            Creates a new instance of a gerber net and appends it to the net list.
-            </summary>
-            <param name="gerberImage">image containing the net</param>
-        </member>
-        <member name="M:GerberVS.GerberNet.#ctor(GerberVS.GerberImage,GerberVS.GerberNet,GerberVS.GerberLevel,GerberVS.GerberNetState)">
-            <summary>
-            Creates a new instance of a gerber net and appends it to the net list.
-            </summary>
-            <param name="gerberImage">image containing the net</param>
-            <param name="currentNet">the current gerber net</param>
-            <param name="level">level infomation for the new net </param>
-            <param name="netState">state information for the new net</param>
         </member>
         <member name="P:GerberVS.GerberNet.StartX">
             <summary>
@@ -1189,14 +1190,48 @@
             RS274X state this net belongs to.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberNet.#ctor(GerberVS.GerberImage)">
+            <summary>
+            Creates a new instance of a gerber net and appends it to the net list.
+            </summary>
+            <param name="gerberImage">image containing the net</param>
+        </member>
+        <member name="M:GerberVS.GerberNet.#ctor(GerberVS.GerberImage,GerberVS.GerberNet,GerberVS.GerberLevel,GerberVS.GerberNetState)">
+            <summary>
+            Creates a new instance of a gerber net and appends it to the net list.
+            </summary>
+            <param name="gerberImage">image containing the net</param>
+            <param name="currentNet">the current gerber net</param>
+            <param name="level">level infomation for the new net </param>
+            <param name="netState">state information for the new net</param>
+        </member>
         <member name="T:GerberVS.BoundingBox">
             <summary>
             Defines the bounding size of Gerber Net objects.
             </summary>
             <remarks>
-            A bounding box consisting of double "min" and "max" values is deemed empty.
-            If any of the the values are a double "min" or "max" is it also deemed to be invalid.
+            A bounding box with any values consisting of double "MinValue" and "MaxValue" is deemed invalid.
             </remarks>
+        </member>
+        <member name="P:GerberVS.BoundingBox.Left">
+            <summary>
+            The X coordinate of the left side of the bounds.
+            </summary>
+        </member>
+        <member name="P:GerberVS.BoundingBox.Top">
+            <summary>
+            The Y coordinate of the top of the bounds.
+            </summary>
+        </member>
+        <member name="P:GerberVS.BoundingBox.Right">
+            <summary>
+            The X coordinate of the right side of the bounds.
+            </summary>
+        </member>
+        <member name="P:GerberVS.BoundingBox.Bottom">
+            <summary>
+            The Y coordinate of the bottom of the bounds.
+            </summary>
         </member>
         <member name="M:GerberVS.BoundingBox.#ctor">
             <summary>
@@ -1205,7 +1240,7 @@
         </member>
         <member name="M:GerberVS.BoundingBox.#ctor(System.Double,System.Double,System.Double,System.Double)">
             <summary>
-            Intializes a new instance of BoundingBbox with specified parameters.
+            Intializes a new instance of BoundingBox with specified parameters.
             </summary>
             <param name="left">left value</param>
             <param name="right">right value</param>
@@ -1214,9 +1249,29 @@
         </member>
         <member name="M:GerberVS.BoundingBox.IsValid">
             <summary>
-            Determines if the bounding box contains all valid values.
+            Determines if the bounding box is a valid size.
             </summary>
             <returns>true if all bounding box values are valid</returns>
+        </member>
+        <member name="M:GerberVS.BoundingBox.Contains(GerberVS.PointD)">
+            <summary>
+            Determines if the specified point is contained within the bounds of this bounding box structure.
+            </summary>
+            <param name="point">the point to test</param>
+            <returns>true if within the bounds</returns>
+        </member>
+        <member name="M:GerberVS.BoundingBox.Contains(GerberVS.BoundingBox)">
+            <summary>
+            Determines if the specified bounding box is contained within the bounds of this bounding box structure.
+            </summary>
+            <param name="boundingBox">the bounding box to test</param>
+            <returns>true if within the bounds</returns>
+        </member>
+        <member name="M:GerberVS.BoundingBox.ToRectangle">
+            <summary>
+            Creates RectangleF structure from the bounding box parameters.
+            </summary>
+            <returns>returns the constructed rectangle</returns>
         </member>
         <member name="T:GerberVS.GerberNetState">
             <summary>
@@ -1238,11 +1293,6 @@
             Maintains a list of selected objects and their associated net index.
             </summary>
         </member>
-        <member name="M:GerberVS.SelectionItem.#ctor">
-            <summary>
-            Creates a new instance of the selection item type class.
-            </summary>
-        </member>
         <member name="P:GerberVS.SelectionItem.SelectedNetList">
             <summary>
             Gets the net list in the current selection.
@@ -1253,21 +1303,15 @@
             Gets the list of net indexes in the cuttent selection
             </summary>
         </member>
+        <member name="M:GerberVS.SelectionItem.#ctor">
+            <summary>
+            Creates a new instance of the selection item type class.
+            </summary>
+        </member>
         <member name="T:GerberVS.SelectionInformation">
             <summary>
             Holds information about the current user selection.
             </summary>
-        </member>
-        <member name="M:GerberVS.SelectionInformation.#ctor(GerberVS.GerberFileInformation)">
-            <summary>
-            Creates a new instance of the selection information type class.
-            </summary>
-        </member>
-        <member name="M:GerberVS.SelectionInformation.RemoveNetFromList(System.Int32)">
-            <summary>
-            Remove a net from the current selection.
-            </summary>
-            <param name="index">index within the net list</param>
         </member>
         <member name="P:GerberVS.SelectionInformation.FileInfo">
             <summary>
@@ -1309,10 +1353,31 @@
             Gets the number of nets in the current selection.
             </summary>
         </member>
-        <member name="P:GerberVS.SelectionInformation.PolygonAreaStartIndex">
+        <member name="M:GerberVS.SelectionInformation.#ctor(GerberVS.GerberFileInformation)">
             <summary>
-            Gets or sets the net index of the first Polygon object in the selection if there is one.
+            Creates a new instance of the selection information type class.
             </summary>
+        </member>
+        <member name="T:GerberVS.GerberSelectRegion">
+            <summary>
+            Test for hits in the underlying graphics objects.
+            </summary>
+        </member>
+        <member name="M:GerberVS.GerberSelectRegion.PointInObject(System.Drawing.Graphics,GerberVS.SelectionInformation,System.Int32@)">
+            <summary>
+            Adds an object to the selection list if the test point is within it's bounds.
+            </summary>
+            <param name="graphics">target graphics</param>
+            <param name="selectionInfo">selection data</param>
+            <param name="index">current net index</param>
+        </member>
+        <member name="M:GerberVS.GerberSelectRegion.ObjectsInRegion(System.Drawing.Graphics,GerberVS.SelectionInformation,System.Int32@)">
+            <summary>
+            Adds an object to the selection list if it's bounds lies within the selection bounds.
+            </summary>
+            <param name="graphics">target graphics</param>
+            <param name="selectionInfo">selection data</param>
+            <param name="index">current net index</param>
         </member>
         <member name="M:GerberVS.GerberState.#ctor">
             <summary>
@@ -1322,6 +1387,21 @@
         <member name="T:GerberVS.GerberFileStats">
             <summary>
             Maintains statistics on the various codes used in a RS274X file.
+            </summary>
+        </member>
+        <member name="P:GerberVS.GerberFileStats.ErrorList">
+            <summary>
+            Gets the error list.
+            </summary>
+        </member>
+        <member name="P:GerberVS.GerberFileStats.ApertureList">
+            <summary>
+            Gets the aperture list.
+            </summary>
+        </member>
+        <member name="P:GerberVS.GerberFileStats.DCodeList">
+            <summary>
+            Gets the D code list.
             </summary>
         </member>
         <member name="M:GerberVS.GerberFileStats.#ctor">
@@ -1357,21 +1437,6 @@
             <param name="line">current file line number</param>
             <returns></returns>
         </member>
-        <member name="P:GerberVS.GerberFileStats.ErrorList">
-            <summary>
-            Gets the error list.
-            </summary>
-        </member>
-        <member name="P:GerberVS.GerberFileStats.ApertureList">
-            <summary>
-            Gets the aperture list.
-            </summary>
-        </member>
-        <member name="P:GerberVS.GerberFileStats.DCodeList">
-            <summary>
-            Gets the D code list.
-            </summary>
-        </member>
         <member name="T:GerberVS.LibGerberVS">
             <summary>
             Gerber process library.
@@ -1381,11 +1446,11 @@
             <summary>
             Creates a new Gerber Project.
             </summary>
-            <returns></returns>
+            <returns>the newly created project</returns>
         </member>
         <member name="M:GerberVS.LibGerberVS.UnloadLayer(GerberVS.GerberProject,System.Int32)">
             <summary>
-            Removes a layer from the project at the specified index.
+            Removes a file from the project at the specified index.
             </summary>
             <param name="project">project containing the file info to remove</param>
             <param name="index">index to remove at</param>
@@ -1412,14 +1477,13 @@
             <param name="fullPathName">file to open</param>
             <returns></returns>
         </member>
-        <member name="M:GerberVS.LibGerberVS.OpenLayerFromFilenameAndColor(GerberVS.GerberProject,System.String,System.Drawing.Color,System.Int32)">
+        <member name="M:GerberVS.LibGerberVS.OpenLayerFromFilenameAndColor(GerberVS.GerberProject,System.String,System.Drawing.Color)">
             <summary>
             Opens a layer and appends it to the project using the specified color and alpha level.
             </summary>
             <param name="project">project</param>
             <param name="fullPathName">file path</param>
             <param name="color">layer color</param>
-            <param name="alpha">alpha level</param>
         </member>
         <member name="M:GerberVS.LibGerberVS.ReloadLayer(GerberVS.GerberProject,System.Int32)">
             <summary>
@@ -1447,14 +1511,14 @@
             <param name="filePath">filename containing the layer geometry</param>
             <returns>gerber image</returns>
         </member>
-        <member name="M:GerberVS.LibGerberVS.ObjectInSelectedRegion(System.Drawing.Graphics,GerberVS.SelectionInformation,System.Int32@)">
+        <member name="M:GerberVS.LibGerberVS.CreateExcellonImageFromFile(System.String)">
             <summary>
-            Adds a gerber object to the selection buffer if it lies within the selection region.
+            Creates the Gerber image holding all the geometry for the drill layer.
             </summary>
-            <param name="graphics">surface where the image is rendered</param>
-            <param name="selectionInfo">current selection info</param>
-            <param name="index">index of the gerber net to test</param>
+            <param name="filePath">filename containing the excellon drill geometry</param>
+            <returns>gerber image</returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:GerberVS.LibGerberVS.ObjectInSelectedRegion(System.Drawing.Graphics,GerberVS.SelectionInformation,System.Int32@)" -->
         <member name="M:GerberVS.LibGerberVS.TranslateToFitDisplay(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
             <summary>
             Applies offsets to move the image within the display area.
@@ -1462,7 +1526,7 @@
             <param name="project">project data</param>
             <param name="renderInfo">rendering information</param>
         </member>
-        <member name="M:GerberVS.LibGerberVS.ScaleToFit(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
+        <member name="M:GerberVS.LibGerberVS.ZoomToFit(GerberVS.GerberProject,GerberVS.GerberRenderInformation)">
             <summary>
             Scales the image to display maximised within the display area.
             </summary>
@@ -1537,7 +1601,12 @@
         </member>
         <member name="F:GerberVS.GerberApertureType.Circle">
             <summary>
-            A round aperture.
+            Round aperture.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberApertureType.Rectangle">
+            <summary>
+            Rectangular aperture.
             </summary>
         </member>
         <member name="F:GerberVS.GerberUnit.Inch">
@@ -1625,12 +1694,33 @@
             Represents an ordered pair of double precision coordinates.
             </summary>
         </member>
+        <member name="P:GerberVS.PointD.X">
+            <summary>
+            Gets or sets the value of the X coordinate.
+            </summary>
+        </member>
+        <member name="P:GerberVS.PointD.Y">
+            <summary>
+            Gets or sets the value of the Y coordinate.
+            </summary>
+        </member>
         <member name="M:GerberVS.PointD.#ctor(System.Double,System.Double)">
             <summary>
             Initialises a new instance of the PointD class with the specified values.
             </summary>
             <param name="x">x coordinate</param>
             <param name="y">y coordinal</param>
+        </member>
+        <member name="P:GerberVS.PointD.IsEmpty">
+            <summary>
+            Gets a value indicating whether this PointD is empty.
+            </summary>
+        </member>
+        <member name="M:GerberVS.PointD.Empty">
+            <summary>
+            Returns an empty PointD structure.
+            </summary>
+            <returns>PointD where X = 0 and Y = 0</returns>
         </member>
         <member name="M:GerberVS.PointD.op_Equality(GerberVS.PointD,GerberVS.PointD)">
             <summary>
@@ -1667,24 +1757,19 @@
             </summary>
             <returns>coordinates as a string value</returns>
         </member>
-        <member name="P:GerberVS.PointD.X">
-            <summary>
-            Gets or sets the value of the X coordinate.
-            </summary>
-        </member>
-        <member name="P:GerberVS.PointD.Y">
-            <summary>
-            Gets or sets the value of the Y coordinate.
-            </summary>
-        </member>
-        <member name="P:GerberVS.PointD.IsEmpty">
-            <summary>
-            Test if the PointD has an x and y value of 0.
-            </summary>
-        </member>
         <member name="T:GerberVS.SizeD">
             <summary>
             Represents an order pair of double precission numbers typically for height and width of a rectangle.
+            </summary>
+        </member>
+        <member name="P:GerberVS.SizeD.Width">
+            <summary>
+            Gets or sets the value of the width coordinate.
+            </summary>
+        </member>
+        <member name="P:GerberVS.SizeD.Height">
+            <summary>
+            Gets or sets the value of the height coordinate.
             </summary>
         </member>
         <member name="M:GerberVS.SizeD.#ctor(System.Double,System.Double)">
@@ -1694,13 +1779,24 @@
             <param name="width">width</param>
             <param name="height">height</param>
         </member>
+        <member name="P:GerberVS.SizeD.IsEmpty">
+            <summary>
+            Test if the SizeD has a width and height value of 0.
+            </summary>
+        </member>
+        <member name="M:GerberVS.SizeD.Empty">
+            <summary>
+            Returns an empty SizeD structure.
+            </summary>
+            <returns>SizeD where Width = 0 and Height = 0</returns>
+        </member>
         <member name="M:GerberVS.SizeD.op_Equality(GerberVS.SizeD,GerberVS.SizeD)">
             <summary>
             Determines whether the coordinates of two sizes are equal.
             </summary>
             <param name="value1"></param>
             <param name="value2"></param>
-            <returns></returns>
+            <returns>true if equal</returns>
         </member>
         <member name="M:GerberVS.SizeD.op_Inequality(GerberVS.SizeD,GerberVS.SizeD)">
             <summary>
@@ -1708,7 +1804,7 @@
             </summary>
             <param name="value1"></param>
             <param name="value2"></param>
-            <returns></returns>
+            <returns>true if equal</returns>
         </member>
         <member name="M:GerberVS.SizeD.op_Division(GerberVS.SizeD,System.Double)">
             <summary>
@@ -1736,21 +1832,6 @@
             Gets a string representation of the coordinates.
             </summary>
             <returns>coordinates as a string value</returns>
-        </member>
-        <member name="P:GerberVS.SizeD.Width">
-            <summary>
-            Gets or sets the value of the width coordinate.
-            </summary>
-        </member>
-        <member name="P:GerberVS.SizeD.Height">
-            <summary>
-            Gets or sets the value of the height coordinate.
-            </summary>
-        </member>
-        <member name="P:GerberVS.SizeD.IsEmpty">
-            <summary>
-            Test if the SizeD has a width and height value of 0.
-            </summary>
         </member>
     </members>
 </doc>
