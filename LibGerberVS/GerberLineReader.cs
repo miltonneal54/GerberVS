@@ -187,7 +187,9 @@ namespace GerberVS
                 nextCharacter = Read();
             }
 
-            Position--;
+            if(nextCharacter != '\n')
+                Position--;
+
             if (!string.IsNullOrEmpty(doubleString))
                 result = double.TryParse(doubleString, out rtnValue);
 

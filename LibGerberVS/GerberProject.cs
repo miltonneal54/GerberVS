@@ -44,6 +44,7 @@ namespace GerberVS
         /// Determine if a user selection is shown on a hidden layer.
         /// </summary>
         public bool ShowHiddenSelection { get; set; }
+
         /// <summary>
         /// The default path to load project files from.
         /// </summary>
@@ -192,72 +193,6 @@ namespace GerberVS
             Image = null;
             IsVisible = true;
             UserTransform = new UserTransform();
-        }
-    }
-
-    public struct HIDAttributeValue
-    {
-        private int intValue;
-        private string strValue;
-        private double realValue;
-
-        public int IntValue
-        {
-            get { return intValue; }
-            set { intValue = value; }
-        }
-
-        public string StrValue
-        {
-            get { return strValue; }
-            set { strValue = value; }
-        }
-
-        public double RealValue
-        {
-            get { return realValue; }
-            set { realValue = value; }
-        }
-
-        public HIDAttributeValue(int intValue, string strValue, double realValue)
-        {
-            this.intValue = intValue;
-            this.strValue = strValue;
-            this.realValue = realValue;
-        }
-    }
-
-    public class GerberHIDAttribute
-    {
-        public string Name { get; set; }
-        public string HelpText { get; set; }
-        public GerberHIDType HIDType { get; set; }
-        public int MinValue { get; set; }
-        public int MaxValue { get; set; }	/* for integer and real */
-        public HIDAttributeValue DefaultValue;	/* Also actual value for global attributes.  */
-        public string[] Enumerations { get; set; }
-        /* If set, this is used for global attributes (i.e. those set
-           statically with REGISTER_ATTRIBUTES below) instead of changing
-           the default_val.  Note that a HID_Mixed attribute must specify a
-           pointer to gerbv_HID_Attr_Val here, and HID_Boolean assumes this is
-           "char *" so the value should be initialized to zero, and may be
-           set to non-zero (not always one).  */
-        public IntPtr Value { get; set; }
-        public int Hash { get; set; } /* for detecting changes. */
-
-        public GerberHIDAttribute()
-        { }
-
-        public GerberHIDAttribute(GerberHIDAttribute attibute)
-        {
-            Name = attibute.Name;
-            HelpText = attibute.HelpText;
-            HIDType = attibute.HIDType;
-            MinValue = attibute.MinValue;
-            MaxValue = attibute.MaxValue;
-            Enumerations = attibute.Enumerations;
-            Value = attibute.Value;
-            Hash = attibute.Hash;
         }
     }
 

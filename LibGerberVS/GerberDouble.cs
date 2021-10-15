@@ -38,27 +38,15 @@ namespace GerberVS
     /// </summary>
     public struct PointD 
     {
-        //public static readonly PointD Empty = new PointD();
-        private double x;
-        private double y;
-
         /// <summary>
         /// Gets or sets the value of the X coordinate.
         /// </summary>
-        public double X
-        {
-            get { return x; }
-            set { x = value; }
-        }
+        public double X { get; set; }
 
         /// <summary>
         /// Gets or sets the value of the Y coordinate.
         /// </summary>
-        public double Y
-        {
-            get { return y; }
-            set { y = value; }
-        }
+        public double Y { get; set; }
 
         /// <summary>
         /// Initialises a new instance of the PointD class with the specified values.
@@ -67,18 +55,26 @@ namespace GerberVS
         /// <param name="y">y coordinal</param>
         public PointD(double x, double y)
         {
-            this.x = x;
-            this.y = y;
+            X = x;
+            Y = y;
         }
 
         /// <summary>
-        /// Test if the PointD has an x and y value of 0.
+        /// Gets a value indicating whether this PointD is empty.
         /// </summary>
-        [Browsable(false)]
         public bool IsEmpty
         {
-            get { return x == 0.0 && y == 0.0; }
-        } 
+            get {return X == 0.0 && Y == 0.0; }
+        }
+        
+        /// <summary>
+        /// Returns an empty PointD structure.
+        /// </summary>
+        /// <returns>PointD where X = 0 and Y = 0</returns>
+        public static PointD Empty
+        {
+            get { return new PointD(0.0, 0.0); }
+        }
 
         /// <summary>
         /// Determines whether the coordinates of two points are equal.
@@ -122,7 +118,7 @@ namespace GerberVS
                 return false;
 
             PointD comp = (PointD)obj;
-            return comp.x == this.x && comp.y == this.y && comp.GetType().Equals(this.GetType());
+            return comp.X == this.X && comp.Y == this.Y && comp.GetType().Equals(this.GetType());
         }
 
         /// <summary>
@@ -131,7 +127,7 @@ namespace GerberVS
         /// <returns>coordinates as a string value</returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{X = {0}, Y = {1}} }", x, y);
+            return string.Format(CultureInfo.CurrentCulture, "{{X = {0}, Y = {1}} }", X, Y);
         } 
     }
 
@@ -140,27 +136,15 @@ namespace GerberVS
     /// </summary>
     public struct SizeD
     {
-        //public static readonly SizeD Empty = new SizeD();
-        private double width;
-        private double height;
-
         /// <summary>
         /// Gets or sets the value of the width coordinate.
         /// </summary>
-        public double Width
-        {
-            get { return width; }
-            set { width = value; }
-        }
+        public double Width { get; set; }
 
         /// <summary>
         /// Gets or sets the value of the height coordinate.
         /// </summary>
-        public double Height
-        {
-            get { return height; }
-            set { height = value; }
-        }
+        public double Height { get; set; }
 
         /// <summary>
         /// Initialises a new instance of the SizeD class with the specified dimensions.
@@ -169,8 +153,8 @@ namespace GerberVS
         /// <param name="height">height</param>
         public SizeD(double width, double height)
         {
-            this.width = width;
-            this.height = height;
+            Width = width;
+            Height = height;
         }
 
         /// <summary>
@@ -179,15 +163,24 @@ namespace GerberVS
         [Browsable(false)]
         public bool IsEmpty
         {
-            get { return width == 0.0 && height == 0.0; }
-        } 
+            get { return Width == 0.0 && Height == 0.0; }
+        }
+
+        /// <summary>
+        /// Returns an empty SizeD structure.
+        /// </summary>
+        /// <returns>SizeD where Width = 0 and Height = 0</returns>
+        public static SizeD Empty()
+        {
+            return new SizeD(0.0, 0.0);
+        }
 
         /// <summary>
         /// Determines whether the coordinates of two sizes are equal.
         /// </summary>
         /// <param name="value1"></param>
         /// <param name="value2"></param>
-        /// <returns></returns>
+        /// <returns>true if equal</returns>
         public static bool operator == (SizeD value1, SizeD value2)
         {
             return value1.Equals(value2);
@@ -198,7 +191,7 @@ namespace GerberVS
         /// </summary>
         /// <param name="value1"></param>
         /// <param name="value2"></param>
-        /// <returns></returns>
+        /// <returns>true if equal</returns>
         public static bool operator != (SizeD value1, SizeD value2)
         {
             return !value1.Equals(value2);
@@ -242,7 +235,7 @@ namespace GerberVS
                 return false;
 
             SizeD comp = (SizeD)obj;
-            return comp.width == this.width && comp.height == this.height && comp.GetType().Equals(this.GetType());
+            return comp.Width == this.Width && comp.Height == this.Height && comp.GetType().Equals(this.GetType());
         }
 
         /// <summary>
@@ -251,7 +244,7 @@ namespace GerberVS
         /// <returns>coordinates as a string value</returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{Width = {0}, Height = {1}} }", width, height);
+            return string.Format(CultureInfo.CurrentCulture, "{{Width = {0}, Height = {1}} }", Width, Height);
         } 
     }
 }

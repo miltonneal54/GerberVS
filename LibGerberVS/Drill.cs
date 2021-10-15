@@ -50,9 +50,13 @@ namespace GerberVS
 
         private static string[] supressionList = new string[] { "None", "Leading", "Trailing" };
         private static string[] unitsList = new string[] { "Inch", "MM" };
-        private static List<GerberHIDAttribute> drillAttributeList = new List<GerberHIDAttribute>(); /* <---- NOT SURE IF WE NEED THIS.*/
 
-        public static GerberImage ParseDrillFile(string drillFileName, List<GerberHIDAttribute> attributeList, int numberOfAttributes, bool reload)
+        public static GerberImage ParseDrillFile(string drillFileName)
+        {
+            return ParseDrillFile(drillFileName, false);
+        }
+
+        public static GerberImage ParseDrillFile(string drillFileName, bool reload)
         {
             bool foundEOF = false;
             string errorMessage = String.Empty;
@@ -62,59 +66,6 @@ namespace GerberVS
             drillImage.FileType = GerberFileType.Drill;
             drillImage.Format.OmitZeros = GerberOmitZero.OmitZerosUnspecified;
             GerberNet gerberNet = new GerberNet(drillImage);    // Create the first gerberNet filled with some initial values.
-            /* gerberNet.Level = new GerberLevel(drillImage);         // Create the first level filled with some default values.
-             gerberNet.NetState = new GerberNetState(drillImage);   // Create the first netState.
-             gerberNet.Label = String.Empty;
-             drillImage.GerberNetList.Add(gerberNet);*/
-
-            CreateDefaultAttributeList();
-            if (reload & attributeList != null)
-            {
-                drillImage.ImageInfo.NumberOfAttribute = numberOfAttributes;
-                drillImage.ImageInfo.AttributeList = new List<GerberHIDAttribute>();
-                for (int i = 0; i < numberOfAttributes; i++)
-                {
-                    GerberHIDAttribute attribute = new GerberHIDAttribute(attributeList[i]);
-                    drillImage.ImageInfo.AttributeList.Add(attribute);
-                }
-            }
-
-            else
-            {
-                // Load default attributes.
-                drillImage.ImageInfo.NumberOfAttribute = drillAttributeList.Count;
-                drillImage.ImageInfo.AttributeList = new List<GerberHIDAttribute>();
-                for (int i = 0; i < drillImage.ImageInfo.NumberOfAttribute; i++)
-                {
-                    GerberHIDAttribute attribute = new GerberHIDAttribute(drillAttributeList[i]);
-                    drillImage.ImageInfo.AttributeList.Add(attribute);
-                }
-            }
-
-            DrillAttributeMerge(drillImage.ImageInfo.AttributeList, drillImage.ImageInfo.NumberOfAttribute, attributeList, numberOfAttributes);
-            if (drillImage.ImageInfo.AttributeList[(int)HA.AutoDetect].DefaultValue.IntValue > 0)
-            {
-                drillState.AutoDetect = false;
-                drillState.DataNumberFormat = DrillNumberFormat.UserDefined;
-                drillState.DecimalPlaces = drillImage.ImageInfo.AttributeList[(int)HA.Digits].DefaultValue.IntValue;
-                if (drillImage.ImageInfo.AttributeList[(int)HA.ZeroSuppression].DefaultValue.IntValue == (int)Units.Millimeters)
-                    drillState.Unit = GerberUnit.Millimeter;
-
-                switch (drillImage.ImageInfo.AttributeList[(int)HA.ZeroSuppression].DefaultValue.IntValue)
-                {
-                    case (int)ZeroSuppression.Leading:
-                        drillImage.Format.OmitZeros = GerberOmitZero.OmitZerosLeading;
-                        break;
-
-                    case (int)ZeroSuppression.Trailing:
-                        drillImage.Format.OmitZeros = GerberOmitZero.OmitZerosTrailing;
-                        break;
-
-                    default:
-                        drillImage.Format.OmitZeros = GerberOmitZero.OmitZerosExplicit;
-                        break;
-                }
-            }
 
             //Debug.WriteLine(String.Format("Starting to parse drill file {0}", drillFileName));
 
@@ -215,23 +166,22 @@ namespace GerberVS
                             case DrillGCode.Slot:
                                 nextCharacter = lineReader.Read();
                                 ParseCoordinate(lineReader, nextCharacter, image, drillState);
-                                currentNet.StopX = drillState.CurrentX;
-                                currentNet.StopY = drillState.CurrentY;
+                                currentNet.EndX = drillState.CurrentX;
+                                currentNet.EndY = drillState.CurrentY;
+                                if (drillState.Unit == GerberUnit.Millimeter)
+                                {
+                                    currentNet.EndX /= 25.4;
+                                    currentNet.EndY /= 25.4;
+                                }
+
                                 // Update boundingBox with drilled slot stop_x,y coords.
                                 radius = image.ApertureArray[drillState.CurrentTool].Parameters[0] / 2;
                                 BoundingBox bbox = currentNet.BoundingBox;
-                                bbox.Left = Math.Min(bbox.Left, currentNet.StopX - radius);
-                                bbox.Right = Math.Max(bbox.Right, currentNet.StopX + radius);
-                                bbox.Bottom = Math.Min(bbox.Bottom, currentNet.StopY - radius);
-                                bbox.Top = Math.Max(bbox.Top, currentNet.StopY + radius);
+                                bbox.Left = Math.Min(bbox.Left, currentNet.EndX - radius);
+                                bbox.Right = Math.Max(bbox.Right, currentNet.EndX + radius);
+                                bbox.Bottom = Math.Min(bbox.Bottom, currentNet.EndY - radius);
+                                bbox.Top = Math.Max(bbox.Top, currentNet.EndY + radius);
                                 UpdateImageInfoBounds(image.ImageInfo, currentNet.BoundingBox);
-
-                                if (drillState.Unit == GerberUnit.Millimeter)
-                                {
-                                    currentNet.StopX /= 25.4;
-                                    currentNet.StopY /= 25.4;
-                                }
-
                                 currentNet.ApertureState = GerberApertureState.On;
                                 break;
 
@@ -482,87 +432,7 @@ namespace GerberVS
             return foundEOF;
         }
 
-        private static void CreateDefaultAttributeList()
-        {
-            // Initialize the default attributes.
-            GerberHIDAttribute attribute = null;
-
-            attribute = new GerberHIDAttribute();
-            attribute.Name = "autodetect";
-            attribute.HelpText = "Try to autodetect the format.";
-            attribute.HIDType = GerberHIDType.Boolean;
-            attribute.MinValue = 0;
-            attribute.MaxValue = 0;
-            attribute.DefaultValue = new HIDAttributeValue(1, null, 0);
-            attribute.Enumerations = null;
-            attribute.Value = IntPtr.Zero;
-            drillAttributeList.Add(attribute);
-
-            attribute = new GerberHIDAttribute();
-            attribute.Name = "zero_suppession";
-            attribute.HelpText = "Zero suppression.";
-            attribute.HIDType = GerberHIDType.Enumeration;
-            attribute.MinValue = 0;
-            attribute.MaxValue = 0;
-            attribute.DefaultValue = new HIDAttributeValue(0, null, 0);
-            attribute.Enumerations = supressionList;
-            attribute.Value = IntPtr.Zero;
-            drillAttributeList.Add(attribute);
-
-            attribute = new GerberHIDAttribute();
-            attribute.Name = "units";
-            attribute.HelpText = "Units.";
-            attribute.HIDType = GerberHIDType.Enumeration;
-            attribute.MinValue = 0;
-            attribute.MaxValue = 0;
-            attribute.DefaultValue = new HIDAttributeValue(0, null, 0);
-            attribute.Enumerations = unitsList;
-            attribute.Value = IntPtr.Zero;
-            drillAttributeList.Add(attribute);
-
-            attribute = new GerberHIDAttribute();
-            attribute.Name = "tool_units";
-            attribute.HelpText = "Tool size units.";
-            attribute.HIDType = GerberHIDType.Enumeration;
-            attribute.MinValue = 0;
-            attribute.MaxValue = 0;
-            attribute.DefaultValue = new HIDAttributeValue(1, null, 0);
-            attribute.Enumerations = unitsList;
-            attribute.Value = IntPtr.Zero;
-            drillAttributeList.Add(attribute);
-
-            attribute = new GerberHIDAttribute();
-            attribute.Name = "digits";
-            attribute.HelpText = "Number of digits. For trailing zero supression," +
-                                 "this is the number of digits before the decimal point. " +
-                                 "Otherwise this is the number of digits after the decimal point.";
-            attribute.HIDType = GerberHIDType.Integer;
-            attribute.MinValue = 0;
-            attribute.MaxValue = 0;
-            attribute.DefaultValue = new HIDAttributeValue(5, null, 0);
-            attribute.Enumerations = null;
-            attribute.Value = IntPtr.Zero;
-            drillAttributeList.Add(attribute);
-        }
-
-        static void DrillAttributeMerge(List<GerberHIDAttribute> dest, int ndest, List<GerberHIDAttribute> src, int nsrc)
-        {
-            for (int i = 0; i < nsrc; i++)
-            {
-                // See if our destination wants this attribute.
-                int j = 0;
-                while (j < ndest && (src[i].Name != dest[j].Name))
-                    j++;
-
-                // If we wanted it and it is the same type, copy it over.
-                if (j < ndest && src[i].HIDType == dest[j].HIDType)
-                {
-                    dest[j].DefaultValue = src[i].DefaultValue;
-                }
-            }
-        }
-
-        static DrillGCode ParseGCode(GerberLineReader lineReader, GerberImage image)
+         static DrillGCode ParseGCode(GerberLineReader lineReader, GerberImage image)
         {
             DrillFileStats stats = image.DrillStats;
             DrillGCode gCode = DrillGCode.Unknown;
@@ -694,6 +564,7 @@ namespace GerberVS
 
         static int ParseTCode(GerberLineReader lineReader, string drillFileName, DrillState drillState, GerberImage image)
         {
+            Aperture aperture;
             int drillNumber;
             double drillSize = 0.0;
             int length = 0;
@@ -733,6 +604,7 @@ namespace GerberVS
             }
 
             drillState.CurrentTool = drillNumber;
+            aperture = image.ApertureArray[drillNumber];
 
             // Tool definition following tool number.
             if (lineReader.Position > 0)
@@ -759,12 +631,12 @@ namespace GerberVS
                             else
                             {
                                 // Allow a redefinition of a tool only if all parameters are the same.
-                                if (image.ApertureArray[drillNumber] != null)
+                                if (aperture != null)
                                 {
-                                    if (image.ApertureArray[drillNumber].Parameters[0] != drillSize ||
-                                        image.ApertureArray[drillNumber].ApertureType != GerberApertureType.Circle ||
-                                        image.ApertureArray[drillNumber].ParameterCount != 1 ||
-                                         image.ApertureArray[drillNumber].Unit != GerberUnit.Inch)
+                                    if (aperture.Parameters[0] != drillSize ||
+                                        aperture.ApertureType != GerberApertureType.Circle ||
+                                        aperture.ParameterCount != 1 ||
+                                        aperture.Unit != GerberUnit.Inch)
                                     {
                                         errorMessage = String.Format(CultureInfo.CurrentCulture, "Found redefinition of drill {0}.\n", drillNumber);
                                         stats.AddNewError(-1, errorMessage, GerberErrorType.GerberError);
@@ -773,11 +645,12 @@ namespace GerberVS
 
                                 else
                                 {
-                                    image.ApertureArray[drillNumber] = new Aperture();
-                                    image.ApertureArray[drillNumber].Parameters[0] = drillSize;
-                                    image.ApertureArray[drillNumber].ApertureType = GerberApertureType.Circle;
-                                    image.ApertureArray[drillNumber].ParameterCount = 1;
-                                    image.ApertureArray[drillNumber].Unit = GerberUnit.Inch;
+                                    aperture = new Aperture();
+                                    image.ApertureArray[drillNumber] = aperture;
+                                    aperture.Parameters[0] = drillSize;
+                                    aperture.ApertureType = GerberApertureType.Circle;
+                                    aperture.ParameterCount = 1;
+                                    aperture.Unit = GerberUnit.Inch;
                                 }
                             }
 
@@ -1014,8 +887,8 @@ namespace GerberVS
                 newDrillNet.NetState.Unit = GerberUnit.Inch;
             }
 
-            newDrillNet.StopX = newDrillNet.StartX - drillState.OriginX;
-            newDrillNet.StopY = newDrillNet.StartY - drillState.OriginY;
+            newDrillNet.EndX = newDrillNet.StartX - drillState.OriginX;
+            newDrillNet.EndY = newDrillNet.StartY - drillState.OriginY;
             newDrillNet.Aperture = drillState.CurrentTool;
             newDrillNet.ApertureState = GerberApertureState.Flash;
 

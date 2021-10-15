@@ -46,18 +46,22 @@ namespace GerberVS
         /// X coordinate of the start point.
         /// </summary>
         public double StartX { get; set; }
+
         /// <summary>
         /// Y coordinate of the start point.
         /// </summary>
         public double StartY { get; set; }
+
         /// <summary>
         /// X coordinate of the end point.
         /// </summary>
-        public double StopX { get; set; }
+        public double EndX { get; set; }
+
         /// <summary>
         /// Y coordinate of the end point.
         /// </summary>
-        public double StopY { get; set; }
+        public double EndY { get; set; }
+
         /// <summary>
         /// Bounding size containing this net.
         /// </summary>
@@ -65,30 +69,37 @@ namespace GerberVS
         /// Used for rendering optimizations.
         /// </remarks>
         public BoundingBox BoundingBox { get; set; }
+
         /// <summary>
         /// Index of the aperture used for this entity.
         /// </summary>
         public int Aperture { get; set; }
+
         /// <summary>
         /// State of the aperture tool (on/off/etc).
         /// </summary>
         public GerberApertureState ApertureState { get; set; }
+
         /// <summary>
         /// Path interpolation method (linear/circular/etc).
         /// </summary>
         public GerberInterpolation Interpolation { get; set; }
+
         /// <summary>
         /// Data for circular nets.
         /// </summary>
         public CircleSegment CircleSegment { get; set; }
+
         /// <summary>
         /// Label for this net.
         /// </summary>
         public string Label { get; set; }
+
         /// <summary>
         /// RS274X level this net belongs to.
         /// </summary>
         public GerberLevel Level { get; set; }
+
         /// <summary>
         /// RS274X state this net belongs to.
         /// </summary>

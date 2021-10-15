@@ -143,7 +143,7 @@ namespace GerberVS
                         oldLevel = currentNet.Level;
                         oldState = currentNet.NetState;
 
-                        int xVal, yVal, endX, endY, centerX, centerY;
+                        int xVal, yVal, endX, endY, centreX, centreY;
                         switch (currentNet.Interpolation)
                         {
                             case GerberInterpolation.LinearX1:
@@ -158,8 +158,8 @@ namespace GerberVS
                                     streamWriter.WriteLine("G01X{0:0000000}Y{1:0000000}D02*", xVal, yVal);
                                 }
 
-                                xVal = (int)Math.Round(currentNet.StopX * decimalCoeff);
-                                yVal = (int)Math.Round(currentNet.StopY * decimalCoeff);
+                                xVal = (int)Math.Round(currentNet.EndX * decimalCoeff);
+                                yVal = (int)Math.Round(currentNet.EndY * decimalCoeff);
                                 streamWriter.Write("G01X{0:0000000}Y{1:0000000}", xVal, yVal);
                                 // and finally, write the esposure value.
                                 if (currentNet.ApertureState == GerberApertureState.Off)
@@ -182,10 +182,10 @@ namespace GerberVS
                                     streamWriter.WriteLine("G01X{0:0000000}Y{1:0000000}D02*", xVal, yVal);
                                 }
 
-                                centerX = (int)Math.Round((currentNet.CircleSegment.CenterX - currentNet.StartX) * decimalCoeff);
-                                centerY = (int)Math.Round((currentNet.CircleSegment.CenterY - currentNet.StartY) * decimalCoeff);
-                                endX = (int)Math.Round(currentNet.StopX * decimalCoeff);
-                                endY = (int)Math.Round(currentNet.StopY * decimalCoeff);
+                                centreX = (int)Math.Round((currentNet.CircleSegment.CenterX - currentNet.StartX) * decimalCoeff);
+                                centreY = (int)Math.Round((currentNet.CircleSegment.CenterY - currentNet.StartY) * decimalCoeff);
+                                endX = (int)Math.Round(currentNet.EndX * decimalCoeff);
+                                endY = (int)Math.Round(currentNet.EndY * decimalCoeff);
 
                                 // Always use multi-quadrant, since it's much easier to export and most all software should support it.
                                 streamWriter.WriteLine("G75*");
@@ -198,7 +198,7 @@ namespace GerberVS
 
                                 // Don't write the I and J values if the exposure is off.
                                 if (currentNet.ApertureState == GerberApertureState.On)
-                                    streamWriter.Write("X{0:000000}Y{1:0000000}I{2:0000000}J{3:0000000}", endX, endY, centerX, centerY);
+                                    streamWriter.Write("X{0:000000}Y{1:0000000}I{2:0000000}J{3:0000000}", endX, endY, centreX, centreY);
                                 else
                                     streamWriter.Write("X{0:0000000}Y{1:0000000}", endX, endY);
                                 // And finally, write the esposure value.
@@ -213,12 +213,12 @@ namespace GerberVS
 
                                 break;
 
-                            case GerberInterpolation.PolygonAreaStart:
+                            case GerberInterpolation.RegionStart:
                                 streamWriter.WriteLine("G36*");
                                 insidePolygon = true;
                                 break;
 
-                            case GerberInterpolation.PolygonAreaEnd:
+                            case GerberInterpolation.RegionEnd:
                                 streamWriter.WriteLine("G37*");
                                 insidePolygon = false;
                                 break;

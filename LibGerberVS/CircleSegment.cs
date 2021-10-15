@@ -95,16 +95,16 @@ namespace GerberVS
         /// <summary>
         /// Create a new instance of the circle segment type class with parameters.
         /// </summary>
-        /// <param name="centerX">center x coordinate</param>
-        /// <param name="centerY">center y coordinate</param>
+        /// <param name="centreX">center x coordinate</param>
+        /// <param name="centreY">center y coordinate</param>
         /// <param name="width">rectanglar width</param>
         /// <param name="height">retangular height</param>
         /// <param name="startAngle">circle segment start angle in degrees</param>
         /// <param name="endAngle">circle segment end angle in degrees</param>
-        public CircleSegment(double centerX, double centerY, double width, double height, double startAngle, double endAngle)
+        public CircleSegment(double centreX, double centreY, double width, double height, double startAngle, double endAngle)
         {
-            CenterX = centerX;
-            CenterY = centerY;
+            CenterX = centreX;
+            CenterY = centreY;
             Width = width;
             Height = height;
             StartAngle = startAngle;

@@ -30,14 +30,8 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Globalization;
-using System.Diagnostics;
 
 namespace GerberVS
 {
@@ -85,7 +79,6 @@ namespace GerberVS
     /// </summary>
     public class Aperture
     {
-        private Collection<SimplifiedApertureMacro> simplifiedMacroList;
         public GerberApertureType ApertureType { get; set; }
         public ApertureMacro ApertureMacro { get; set; }
         public double[] Parameters { get; set; }
@@ -95,17 +88,14 @@ namespace GerberVS
         /// <summary>
         /// Gets the simplified macro list.
         /// </summary>
-        public Collection<SimplifiedApertureMacro> SimplifiedMacroList
-        {
-            get { return simplifiedMacroList; }
-        }
+        public Collection<SimplifiedApertureMacro> SimplifiedMacroList { get; }
 
         /// <summary>
         /// Creates a new instance of an aperture definition type class.
         /// </summary>
         public Aperture()
         {
-            simplifiedMacroList = new Collection<SimplifiedApertureMacro>();
+            SimplifiedMacroList = new Collection<SimplifiedApertureMacro>();
             Parameters = new double[Gerber.MaximumApertureParameters];
         }
     }

@@ -2,3 +2,30 @@ C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberV
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Debug\LibGerberVS.pdb
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Debug\LibGerberVS.dll
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Debug\GerberVS.csprojResolveAssemblyReference.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\LibGerberVS\LibGerberVS\bin\Debug\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\LibGerberVS\LibGerberVS\bin\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\LibGerberVS\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\LibGerberVS\LibGerberVS\obj\Debug\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\LibGerberVS\LibGerberVS\obj\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Debug\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Debug\GerberVS.csprojAssemblyReference.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\LibGerberVS.xml
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\GerberView\LibGerberVS\bin\Debug\LibGerberVS.xml
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\GerberView\LibGerberVS\bin\Debug\LibGerberVS.dll
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\GerberView\LibGerberVS\bin\Debug\LibGerberVS.pdb
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\GerberView\LibGerberVS\obj\Debug\GerberVS.csprojAssemblyReference.cache
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\GerberView\LibGerberVS\obj\Debug\LibGerberVS.dll
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\GerberView\LibGerberVS\obj\Debug\LibGerberVS.pdb
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\bin\Debug\LibGerberVS.xml
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\bin\Debug\LibGerberVS.dll
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\bin\Debug\LibGerberVS.pdb
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\obj\Debug\GerberVS.csprojAssemblyReference.cache
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\obj\Debug\LibGerberVS.dll
+C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\obj\Debug\LibGerberVS.pdb

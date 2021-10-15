@@ -98,7 +98,6 @@ namespace GerberVS
         public double ImageJustifyOffsetActualB { get; set; }
         public string PlotterFilm { get; set; }
         public string FileTypeName { get; set; }                    // Descriptive string for the type of file (RS274-X, Drill, etc)
-        public List<GerberHIDAttribute> AttributeList { get; set; } // Attribute list that is used to hold all sorts of information about how the layer will be parsed.
         public int NumberOfAttribute { get; set; }
 
         /// <summary>
@@ -124,31 +123,26 @@ namespace GerberVS
             public int newIndex;
         }
 
-        private Collection<ApertureMacro> apertureMacroList;
-        private Collection<GerberNet> gerberNetList;
-        private Collection<GerberLevel> levelList;
-        private Collection<GerberNetState> netStateList;
-
         // Public properties.
         /// <summary>
         /// A collection of all aperture macros used (only used in RS274X types).
         /// </summary>
-        public Collection<ApertureMacro> ApertureMacroList { get { return apertureMacroList; } }
+        public Collection<ApertureMacro> ApertureMacroList { get; }
 
         /// <summary>
         /// A collection of all geometric entities in the layer.
         /// </summary>
-        public Collection<GerberNet> GerberNetList { get { return gerberNetList; } }
+        public Collection<GerberNet> GerberNetList { get; }
 
         /// <summary>
         /// A collection of all RS274X levels used (only used in RS274X types).
         /// </summary>
-        public Collection<GerberLevel> LevelList { get { return levelList; } }
+        public Collection<GerberLevel> LevelList { get; }
 
         /// <summary>
         /// A collection all RS274X states used (only used in RS274X types).
         /// </summary>
-        public Collection<GerberNetState> NetStateList { get { return netStateList; } }
+        public Collection<GerberNetState> NetStateList { get; }
 
         // Automatic properties.
         /// <summary>
@@ -172,6 +166,11 @@ namespace GerberVS
         public GerberFormat Format { get; internal set; }
 
         /// <summary>
+        /// The gerber image unit of messure.
+        /// </summary>
+        //public GerberUnit Unit { get; internal set; } 
+
+        /// <summary>
         /// RS274X statistics for the layer.
         /// </summary>
         public GerberFileStats GerberStats { get; internal set; }
@@ -193,23 +192,25 @@ namespace GerberVS
         /// <param name="fileTypeName">type of file, eg rs274-x, drill</param>
         public GerberImage(string fileTypeName)
         {
-            ImageInfo = new GerberImageInfo();
-            ImageInfo.MinX = double.MaxValue;
-            ImageInfo.MinY = double.MaxValue;
-            ImageInfo.MaxX = double.MinValue;
-            ImageInfo.MaxY = double.MinValue;
+            ImageInfo = new GerberImageInfo
+            {
+                MinX = double.MaxValue,
+                MinY = double.MaxValue,
+                MaxX = double.MinValue,
+                MaxY = double.MinValue
+            };
+
             if (!String.IsNullOrEmpty(fileTypeName))
                 ImageInfo.FileTypeName = fileTypeName;
 
             // The individual file parsers will have to set this.
-            ImageInfo.AttributeList = null;
             ImageInfo.NumberOfAttribute = 0;
-            apertureMacroList = new Collection<ApertureMacro>();
+            ApertureMacroList = new Collection<ApertureMacro>();
             ApertureArray = new Aperture[Gerber.MaximumApertures];
-            levelList = new Collection<GerberLevel>();
-            netStateList = new Collection<GerberNetState>();
+            LevelList = new Collection<GerberLevel>();
+            NetStateList = new Collection<GerberNetState>();
             Format = new GerberFormat();
-            gerberNetList = new Collection<GerberNet>();
+            GerberNetList = new Collection<GerberNet>();
             GerberStats = new GerberFileStats();
             DrillStats = new DrillFileStats();
         }
@@ -253,7 +254,7 @@ namespace GerberVS
         {
             GerberNet currentNet = this.GerberNetList[index];
 
-            if (currentNet.Interpolation != GerberInterpolation.PolygonAreaStart)
+            if (currentNet.Interpolation != GerberInterpolation.RegionStart)
             {
                 currentNet.Aperture = 0;
                 currentNet.ApertureState = GerberApertureState.Off;
@@ -271,7 +272,7 @@ namespace GerberVS
                     currentNet.Interpolation = GerberInterpolation.Deleted;
                     index++;
                 }
-                while (index < this.gerberNetList.Count && this.GerberNetList[index].Interpolation != GerberInterpolation.PolygonAreaEnd);
+                while (index < this.GerberNetList.Count && this.GerberNetList[index].Interpolation != GerberInterpolation.RegionEnd);
             }
         }
 
@@ -370,8 +371,8 @@ namespace GerberVS
             newNet.Interpolation = sourceNet.Interpolation;
             newNet.StartX = sourceNet.StartX;
             newNet.StartY = sourceNet.StartY;
-            newNet.StopX = sourceNet.StopX;
-            newNet.StopY = sourceNet.StopY;
+            newNet.EndX = sourceNet.EndX;
+            newNet.EndY = sourceNet.EndY;
         }
 
         // Compact the aperture list.

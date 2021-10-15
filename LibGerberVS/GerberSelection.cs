@@ -28,12 +28,8 @@
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
  */
-using System;
-using System.Collections.Generic;
+
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GerberVS
 {
@@ -42,32 +38,24 @@ namespace GerberVS
     /// </summary>
     public class SelectionItem
     {
-        private Collection<GerberNet> selectedNetList;
-        private Collection<int> selectedNetIndex;
 
         /// <summary>
         /// Gets the net list in the current selection.
         /// </summary>
-        public Collection<GerberNet> SelectedNetList
-        {
-            get { return selectedNetList; }
-        }
+        public Collection<GerberNet> SelectedNetList { get; }
 
         /// <summary>
         /// Gets the list of net indexes in the cuttent selection
         /// </summary>
-        public Collection<int> SelectedNetIndex
-        {
-            get { return selectedNetIndex; }
-        }
+        public Collection<int> SelectedNetIndex { get; }
 
         /// <summary>
         /// Creates a new instance of the selection item type class.
         /// </summary>
         public SelectionItem()
         {
-            selectedNetList = new Collection<GerberNet>();
-            selectedNetIndex = new Collection<int>();
+            SelectedNetList = new Collection<GerberNet>();
+            SelectedNetIndex = new Collection<int>();
         }
     }
 
@@ -76,8 +64,6 @@ namespace GerberVS
     /// </summary>
     public class SelectionInformation
     {
-        private SelectionItem selectedNodeArray;
-
         /// <summary>
         /// File information on the  current selection layer.
         /// </summary>
@@ -111,61 +97,24 @@ namespace GerberVS
         /// <summary>
         /// Gets the list of objects and their indexes in the current selection.
         /// </summary>
-        public SelectionItem SelectedNodeArray
-        {
-            get { return selectedNodeArray; }
-        }
+        public SelectionItem SelectedNodeArray { get; }
 
         /// <summary>
         /// Gets the number of nets in the current selection.
         /// </summary>
         public int Count
         {
-            get { return selectedNodeArray.SelectedNetIndex.Count; }
+            get { return SelectedNodeArray.SelectedNetIndex.Count; }
         }
-
-        /// <summary>
-        /// Gets or sets the net index of the first Polygon object in the selection if there is one.
-        /// </summary>
-        public int PolygonAreaStartIndex { get; set; }
 
         /// <summary>
         /// Creates a new instance of the selection information type class.
         /// </summary>
         public SelectionInformation(GerberFileInformation fileInfo)
         {
-            selectedNodeArray = new SelectionItem();
+            SelectedNodeArray = new SelectionItem();
             SelectionType = GerberSelection.None;
-            PolygonAreaStartIndex = -1;
             FileInfo = fileInfo;
         }
-
-        /// <summary>
-        /// Remove a net from the current selection.
-        /// </summary>
-        /// <param name="index">index within the net list</param>
-        public void RemoveNetFromList(int index)
-        {
-            GerberNet currentNet = this.SelectedNodeArray.SelectedNetList[index];
-
-            if (currentNet.Interpolation != GerberInterpolation.PolygonAreaStart)
-                this.SelectedNodeArray.SelectedNetList.RemoveAt(index);
-
-            // If this is a polygon start, we need to remove all the rest of the nets in this polygon.
-            else
-            {
-                do
-                {
-                    this.SelectedNodeArray.SelectedNetList.RemoveAt(index);
-                }
-
-                while (index < this.SelectedNodeArray.SelectedNetList.Count &&
-                       this.SelectedNodeArray.SelectedNetList[index].Interpolation != GerberInterpolation.PolygonAreaEnd);
-
-                this.SelectedNodeArray.SelectedNetList.RemoveAt(index);
-                this.SelectedNodeArray.SelectedNetIndex.RemoveAt(index);
-                this.PolygonAreaStartIndex = -1;
-            }
-        }
-    }
+     }
 }

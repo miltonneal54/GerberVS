@@ -89,15 +89,15 @@ namespace GerberVS
                             switch (currentNet.ApertureState)
                             {
                                 case GerberApertureState.Flash:
-                                    streamWriter.WriteLine("X{0:000000}Y{1:000000}", Math.Round(currentNet.StopX * 10000.0), Math.Round(currentNet.StopY * 10000.0));
+                                    streamWriter.WriteLine("X{0:000000}Y{1:000000}", Math.Round(currentNet.EndX * 10000.0), Math.Round(currentNet.EndY * 10000.0));
                                     break;
 
                                 case GerberApertureState.On:	// Cut slot.
                                     streamWriter.WriteLine("X{0:000000}Y{1:000000}G85X{2:000000}Y{3:000000}",
                                                            Math.Round(currentNet.StartX * 10000.0),
                                                            Math.Round(currentNet.StartY * 10000.0),
-                                                           Math.Round(currentNet.StopX * 10000.0),
-                                                           Math.Round(currentNet.StopY * 10000.0));
+                                                           Math.Round(currentNet.EndX * 10000.0),
+                                                           Math.Round(currentNet.EndY * 10000.0));
                                     break;
 
                                 default:

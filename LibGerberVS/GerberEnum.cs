@@ -1,4 +1,4 @@
-﻿/* GerberImage.cs - Gerber enumations. */
+﻿/* GerberEnum.cs - Gerber enumations. */
 
 /*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
     *** Acknowledgments to Gerbv Authors and Contributors. ***
@@ -63,18 +63,6 @@ namespace GerberVS
         GerberNote             // An irregularity was encountered, but needs no intervention.
     }
 
-    public enum GerberHIDType
-    {
-        Label,
-        Integer,
-        HID_Real,
-        String,
-        Boolean,
-        Enumeration,
-        Mixed,
-        Path
-    }
-
     /// <summary>
     /// Enumeration of aperture types.
     /// </summary>
@@ -86,11 +74,15 @@ namespace GerberVS
         None,
 
         /// <summary>
-        /// A round aperture.
+        /// Round aperture.
         /// </summary>
         Circle,
 
-        Rectangle,        // a rectangular aperture.
+        /// <summary>
+        /// Rectangular aperture.
+        /// </summary>
+        Rectangle,
+
         Oval,             // an ovular (obround) aperture.
         Polygon,          // a polygon aperture.
         Macro,            // a RS274X macro.
@@ -193,13 +185,13 @@ namespace GerberVS
         ClockwiseCircular,          // draw an arc in the clockwise direction.
         CounterClockwiseCircular,   // draw an arc in the counter-clockwise direction.
         /// <summary>
-        /// Start polygon draw.
+        /// Start polygon region draw.
         /// </summary>
-        PolygonAreaStart,
+        RegionStart,
         /// <summary>
-        /// End polygon draw.
+        /// End polygon region draw.
         /// </summary>
-        PolygonAreaEnd,        
+        RegionEnd,        
         Deleted                     // the net has been deleted by the user, and will not be drawn.
     }
 

@@ -15,10 +15,23 @@ namespace GerberVS
     public class GerberLevel
     {
         // Auto properties.
-        internal GerberStepAndRepeat StepAndRepeat { get; set; }   // The current step and repeat group (refer to RS274X specs).
         internal GerberKnockout Knockout { get; set; }             // The current knockout group (refer to RS274X specs)
-        internal double Rotation { get; set; }                     // The current rotation around the origin.
-        internal GerberPolarity Polarity { get; set; }             // The polarity of this level.
+
+        /// <summary>
+        /// The current step and repeat group for this level.
+        /// </summary>
+        internal GerberStepAndRepeat StepAndRepeat { get; set; }
+
+        /// <summary>
+        /// The current rotation around the origin.
+        /// </summary>
+        internal double Rotation { get; set; } 
+
+        /// <summary>
+        /// Dark or clear polarity for this level.
+        /// </summary>
+        internal GerberPolarity Polarity { get; set; }
+
         /// <summary>
         /// The level name.
         /// </summary>
@@ -39,12 +52,17 @@ namespace GerberVS
             if (gerberImage.LevelList.Count > 0)
             {
                 int previous = gerberImage.LevelList.Count - 1;
-                this.LevelName = gerberImage.LevelList[previous].LevelName;
-                this.StepAndRepeat = gerberImage.LevelList[previous].StepAndRepeat;
-                this.Polarity = gerberImage.LevelList[previous].Polarity;
-                this.Knockout = gerberImage.LevelList[previous].Knockout;
+
+                LevelName = gerberImage.LevelList[previous].LevelName;
+                StepAndRepeat.X = gerberImage.LevelList[previous].StepAndRepeat.X;
+                StepAndRepeat.Y = gerberImage.LevelList[previous].StepAndRepeat.Y;
+                StepAndRepeat.DistanceX = gerberImage.LevelList[previous].StepAndRepeat.DistanceX;
+                StepAndRepeat.DistanceY = gerberImage.LevelList[previous].StepAndRepeat.DistanceY;
+                Rotation = gerberImage.LevelList[previous].Rotation;
+                Polarity = gerberImage.LevelList[previous].Polarity;
+                Knockout = gerberImage.LevelList[previous].Knockout;
                 // Clear this boolean so we only draw the knockout once.
-                this.Knockout.FirstInstance = false;
+                Knockout.FirstInstance = false;
             }
 
             gerberImage.LevelList.Add(this);

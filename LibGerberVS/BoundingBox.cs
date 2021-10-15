@@ -29,11 +29,7 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GerberVS
 {
@@ -41,22 +37,36 @@ namespace GerberVS
     /// Defines the bounding size of Gerber Net objects.
     /// </summary>
     /// <remarks>
-    /// A bounding box consisting of double "min" and "max" values is deemed empty.
-    /// If any of the the values are a double "min" or "max" is it also deemed to be invalid.
+    /// A bounding box with any values consisting of double "MinValue" and "MaxValue" is deemed invalid.
     /// </remarks>
     public class BoundingBox
     {
         // Auto properties.
-        public double Left { get; set; }     // The X coordinate of the left side.
-        public double Top { get; set; }      // The Y coordinate of the top side.
-        public double Right { get; set; }    // The X coordinate of the right side.
-        public double Bottom { get; set; }   // The Y coordinate of the bottom side.
+        /// <summary>
+        /// The X coordinate of the left side of the bounds.
+        /// </summary>
+        public double Left { get; set; } 
+
+        /// <summary>
+        /// The Y coordinate of the top of the bounds.
+        /// </summary>
+        public double Top { get; set; }
+ 
+        /// <summary>
+        /// The X coordinate of the right side of the bounds.
+        /// </summary>
+        public double Right { get; set; }
+
+        /// <summary>
+        /// The Y coordinate of the bottom of the bounds.
+        /// </summary>
+        public double Bottom { get; set; }
 
         /// <summary>
         /// Intializes a new instance of BoundingBox with empty parameters.
         /// </summary>
         public BoundingBox()
-        {
+         {
             Left = double.MaxValue;
             Top = double.MinValue;
             Right = double.MinValue;
@@ -64,7 +74,7 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Intializes a new instance of BoundingBbox with specified parameters.
+        /// Intializes a new instance of BoundingBox with specified parameters.
         /// </summary>
         /// <param name="left">left value</param>
         /// <param name="right">right value</param>
@@ -79,7 +89,7 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Determines if the bounding box contains all valid values.
+        /// Determines if the bounding box is a valid size.
         /// </summary>
         /// <returns>true if all bounding box values are valid</returns>
         public bool IsValid()
@@ -90,6 +100,11 @@ namespace GerberVS
             return true;
         }
 
+        /// <summary>
+        /// Determines if the specified point is contained within the bounds of this bounding box structure.
+        /// </summary>
+        /// <param name="point">the point to test</param>
+        /// <returns>true if within the bounds</returns>
         public bool Contains(PointD point)
         {
             if (point.X >= this.Left && point.X <= this.Right && point.Y >= this.Bottom && point.Y <= this.Top)
@@ -98,18 +113,26 @@ namespace GerberVS
             return false;
         }
 
-        public bool Contains(BoundingBox box)
+        /// <summary>
+        /// Determines if the specified bounding box is contained within the bounds of this bounding box structure.
+        /// </summary>
+        /// <param name="boundingBox">the bounding box to test</param>
+        /// <returns>true if within the bounds</returns>
+        public bool Contains(BoundingBox boundingBox)
         {
-            if (Contains(new PointD(box.Left, box.Bottom)) && Contains(new PointD(box.Right, box.Top)))
+            if (Contains(new PointD(boundingBox.Left, boundingBox.Bottom)) && Contains(new PointD(boundingBox.Right, boundingBox.Top)))
                 return true;
 
             return false;
         }
 
+        /// <summary>
+        /// Creates RectangleF structure from the bounding box parameters.
+        /// </summary>
+        /// <returns>returns the constructed rectangle</returns>
         public RectangleF ToRectangle()
         {
-            RectangleF rect = new RectangleF((float)Left, (float)Top, (float)(Right - Left), (float)(Top - Bottom));
-            return rect;
+            return new RectangleF((float)Left, (float)Bottom, (float)(Math.Abs(Right - Left)), (float)(Math.Abs(Bottom - Top)));
         }
     }
 }
