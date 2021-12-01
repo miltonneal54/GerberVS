@@ -57,10 +57,25 @@ namespace GerberVS
     /// </summary>
     public enum GerberErrorType
     {
-        GerberCritical = 0,    // File processing can not continue.
-        GerberError,           // Something went wrong, but processing can still continue.
-        GerberWarning,         // Something was encountered that may provide the wrong output.
-        GerberNote             // An irregularity was encountered, but needs no intervention.
+        /// <summary>
+        /// Critical error, file processing can not continue.
+        /// </summary>
+        GerberCritical = 0,
+
+        /// <summary>
+        /// Error found but processing can still continue.
+        /// </summary>
+        GerberError,
+
+        /// <summary>
+        /// Encountered an issue that may provide the wrong output.
+        /// </summary>
+        GerberWarning,
+
+        /// <summary>
+        /// An irregularity was encountered, but needs no intervention.
+        /// </summary>
+        GerberNote
     }
 
     /// <summary>
@@ -175,41 +190,63 @@ namespace GerberVS
         Incremental
     }
 
-    // The interpolation methods available.
+    /// <summary>
+    /// The interpolation methods.
+    /// </summary>
     public enum GerberInterpolation
     {
-        LinearX1,                   // draw a line.
-        LinearX10,                  // draw a line.
-        LinearX01,                  // draw a line.
-        LinearX001,                 // draw a line.
-        ClockwiseCircular,          // draw an arc in the clockwise direction.
-        CounterClockwiseCircular,   // draw an arc in the counter-clockwise direction.
+        /// <summary>
+        /// Draw a line.
+        /// </summary>
+        Linear,
+
+       /* /// <summary>
+        /// Draw a slot.
+        /// </summary>
+        DrillSlot,*/
+
+        /// <summary>
+        /// Draw an arc in the clockwise direction.
+        /// </summary>
+        ClockwiseCircular,
+
+        /// <summary>
+        /// Draw an arc in the counter-clockwise direction.
+        /// </summary>
+        CounterclockwiseCircular,
+
         /// <summary>
         /// Start polygon region draw.
         /// </summary>
         RegionStart,
+
         /// <summary>
         /// End polygon region draw.
         /// </summary>
-        RegionEnd,        
+        RegionEnd,
+
+        /// <summary>
+        /// Deleted by the user, and will not be drawn.
+        /// </summary>
         Deleted                     // the net has been deleted by the user, and will not be drawn.
     }
 
-    public enum GerberEncoding
-    {
-        None,
-        ASCII,
-        EBCDIC,
-        BCD,
-        ISOASCII,
-        EIA
-    }
-
-    // The different file types used.
+    
+    /// <summary>
+    /// Supported file types.
+    /// </summary>
     public enum GerberFileType
     {
-        RS274X,        // the file is a RS274X file.
-        Drill,         // the file is an Excellon drill file.
+        /// <summary>
+        /// Gerber RS274X file.
+        /// </summary>
+        RS274X,
+
+        /// <summary>
+        /// Excellon drill file.
+        /// </summary>
+        Drill,
+
        // PickAndPlace   // the file is a CSV pick and place file.
     }
 
@@ -348,7 +385,7 @@ namespace GerberVS
      * It could be any of above or'ed together
      */
     [Flags]
-    public enum GerberVerifyError : int
+    public enum GerberVerifyErrors : int
     {
         /// <summary>
         /// No error found in image.
@@ -367,7 +404,6 @@ namespace GerberVS
         HighSpeed, /*!< use the cairo library with the smoothest edges */
         HighQuality
     }
-
 }
 
 

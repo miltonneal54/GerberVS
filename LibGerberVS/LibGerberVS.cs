@@ -29,13 +29,9 @@
     SUCH DAMAGE.
  */
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-
 
 [assembly: CLSCompliant(true)]
 namespace GerberVS
@@ -48,7 +44,7 @@ namespace GerberVS
         private const int NumberOfDefaultColors = 18;
         private static int defaultColorIndex = 0;
         private static Color backgroundColor;
-        private static int[,] defaultColors = {
+        private static readonly int[,] defaultColors = {
             {177, 115, 115, 222},
             {177, 255, 127, 115},
             {177, 193, 0, 224},
@@ -75,14 +71,124 @@ namespace GerberVS
         public GerberProject CreateNewProject()
         {
             GerberProject project = new GerberProject();
-            project.Path = Directory.GetCurrentDirectory();
             defaultColorIndex = 0;
-            project.FileCount = 0;
-            project.CurrentIndex = -1;
-            project.ProjectName = String.Empty;
-            project.Path = String.Empty;
             return project;
         }
+
+        /// <summary>
+        /// Opens a layer and appends it to the project.
+        /// </summary>
+        /// <param name="project">project to append file</param>
+        /// <param name="fullPathName">file to open</param>
+        /// <returns></returns>
+        public void OpenLayerFromFileName(GerberProject project, string fullPathName)
+        {
+            bool reload = false;
+
+            try
+            {
+                OpenImage(project, fullPathName, reload, -1);
+            }
+
+            catch (Exception ex)
+            {
+                throw new GerberDllException("", ex);
+            }
+
+        }
+
+        /// <summary>
+        /// Opens a layer and appends it to the project using the specified color and alpha level.
+        /// </summary>
+        /// <param name="project">project</param>
+        /// <param name="fullPathName">file path</param>
+        /// <param name="color">layer color</param>
+        public void OpenLayerFromFileNameAndColor(GerberProject project, string fullPathName, Color color)
+        {
+            bool reload = false;
+            int fileIndex;
+            try
+            {
+                OpenImage(project, fullPathName, reload, -1);
+                fileIndex = project.FileCount - 1;
+                project.FileInfo[fileIndex].LayerDirty = false;
+                project.FileInfo[fileIndex].Color = color;
+            }
+
+            catch (Exception ex)
+            {
+                throw new GerberDllException("", ex);
+            }
+        }
+
+        /// <summary>
+        /// Saves the current image layer to the specified file.
+        /// </summary>
+        /// <param name="project">current project</param>
+        /// <param name="index">index of the current layer</param>
+        /// <param name="fullPathName">path and filename to save the file</param>
+        public void SaveLayerFromIndex(GerberProject project, int index, string fullPathName)
+        {
+            GerberFileType fileType = project.FileInfo[index].Image.FileType;
+            SaveLayerFromIndex(project, index, fileType, fullPathName);
+        }
+
+        /// <summary>
+        /// Saves the current image layer to the specified file.
+        /// </summary>
+        /// <param name="project">current project</param>
+        /// <param name="index">index of the current layer</param>
+        /// <param name="fileType"> file type to save the image as</param>
+        /// <param name="fullPathName">path and filename to save the file</param>
+        public void SaveLayerFromIndex(GerberProject project, int index, GerberFileType fileType, string fullPathName)
+        {
+            if (fileType == GerberFileType.RS274X)
+            {
+                WriteGerberRS274X.RS274XFromImage(fullPathName, project.FileInfo[index].Image, project.FileInfo[index].UserTransform);
+            }
+
+            else if(fileType == GerberFileType.Drill)
+            {
+                WriteExcellonDrill.DrillFileFromImage(fullPathName, project.FileInfo[index].Image, project.FileInfo[index].UserTransform);
+            }
+
+            project.FileInfo[index].LayerDirty = false;
+        }
+
+        /// <summary>
+        /// Reloads an existing layer within the current project.
+        /// </summary>
+        /// <param name="project">project</param>
+        /// <param name="index">project file index to reload</param>
+        public void ReloadLayer(GerberProject project, int index)
+        {
+            bool reload = true;
+
+            try
+            {
+                OpenImage(project, project.FileInfo[index].FullPathName, reload, index);
+                project.FileInfo[index].LayerDirty = false;
+            }
+
+            catch (Exception ex)
+            {
+                throw new GerberDllException("", ex);
+            }
+        }
+
+        /// <summary>
+        /// Reloads all existing layers within the current project.
+        /// </summary>
+        /// <param name="project">gerber project</param>
+        public void ReloadAllLayers(GerberProject project)
+        {
+            for (int i = 0; i < project.FileCount; i++)
+            {
+                if (project.FileInfo[i] != null && !String.IsNullOrEmpty(project.FileInfo[i].FullPathName))
+                    ReloadLayer(project, i);
+            }
+        }
+
 
         /// <summary>
         /// Removes a file from the project at the specified index.
@@ -142,85 +248,94 @@ namespace GerberVS
             project.FileInfo[newPosition] = tempFileInfo;
         }
 
-        /// <summary>
-        /// Opens a layer and appends it to the project.
-        /// </summary>
-        /// <param name="project">project to append file</param>
-        /// <param name="fullPathName">file to open</param>
-        /// <returns></returns>
-        public void OpenLayerFromFilename(GerberProject project, string fullPathName)
+        private static void AddFileToProject(GerberProject project, GerberImage parsedImage, string fullPathName, bool reloading, int index)
         {
-            bool reload = false;
+            int colorIndex = 0;
+            GerberVerifyErrors error = GerberVerifyErrors.None;
+            GerberFileInformation fileInfo = project.FileInfo[index];
 
-            try
+            //Debug.WriteLine("Integrity check on image....\n");
+            error = parsedImage.ImageVerify();
+            if (error != GerberVerifyErrors.None)
             {
-                OpenImage(project, fullPathName, reload, -1);
+                project.FileInfo.RemoveAt(index);   // Image has errors, remove it from the file list and throw exception.
+                project.FileCount--;
+                if ((error & GerberVerifyErrors.MissingNetList) > 0)
+                    throw new GerberImageException("Missing image net list.");
+
+                if ((error & GerberVerifyErrors.MissingFormat) > 0)
+                    throw new GerberImageException("Missing format information in file.");
+
+                if ((error & GerberVerifyErrors.MissingApertures) > 0)
+                    throw new GerberImageException("Missing aperture/drill sizes.");
+
+                if ((error & GerberVerifyErrors.MissingImageInfo) > 0)
+                    throw new GerberImageException("Missing image information.");
             }
 
-            catch (Exception ex)
-            {
-                throw new GerberDLLException("", ex);
-            }
+            fileInfo.Image = parsedImage;
+            if (reloading) // If reloading, just exchange the image and return.
+                return;
 
+            fileInfo.FullPathName = fullPathName;
+            fileInfo.FileName = Path.GetFileName(fullPathName);
+            colorIndex = defaultColorIndex % NumberOfDefaultColors;
+            fileInfo.Color = Color.FromArgb(defaultColors[colorIndex, 0], defaultColors[colorIndex, 1],
+                                                           defaultColors[colorIndex, 2], defaultColors[colorIndex, 3]);
+            fileInfo.IsVisible = true;
+            defaultColorIndex++;
+        }
+
+        private static void OpenImage(GerberProject project, string fullPathName, bool reloading, int index)
+        {
+            GerberImage parsedImage = null;
+
+            if (Gerber.IsGerberRS427X(fullPathName))
+                parsedImage = Gerber.ParseGerber(fullPathName);
+
+            else if (Drill.IsDrillFile(fullPathName))
+                parsedImage = Drill.ParseDrillFile(fullPathName, reloading);
+
+            else
+                throw new GerberFileException("Unknown file type: " + Path.GetFileName(fullPathName));
+
+            if (parsedImage != null)
+            {
+                if (!reloading)
+                {
+                    project.FileInfo.Add(new GerberFileInformation());
+                    project.FileCount++;
+                    index = project.FileCount - 1;
+                }
+
+                AddFileToProject(project, parsedImage, fullPathName, reloading, index);
+            }
         }
 
         /// <summary>
-        /// Opens a layer and appends it to the project using the specified color and alpha level.
+        /// Creates the Gerber image holding all the geometry for the layer.
         /// </summary>
-        /// <param name="project">project</param>
-        /// <param name="fullPathName">file path</param>
-        /// <param name="color">layer color</param>
-        public void OpenLayerFromFilenameAndColor(GerberProject project, string fullPathName, Color color)
+        /// <param name="filePath">filename containing the layer geometry</param>
+        /// <returns>gerber image</returns>
+        public GerberImage CreateRS274XImageFromFile(string filePath)
         {
-            bool reload = false;
-            int fileIndex;
-            try
-            {
-                OpenImage(project, fullPathName, reload, -1);
-                fileIndex = project.FileCount - 1;
-                project.FileInfo[fileIndex].LayerDirty = false;
-                project.FileInfo[fileIndex].Color = color;
-            }
+            GerberImage returnImage;
 
-            catch (Exception ex)
-            {
-                throw new GerberDLLException("", ex);
-            }
+            returnImage = Gerber.ParseGerber(filePath);
+            return returnImage;
         }
 
         /// <summary>
-        /// Reloads an existing layer within a project.
+        /// Creates the Gerber image holding all the geometry for the drill layer.
         /// </summary>
-        /// <param name="project">project</param>
-        /// <param name="index">project file index to reload</param>
-        public void ReloadLayer(GerberProject project, int index)
+        /// <param name="filePath">filename containing the excellon drill geometry</param>
+        /// <returns>gerber image</returns>
+        public GerberImage CreateExcellonImageFromFile(string filePath)
         {
-            bool reload = true;
+            GerberImage returnImage;
 
-            try
-            {
-                OpenImage(project, project.FileInfo[index].FullPathName, reload, index);
-                project.FileInfo[index].LayerDirty = false;
-            }
-
-            catch (Exception ex)
-            {
-                throw new GerberDLLException("", ex);
-            }
-
-        }
-
-        /// <summary>
-        /// Reloads all existing layers within a project.
-        /// </summary>
-        /// <param name="project">gerber project</param>
-        public void ReloadAllLayers(GerberProject project)
-        {
-            for (int i = 0; i < project.FileCount; i++)
-            {
-                if (project.FileInfo[i] != null && !String.IsNullOrEmpty(project.FileInfo[i].FullPathName))
-                    ReloadLayer(project, i);
-            }
+            returnImage = Drill.ParseDrillFile(filePath);
+            return returnImage;
         }
 
         /// <summary>
@@ -283,36 +398,10 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Creates the Gerber image holding all the geometry for the layer.
-        /// </summary>
-        /// <param name="filePath">filename containing the layer geometry</param>
-        /// <returns>gerber image</returns>
-        public GerberImage CreateRS274XImageFromFile(string filePath)
-        {
-            GerberImage returnImage;
-
-            returnImage = Gerber.ParseGerber(filePath);
-            return returnImage;
-        }
-
-        /// <summary>
-        /// Creates the Gerber image holding all the geometry for the drill layer.
-        /// </summary>
-        /// <param name="filePath">filename containing the excellon drill geometry</param>
-        /// <returns>gerber image</returns>
-        public GerberImage CreateExcellonImageFromFile(string filePath)
-        {
-            GerberImage returnImage;
-
-            returnImage = Drill.ParseDrillFile(filePath);
-            return returnImage;
-        }
-
-        /// <summary>
         /// Adds a gerber object to the selection buffer if it lies within the selection region.
         /// </summary>
         /// <param name="graphics">target where the image is rendered</param>
-        /// <param name="selectionInfo">user selection information/param>
+        /// <param name="selectionInfo">user selection information</param>
         /// <param name="index">current index of the gerber net to test</param>
         public void ObjectInSelectedRegion(Graphics graphics, SelectionInformation selectionInfo, ref int index)
         {
@@ -334,26 +423,28 @@ namespace GerberVS
             if (!bb.IsValid())
                 return;
 
-            double left = (bb.Left * renderInfo.ScaleFactorX) - 0.25f;
-            double bottom = (bb.Bottom * renderInfo.ScaleFactorY) - 0.25f;
-            double right = (bb.Right * renderInfo.ScaleFactorX) + 0.25f;
-            double top = (bb.Top * renderInfo.ScaleFactorY) + 0.25f;
+            double left = (bb.Left * renderInfo.ScaleFactorX) - 0.05f;
+            double bottom = (bb.Bottom * renderInfo.ScaleFactorY) - 0.05f;
+            double right = (bb.Right * renderInfo.ScaleFactorX) + 0.05f;
+            double top = (bb.Top * renderInfo.ScaleFactorY) + 0.05f;
+
+            renderInfo.LowerLeftX = -left;
+            renderInfo.LowerLeftY = -top;
 
             renderInfo.ImageWidth = right - left;
             renderInfo.ImageHeight = top - bottom;
-            renderInfo.Left = -left;
-            renderInfo.Bottom = -((top - bottom) + bottom);
         }
 
         /// <summary>
-        /// Scales the image to display maximised within the display area.
+        /// Scales and translates the image to fit centrally within the display area.
         /// </summary>
         /// <param name="project">project data</param>
         /// <param name="renderInfo">rendering information</param>
-        public void ZoomToFit(GerberProject project, GerberRenderInformation renderInfo)
+        public void ZoomToFitDisplay(GerberProject project, GerberRenderInformation renderInfo)
         {
             double width, height;
             double scaleX, scaleY;
+            double left, bottom;
 
             BoundingBox bb = GetProjectBounds(project);
             if (!bb.IsValid())
@@ -361,10 +452,19 @@ namespace GerberVS
 
             width = bb.Right - bb.Left;
             height = bb.Top - bb.Bottom;
-            scaleX = (float)((renderInfo.DisplayWidth - 0.3) / width);
-            scaleY = (float)((renderInfo.DisplayHeight - 0.3) / height);
-            renderInfo.ScaleFactorX = renderInfo.ScaleFactorY = (float)Math.Min(scaleX, scaleY);
-            TranslateToCentre(project, renderInfo);
+            scaleX = renderInfo.DisplayWidth / (width * 1.05);
+            scaleY = renderInfo.DisplayHeight / (height * 1.05);
+            renderInfo.ScaleFactorX = renderInfo.ScaleFactorY = Math.Min(scaleX, scaleY);
+
+            width *= renderInfo.ScaleFactorX;
+            height *= renderInfo.ScaleFactorY;
+            left = bb.Left * renderInfo.ScaleFactorX;
+            renderInfo.LowerLeftX = ((renderInfo.DisplayWidth - width) / 2) - left;
+            bottom = bb.Bottom * renderInfo.ScaleFactorY;
+            renderInfo.LowerLeftY = -((renderInfo.DisplayHeight + height) / 2) - bottom;
+
+            renderInfo.ImageWidth = width;
+            renderInfo.ImageHeight = height;
         }
 
         /// <summary>
@@ -372,26 +472,32 @@ namespace GerberVS
         /// </summary>
         /// <param name="project">project data</param>
         /// <param name="renderInfo">rendering information</param>
-        public void TranslateToCentre(GerberProject project, GerberRenderInformation renderInfo)
+        public void TranslateToCenter(GerberProject project, GerberRenderInformation renderInfo)
         {
+            double width, height;
+            double left, bottom, right, top;
+
             BoundingBox bb = GetProjectBounds(project);
             if (!bb.IsValid())
                 return;
 
-            double left = (bb.Left * renderInfo.ScaleFactorX) - 0.15;
-            double bottom = (bb.Bottom * renderInfo.ScaleFactorY) - 0.15;
-            double right = (bb.Right * renderInfo.ScaleFactorX) + 0.15;
-            double top = (bb.Top * renderInfo.ScaleFactorY) + 0.15;
+            left = (bb.Left * renderInfo.ScaleFactorX) - 0.05f;
+            bottom = (bb.Bottom * renderInfo.ScaleFactorY) - 0.05f;
+            right = (bb.Right * renderInfo.ScaleFactorX) + 0.05f;
+            top = (bb.Top * renderInfo.ScaleFactorY) + 0.05f;
 
-            renderInfo.ImageWidth = right - left;
-            renderInfo.ImageHeight = top - bottom;
-            renderInfo.Left = ((renderInfo.DisplayWidth - renderInfo.ImageWidth) / 2) - left;
-            renderInfo.Bottom = -((renderInfo.DisplayHeight + renderInfo.ImageHeight) / 2) - bottom;
-            if (renderInfo.ImageWidth > renderInfo.DisplayWidth)
-                renderInfo.Left = -left;
+            width = right - left;
+            height = top - bottom;
+            renderInfo.LowerLeftX = ((renderInfo.DisplayWidth - width) / 2) - left;
+            renderInfo.LowerLeftY = -((renderInfo.DisplayHeight + height) / 2) - bottom;
+            if (width > renderInfo.DisplayWidth)
+                renderInfo.LowerLeftX = -left;
 
-            if (renderInfo.ImageHeight > renderInfo.DisplayHeight)
-                renderInfo.Bottom = -(renderInfo.ImageHeight + bottom);
+            if (height > renderInfo.DisplayHeight)
+                renderInfo.LowerLeftY = -(height + bottom);
+
+            renderInfo.ImageWidth = width;
+            renderInfo.ImageHeight = height;
         }
 
         /// <summary>
@@ -425,8 +531,7 @@ namespace GerberVS
             }
 
             // For testing :- draws a bounding rectangle.
-            //graphics.CompositingMode = CompositingMode.SourceCopy;
-            GraphicsState gs = graphics.Save();
+            /*GraphicsState gs = graphics.Save();
             ScaleAndTranslate(graphics, renderInfo);
             BoundingBox bb = GetProjectBounds(project);
             RectangleF r = new RectangleF((float)bb.Left, (float)bb.Top, (float)(bb.Right - bb.Left), (float)(bb.Top - bb.Bottom));
@@ -436,7 +541,7 @@ namespace GerberVS
             path.AddLine((float)bb.Right, (float)bb.Top, (float)bb.Right, (float)bb.Bottom);
             path.AddLine((float)bb.Right, (float)bb.Bottom, (float)bb.Left, (float)bb.Bottom);
             graphics.DrawPath(new Pen(Color.White, 0.015f / (float)renderInfo.ScaleFactorX), path);
-            graphics.Restore(gs);
+            graphics.Restore(gs);*/
         }
 
         /// <summary>
@@ -476,44 +581,9 @@ namespace GerberVS
             }
         }
 
-        /// <summary>
-        /// Exports a gerber project to a Png image.
-        /// </summary>
-        /// <param name="filePath">Full path name to write file to</param>
-        /// <param name="project">project info</param>
-        /// <param name="renderInfo">render information</param>
-        public void ExportProjectToPng(string filePath, GerberProject project, GerberRenderInformation renderInfo)
-        {
-            try
-            {
-                int fileIndex = project.FileInfo.Count - 1;
-                int width = (int)(renderInfo.ImageWidth * 96);
-                int height = (int)(renderInfo.ImageHeight * 96);
-
-                using (Bitmap bitmap = new Bitmap(width, height))
-                using (Graphics graphics = Graphics.FromImage(bitmap))
-                {
-                    graphics.Clear(backgroundColor);
-                    for (int i = fileIndex; i >= 0; i--)
-                    {
-                        if (project.FileInfo[i] != null && project.FileInfo[i].IsVisible)
-                            RenderLayer(graphics, project.FileInfo[i], null, renderInfo);
-                    }
-
-                    bitmap.Save(filePath, ImageFormat.Png);
-                }
-            }
-
-            catch (Exception ex)
-            {
-                throw new GerberExportException(Path.GetFileName(filePath), ex);
-            }
-        }
-
         private void RenderLayer(Graphics graphics, GerberFileInformation fileInfo, SelectionInformation selectionInfo, GerberRenderInformation renderInfo)
         {
             Size bmSize = GetBitmapSize(graphics, renderInfo);
-            //bmSize = new Size((int)(renderInfo.ImageWidth * graphics.DpiX), (int)(renderInfo.ImageHeight * graphics.DpiY));
             // Create a back buffer and draw to it with no alpha level.
             using (Bitmap bitmap = new Bitmap(bmSize.Width, bmSize.Height, graphics))
             using (Graphics backBuffer = Graphics.FromImage(bitmap))
@@ -527,76 +597,12 @@ namespace GerberVS
             }
         }
 
-        private static void OpenImage(GerberProject project, string fullPathName, bool reloading, int index)
-        {
-            GerberImage parsedImage = null;
-
-            if (Gerber.IsGerberRS427X(fullPathName))
-                parsedImage = Gerber.ParseGerber(fullPathName);
-
-            else if (Drill.IsDrillFile(fullPathName))
-                parsedImage = Drill.ParseDrillFile(fullPathName, reloading);
-
-            else
-                throw new GerberFileException("Unknown file type: " + Path.GetFileName(fullPathName));
-
-            if (parsedImage != null)
-            {
-                if (!reloading)
-                {
-                    project.FileInfo.Add(new GerberFileInformation());
-                    project.FileCount++;
-                    index = project.FileCount - 1;
-                }
-
-                AddFileToProject(project, parsedImage, fullPathName, reloading, index);
-            }
-        }
-
-        private static void AddFileToProject(GerberProject project, GerberImage parsedImage, string fullPathName, bool reloading, int index)
-        {
-            int colorIndex = 0;
-            GerberVerifyError error = GerberVerifyError.None;
-            GerberFileInformation fileInfo = project.FileInfo[index];
-
-            //Debug.WriteLine("Integrity check on image....\n");
-            error = parsedImage.ImageVerify();
-            if (error != GerberVerifyError.None)
-            {
-                project.FileInfo.RemoveAt(index);   // Image has errors, remove it from the file list and throw exception.
-                project.FileCount--;
-                if ((error & GerberVerifyError.MissingNetList) > 0)
-                    throw new GerberImageException("Missing image net list.");
-
-                if ((error & GerberVerifyError.MissingFormat) > 0)
-                    throw new GerberImageException("Missing format information in file.");
-
-                if ((error & GerberVerifyError.MissingApertures) > 0)
-                    throw new GerberImageException("Missing aperture/drill sizes.");
-
-                if ((error & GerberVerifyError.MissingImageInfo) > 0)
-                    throw new GerberImageException("Missing image information.");
-            }
-
-            fileInfo.Image = parsedImage;
-            if (reloading) // If reloading, just exchange the image and return.
-                return;
-
-            fileInfo.FullPathName = fullPathName;
-            fileInfo.FileName = Path.GetFileName(fullPathName);
-            colorIndex = defaultColorIndex % NumberOfDefaultColors;
-            fileInfo.Color = Color.FromArgb(defaultColors[colorIndex, 0], defaultColors[colorIndex, 1],
-                                                           defaultColors[colorIndex, 2], defaultColors[colorIndex, 3]);
-            fileInfo.IsVisible = true;
-            defaultColorIndex++;
-        }
-
         private static void RenderLayerToTarget(Graphics graphics, GerberFileInformation fileInfo, SelectionInformation selectionInfo)
         {
             // Add transparency to the rendering color.
             Color foregroundColor = fileInfo.Color;
             if (selectionInfo != null)
-                foregroundColor = Color.FromArgb(200, Color.White);
+                foregroundColor = Color.FromArgb(177, Color.White);
 
             GerberDraw.RenderImageToTarget(graphics, fileInfo.Image, selectionInfo, fileInfo.UserTransform, foregroundColor, backgroundColor);
         }
@@ -615,7 +621,7 @@ namespace GerberVS
             graphics.PageUnit = GraphicsUnit.Inch;
             //  Translate the draw area before drawing. We must translate the whole drawing down.
             graphics.ScaleTransform(1, -1);
-            graphics.TranslateTransform((float)renderInfo.Left, (float)renderInfo.Bottom);
+            graphics.TranslateTransform((float)renderInfo.LowerLeftX, (float)renderInfo.LowerLeftY);
             graphics.ScaleTransform((float)renderInfo.ScaleFactorX, (float)renderInfo.ScaleFactorY);
         }
 
@@ -636,6 +642,8 @@ namespace GerberVS
             else
                 bmSize.Height = (int)(renderInfo.ImageHeight * graphics.DpiY);
 
+            //bmSize.Width = (int)((renderInfo.ImageWidth * graphics.DpiX) * renderInfo.ScaleFactorX);
+            //bmSize.Height = (int)((renderInfo.ImageHeight * graphics.DpiY) * renderInfo.ScaleFactorY);
             return bmSize;
         }
 

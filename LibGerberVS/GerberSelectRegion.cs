@@ -62,7 +62,7 @@ namespace GerberVS
                         {
                             int aperture = currentNet.Aperture;
                             RectangleF objRectangle = RectangleF.Empty;
-                            GerberApertureType type = selectionInfo.FileInfo.Image.ApertureArray[aperture].ApertureType;
+                            GerberApertureType type = selectionInfo.FileInfo.Image.ApertureArray()[aperture].ApertureType;
                             switch (type)
                             {
                                 case GerberApertureType.Circle:
@@ -76,8 +76,8 @@ namespace GerberVS
                                     break;
 
                                 case GerberApertureType.Macro:
-                                    GerberApertureType macroType = selectionInfo.FileInfo.Image.ApertureArray[aperture].SimplifiedMacroList[0].ApertureType;
-                                    SimplifiedApertureMacro sam = selectionInfo.FileInfo.Image.ApertureArray[aperture].SimplifiedMacroList[0];
+                                    GerberApertureType macroType = selectionInfo.FileInfo.Image.ApertureArray()[aperture].SimplifiedMacroList[0].ApertureType;
+                                    SimplifiedApertureMacro sam = selectionInfo.FileInfo.Image.ApertureArray()[aperture].SimplifiedMacroList[0];
                                     x1 -= (float)currentNet.EndX;
                                     y1 -= (float)currentNet.EndY;
 
@@ -215,13 +215,11 @@ namespace GerberVS
 
                                     break;
 
-                                case GerberInterpolation.LinearX10:
-                                case GerberInterpolation.LinearX1:
-                                case GerberInterpolation.LinearX01:
-                                case GerberInterpolation.LinearX001:
+                                case GerberInterpolation.Linear:
+                                //case GerberInterpolation.DrillSlot:
                                     using (Pen pen = new Pen(Color.Black))
                                     {
-                                        pen.Width = (float)image.ApertureArray[currentNet.Aperture].Parameters[0];
+                                        pen.Width = (float)image.ApertureArray()[currentNet.Aperture].Parameters()[0];
                                         pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
                                         PointF[] points = new PointF[] { new PointF(startX, startY), new PointF(stopX, stopY) };
                                         path.AddLine(points[0], points[1]);
@@ -232,7 +230,7 @@ namespace GerberVS
                                     break;
 
                                 case GerberInterpolation.ClockwiseCircular:
-                                case GerberInterpolation.CounterClockwiseCircular:
+                                case GerberInterpolation.CounterclockwiseCircular:
                                     using (Pen pen = new Pen(Color.Black))
                                     {
                                         float centreX = (float)currentNet.CircleSegment.CenterX;
@@ -242,8 +240,8 @@ namespace GerberVS
                                         float startAngle = (float)currentNet.CircleSegment.StartAngle;
                                         float sweepAngle = (float)currentNet.CircleSegment.SweepAngle;
 
-                                        pen.Width = (float)image.ApertureArray[currentNet.Aperture].Parameters[0];
-                                        if (image.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
+                                        pen.Width = (float)image.ApertureArray()[currentNet.Aperture].Parameters()[0];
+                                        if (image.ApertureArray()[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
                                             pen.SetLineCap(LineCap.Square, LineCap.Square, DashCap.Flat);
 
                                         else

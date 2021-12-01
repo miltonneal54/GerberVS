@@ -24,9 +24,6 @@ namespace GerberVS
         public int G2 { get; set; }
         public int G3 { get; set; }
         public int G4 { get; set; }
-        public int G10 { get; set; }
-        public int G11 { get; set; }
-        public int G12 { get; set; }
         public int G36 { get; set; }
         public int G37 { get; set; }
         public int G54 { get; set; }
@@ -148,7 +145,7 @@ namespace GerberVS
             newAperture.Number = number;
             newAperture.ApertureType = type;
             for (int i = 0; i < 5; i++)
-                newAperture.Parameters[i] = parameter[i];
+                newAperture.Parameters()[i] = parameter[i];
 
             apertureList.Add(newAperture);
             return;

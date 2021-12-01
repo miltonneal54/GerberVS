@@ -26,7 +26,7 @@ namespace GerberVS
         public int FileCount { get; set; }
 
         /// <summary>
-        /// The index of the selected file.
+        /// Index of the currently selected file.
         /// </summary>
         public int CurrentIndex { get; set; }
 
@@ -77,9 +77,12 @@ namespace GerberVS
         public GerberProject()
         {
             fileInfo = new Collection<GerberFileInformation>();
+            RenderQuality = GerberRenderQuality.Default;
             CheckBeforeDelete = true;
             ShowHiddenSelection = false;
-            RenderQuality = GerberRenderQuality.Default;
+            Path = String.Empty;
+            ProjectName = String.Empty;
+            CurrentIndex = -1;
         }
     }
 
@@ -122,12 +125,12 @@ namespace GerberVS
         /// <summary>
         /// The X coordinate of the lower left corner (in real world coordinates, in inches).
         /// </summary>
-        public double Left { get; set; } 
+        public double LowerLeftX { get; set; } 
 
         /// <summary>
         /// The Y coordinate of the lower left corner (in real world coordinates, in inches).
         /// </summary>
-        public double Bottom { get; set; }
+        public double LowerLeftY { get; set; }
 
         /// <summary>
         /// The quality of rendering to use when drawing layers.
@@ -260,9 +263,9 @@ namespace GerberVS
         /// <param name="rotation"></param>
         /// <param name="mirrorArroundX"></param>
         /// <param name="mirrorAroundY"></param>
-        /// <param name="Inverted"></param>
+        /// <param name="inverted"></param>
         public UserTransform(double translateX, Double translateY, double scaleX, double scaleY, double rotation,
-                                   bool mirrorArroundX, bool mirrorAroundY, bool Inverted)
+                                   bool mirrorArroundX, bool mirrorAroundY, bool inverted)
         {
             TranslateX = translateX;
             TranslateY = translateY;
@@ -271,7 +274,7 @@ namespace GerberVS
             Rotation = rotation;
             MirrorAroundX = mirrorArroundX;
             MirrorAroundY = mirrorAroundY;
-            Inverted = false;
+            Inverted = inverted;
         }
     }
 }

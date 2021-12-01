@@ -10,13 +10,13 @@ namespace GerberVS
     /// GerberVS.GerberDLLException class.
     /// </summary>
     [Serializable]
-    public class GerberDLLException : System.Exception
+    public class GerberDllException : System.Exception
     {
         private static string baseMessage = "GerberVS DLL error.";
         /// <summary>
         /// Initialses a new instance of GerberVS.GerberDLLException class.
         /// </summary>
-        public GerberDLLException()
+        public GerberDllException()
             : base()
         { }
 
@@ -24,7 +24,7 @@ namespace GerberVS
         /// Initialses a new instance of GerberVS.GerberDLLException class with a specified error message.
         /// </summary>
         /// <param name="message">error message.</param>
-        public GerberDLLException(string message)
+        public GerberDllException(string message)
             : base(baseMessage + Environment.NewLine + message)
         { }
 
@@ -33,7 +33,7 @@ namespace GerberVS
         /// </summary>
         /// <param name="message">error message</param>
         /// <param name="innerException">inner exception.</param>
-        public GerberDLLException(string message, Exception innerException)
+        public GerberDllException(string message, Exception innerException)
             : base(baseMessage + Environment.NewLine + message, innerException)
         { }
 
@@ -42,7 +42,7 @@ namespace GerberVS
         /// </summary>
         /// <param name="info">serialization info.</param>
         /// <param name="context">streaming context.</param>
-        protected GerberDLLException(SerializationInfo info, StreamingContext context)
+        protected GerberDllException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
     }
@@ -129,7 +129,7 @@ namespace GerberVS
         { }
     }
 
-    // <summary>
+    ///<summary>
     /// GerberVS.GerberExportException class.
     /// </summary>
     [Serializable]

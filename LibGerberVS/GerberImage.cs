@@ -81,11 +81,6 @@ namespace GerberVS
         public double OffsetB { get; set; }
 
         /// <summary>
-        /// Encoding of the gerber text file.
-        /// </summary>
-        public GerberEncoding Encoding { get; set; }
-
-        /// <summary>
         /// Rotation angle of the image.
         /// </summary>
         public double ImageRotation { get; set; }
@@ -98,7 +93,6 @@ namespace GerberVS
         public double ImageJustifyOffsetActualB { get; set; }
         public string PlotterFilm { get; set; }
         public string FileTypeName { get; set; }                    // Descriptive string for the type of file (RS274-X, Drill, etc)
-        public int NumberOfAttribute { get; set; }
 
         /// <summary>
         /// Creates a new instance of the gerber image information type.
@@ -123,42 +117,37 @@ namespace GerberVS
             public int newIndex;
         }
 
-        // Public properties.
+        private readonly Aperture[] apertureArray;
+
         /// <summary>
-        /// A collection of all aperture macros used (only used in RS274X types).
+        /// A list of all aperture macros used (only used in RS274X types).
         /// </summary>
         public Collection<ApertureMacro> ApertureMacroList { get; }
 
         /// <summary>
-        /// A collection of all geometric entities in the layer.
+        /// A list of all geometric entities in the layer.
         /// </summary>
         public Collection<GerberNet> GerberNetList { get; }
 
         /// <summary>
-        /// A collection of all RS274X levels used (only used in RS274X types).
+        /// A list of all RS274X levels used (only used in RS274X types).
         /// </summary>
         public Collection<GerberLevel> LevelList { get; }
 
         /// <summary>
-        /// A collection all RS274X states used (only used in RS274X types).
+        /// A list all RS274X states used (only used in RS274X types).
         /// </summary>
         public Collection<GerberNetState> NetStateList { get; }
 
-        // Automatic properties.
         /// <summary>
         /// Miscellaneous info regarding the layer such as overall size, etc.
         /// </summary>
-        public GerberImageInfo ImageInfo { get; internal set; }
+        public GerberImageInfo ImageInfo { get; }
 
         /// <summary>
         /// The type of file (RS274X, drill).
         /// </summary>
         public GerberFileType FileType { get; internal set; }
-
-        /// <summary>
-        /// // List of all apertures used.
-        /// </summary>
-        public Aperture[] ApertureArray { get; internal set; }
 
         /// <summary>
         /// The layer formating information.
@@ -168,7 +157,7 @@ namespace GerberVS
         /// <summary>
         /// The gerber image unit of messure.
         /// </summary>
-        //public GerberUnit Unit { get; internal set; } 
+        public GerberUnit Unit { get; } 
 
         /// <summary>
         /// RS274X statistics for the layer.
@@ -204,9 +193,8 @@ namespace GerberVS
                 ImageInfo.FileTypeName = fileTypeName;
 
             // The individual file parsers will have to set this.
-            ImageInfo.NumberOfAttribute = 0;
+            apertureArray = new Aperture[Gerber.MaximumApertures];
             ApertureMacroList = new Collection<ApertureMacro>();
-            ApertureArray = new Aperture[Gerber.MaximumApertures];
             LevelList = new Collection<GerberLevel>();
             NetStateList = new Collection<GerberNetState>();
             Format = new GerberFormat();
@@ -216,22 +204,31 @@ namespace GerberVS
         }
 
         /// <summary>
+        /// List of apertures used.
+        /// </summary>
+        /// <returns>aperture array</returns>
+        public Aperture[] ApertureArray()
+        {
+            return apertureArray;
+        }
+
+        /// <summary>
         /// Perform some basic integrity checks on the gerber image.
         /// </summary>
         /// <returns>error status</returns>
-        public GerberVerifyError ImageVerify()
+        public GerberVerifyErrors ImageVerify()
         {
-            GerberVerifyError errorStatus = GerberVerifyError.None;
+            GerberVerifyErrors errorStatus = GerberVerifyErrors.None;
             int numberOfNets = 0;
 
             if (this.GerberNetList == null)
-                errorStatus |= GerberVerifyError.MissingNetList;
+                errorStatus |= GerberVerifyErrors.MissingNetList;
 
             if (this.Format == null)
-                errorStatus |= GerberVerifyError.MissingFormat;
+                errorStatus |= GerberVerifyErrors.MissingFormat;
 
             if (this.ImageInfo == null)
-                errorStatus |= GerberVerifyError.MissingImageInfo;
+                errorStatus |= GerberVerifyErrors.MissingImageInfo;
 
             if (this.GerberNetList != null)
                 numberOfNets = this.GerberNetList.Count;
@@ -239,8 +236,8 @@ namespace GerberVS
             // If we have nets but no apertures are defined, then return an error.
             if (numberOfNets > 0)
             {
-                if (this.ApertureArray.Length == 0)
-                    errorStatus |= GerberVerifyError.MissingApertures;
+                if (ApertureArray().Length == 0)
+                    errorStatus |= GerberVerifyErrors.MissingApertures;
             }
 
             return errorStatus;
@@ -295,12 +292,13 @@ namespace GerberVS
             newImage.Format = sourceImage.Format;
             newImage.GerberStats = sourceImage.GerberStats;
             newImage.DrillStats = sourceImage.DrillStats;
-            // Copy the apertures to the new aperture list and remove any vacant positions.
+
+            // Copy all the apertures to the new aperture list and remove any vacant positions.
             for (int i = 0; i < lastAperture; i++)
             {
-                if (sourceImage.ApertureArray[i] != null)
+                if (sourceImage.ApertureArray()[i] != null)
                 {
-                    newImage.ApertureArray[apertureIndex] = CopyAperture(sourceImage.ApertureArray[i]);
+                    newImage.ApertureArray()[apertureIndex] = CopyAperture(sourceImage.ApertureArray()[i]);
                     if (i != apertureIndex)
                     {
                         // Add it the translation to the table.
@@ -328,14 +326,19 @@ namespace GerberVS
             {
                 foreach (SimplifiedApertureMacro sam in sourceAperture.SimplifiedMacroList)
                 {
-                    SimplifiedApertureMacro sm = new SimplifiedApertureMacro();
-                    sm.ApertureType = sam.ApertureType;
-                    Array.Copy(sam.Parameters, sm.Parameters, sam.Parameters.Length);
-                    newAperture.SimplifiedMacroList.Add(sm);
+                    // Copy the parameters.
+                    Collection<double> paramters = new Collection<double>();
+                    foreach (double p in sam.Parameters)
+                        paramters.Add(p);
+
+                    SimplifiedApertureMacro macro = new SimplifiedApertureMacro(paramters);
+                    macro.ApertureType = sam.ApertureType;
+                    newAperture.SimplifiedMacroList.Add(macro);
                 }
             }
 
-            Array.Copy(sourceAperture.Parameters, newAperture.Parameters, sourceAperture.ParameterCount);
+            // Copy aperture parameters.
+            Array.Copy(sourceAperture.Parameters(), newAperture.Parameters(), sourceAperture.ParameterCount);
             if (sourceAperture.ApertureMacro != null)
             {
                 ApertureMacro am = new ApertureMacro();

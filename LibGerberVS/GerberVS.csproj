@@ -33,6 +33,15 @@
     <DocumentationFile>bin\Release\LibGerberVS.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CustomColorDialog">
+      <HintPath>..\..\Controls\CustomColorDialog\CustomColorDialog\bin\Release\CustomColorDialog.dll</HintPath>
+    </Reference>
+    <Reference Include="FileListBox">
+      <HintPath>..\..\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
+    </Reference>
+    <Reference Include="Ruler">
+      <HintPath>..\..\Controls\Ruler\Ruler\bin\Release\Ruler.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

@@ -30,15 +30,10 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 
 namespace GerberVS
 {
@@ -61,6 +56,7 @@ namespace GerberVS
 
             Collection<SimplifiedApertureMacro> simplifiedMacroList;
             Collection<GerberNet> gerberNetList = null;
+            Aperture[] apertures = gerberImage.ApertureArray();
             PointF startPoint, endPoint;
             GerberNet currentNet = null;
             GerberLevel oldLevel = null;
@@ -68,16 +64,6 @@ namespace GerberVS
 
             SolidBrush brush = new SolidBrush(foreGroundColor);
             Pen pen = new Pen(foreGroundColor);
-
-            if (selectionInfo == null)
-                gerberNetList = gerberImage.GerberNetList;
-
-            else
-            {
-                // Rendering the user selection.
-                gerberNetList = selectionInfo.SelectedNodeArray.SelectedNetList;
-                invertPolarity = false; // Don't allow inverted polarity when rendering selected objects.
-            }
 
             // Apply user supplied transformations.
             double scaleX = userTransform.ScaleX;
@@ -100,6 +86,17 @@ namespace GerberVS
             if (gerberImage.ImageInfo.Polarity == GerberPolarity.Negative)
                 invertPolarity = !invertPolarity;
 
+            // Select the netlist to render.
+            if (selectionInfo == null)
+                gerberNetList = gerberImage.GerberNetList;
+
+            else
+            {
+                // Rendering the user selection.
+                gerberNetList = selectionInfo.SelectedNodeArray.SelectedNetList;
+                invertPolarity = false; // Don't allow inverted polarity when rendering selected objects.
+            }
+
             if (invertPolarity)
                 graphics.Clear(foreGroundColor);
 
@@ -111,10 +108,12 @@ namespace GerberVS
                 if (currentNet.Level != oldLevel)
                 {
                     graphics.Restore(gState);
-                    // Set the current level transformation and polarity.
-                    graphics.RotateTransform((float)currentNet.Level.Rotation);
+                    // Set the current level polarity.
                     if (currentNet.Level.Polarity == GerberPolarity.Clear ^ invertPolarity)
-                        pen.Color = brush.Color = backGroundColor;
+                    {
+                        pen.Color = backGroundColor;
+                        brush.Color = Color.FromArgb(0, backGroundColor);
+                    }
 
                     else
                         pen.Color = brush.Color = foreGroundColor;
@@ -194,23 +193,21 @@ namespace GerberVS
                             case GerberApertureState.On:
                                 switch (currentNet.Interpolation)
                                 {
-                                    case GerberInterpolation.LinearX10:
-                                    case GerberInterpolation.LinearX01:
-                                    case GerberInterpolation.LinearX001:
-                                    case GerberInterpolation.LinearX1:
+                                    case GerberInterpolation.Linear:
+                                    //case GerberInterpolation.DrillSlot:
                                         pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
-                                        switch (gerberImage.ApertureArray[currentNet.Aperture].ApertureType)
+                                        switch (apertures[currentNet.Aperture].ApertureType)
                                         {
                                             case GerberApertureType.Circle:
-                                                pen.Width = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[0];
+                                                pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
                                                 startPoint = new PointF(startX, startY);
                                                 endPoint = new PointF(stopX, stopY);
                                                 graphics.DrawLine(pen, startPoint, endPoint);
                                                 break;
 
                                             case GerberApertureType.Rectangle:
-                                                dx = (float)(gerberImage.ApertureArray[currentNet.Aperture].Parameters[0] / 2);
-                                                dy = (float)(gerberImage.ApertureArray[currentNet.Aperture].Parameters[1] / 2);
+                                                dx = (float)(apertures[currentNet.Aperture].Parameters()[0] / 2);
+                                                dy = (float)(apertures[currentNet.Aperture].Parameters()[1] / 2);
                                                 if (startX > stopX)
                                                     dx = -dx;
 
@@ -231,7 +228,7 @@ namespace GerberVS
                                             // For now, just render ovals and polygons like a circle.
                                             case GerberApertureType.Oval:
                                             case GerberApertureType.Polygon:
-                                                pen.Width = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[0];
+                                                pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
                                                 startPoint = new PointF(startX, startY);
                                                 endPoint = new PointF(stopX, stopY);
                                                 graphics.DrawLine(pen, startPoint, endPoint);
@@ -244,21 +241,21 @@ namespace GerberVS
                                         break;
 
                                     case GerberInterpolation.ClockwiseCircular:
-                                    case GerberInterpolation.CounterClockwiseCircular:
+                                    case GerberInterpolation.CounterclockwiseCircular:
                                         float centreX = (float)currentNet.CircleSegment.CenterX;
                                         float centreY = (float)currentNet.CircleSegment.CenterY;
                                         float width = (float)currentNet.CircleSegment.Width;
                                         float height = (float)currentNet.CircleSegment.Height;
                                         float startAngle = (float)currentNet.CircleSegment.StartAngle;
                                         float sweepAngle = (float)currentNet.CircleSegment.SweepAngle;
-                                        if (gerberImage.ApertureArray[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
+                                        if (apertures[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
                                             pen.SetLineCap(LineCap.Square, LineCap.Square, DashCap.Flat);
 
                                         else
                                             pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
 
                                         RectangleF arcRectangle = new RectangleF(centreX - (width / 2), centreY - (height / 2), width, height);
-                                        pen.Width = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[0];
+                                        pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
                                         //pen.Alignment = PenAlignment.Inset;
                                         if (arcRectangle != RectangleF.Empty)
                                             graphics.DrawArc(pen, arcRectangle, startAngle, sweepAngle);
@@ -271,18 +268,18 @@ namespace GerberVS
                                 break;
 
                             case GerberApertureState.Flash:
-                                p0 = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[0];
-                                p1 = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[1];
-                                p2 = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[2];
-                                p3 = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[3];
-                                p4 = (float)gerberImage.ApertureArray[currentNet.Aperture].Parameters[4];
+                                p0 = (float)apertures[currentNet.Aperture].Parameters()[0];
+                                p1 = (float)apertures[currentNet.Aperture].Parameters()[1];
+                                p2 = (float)apertures[currentNet.Aperture].Parameters()[2];
+                                p3 = (float)apertures[currentNet.Aperture].Parameters()[3];
+                                p4 = (float)apertures[currentNet.Aperture].Parameters()[4];
                                 RectangleF apertureRectangle;
 
                                 GraphicsState state = graphics.Save();
                                 graphics.TranslateTransform(stopX, stopY);
                                 using (GraphicsPath path = new GraphicsPath())
                                 {
-                                    switch (gerberImage.ApertureArray[currentNet.Aperture].ApertureType)
+                                    switch (apertures[currentNet.Aperture].ApertureType)
                                     {
                                         case GerberApertureType.Circle:
                                             apertureRectangle = new RectangleF(-(p0 / 2), -(p0 / 2), p0, p0);
@@ -308,7 +305,7 @@ namespace GerberVS
                                             break;
 
                                         case GerberApertureType.Macro:
-                                            simplifiedMacroList = gerberImage.ApertureArray[currentNet.Aperture].SimplifiedMacroList;
+                                            simplifiedMacroList = apertures[currentNet.Aperture].SimplifiedMacroList;
                                             DrawApertureMacro(graphics, simplifiedMacroList, brush.Color, backGroundColor);
                                             break;
 
@@ -342,49 +339,55 @@ namespace GerberVS
             //Debug.WriteLine("Drawing simplified Aperture macros:");
             bool success = true;                // Sucessfully processed macro flag.
             GraphicsState state = graphics.Save();
+            PointF[] points = null;
+            float rotation = 0.0f;
+            float exposure = 0.0f;
+            float diameter = 0.0f;
+            float centreX, centreY = 0.0f;
 
             using (GraphicsPath graphicsPath = new GraphicsPath())
             {
                 foreach (SimplifiedApertureMacro simplifiedAperture in simplifiedApertureList)
                 {
-                    // This handles the exposure of the aperture.
-                    // The exposure is always the first element in the parameter list independent of Aperture macro.
-                    graphicsPath.FillMode = FillMode.Alternate;
-
-                    if (simplifiedAperture.ApertureType == GerberApertureType.MacroCircle)
+                    using (Pen pen = new Pen(layerColor))
                     {
-                        float centreX = (float)simplifiedAperture.Parameters[(int)CircleParameters.CentreX];
-                        float centreY = (float)simplifiedAperture.Parameters[(int)CircleParameters.CentreY];
-                        float diameter = (float)simplifiedAperture.Parameters[(int)CircleParameters.Diameter];
-                        float exposure = (float)simplifiedAperture.Parameters[(int)CircleParameters.Exposure];
-                        float radius = diameter / 2.0f;
+                        // This handles the exposure of the aperture.
+                        // The exposure is always the first element in the parameter list independent of Aperture macro.
+                        graphicsPath.FillMode = FillMode.Alternate;
 
-                        RectangleF objectRectangle = new RectangleF(centreX - radius, centreY - radius, diameter, diameter);
-                        if (exposure > 0)
-                            graphicsPath.FillMode = FillMode.Winding;
-
-                        graphicsPath.AddEllipse(objectRectangle);
-                    }
-
-                    else if (simplifiedAperture.ApertureType == GerberApertureType.MacroMoire)
-                    {
-                        float centreX = (float)simplifiedAperture.Parameters[(int)MoireParameters.CentreX];
-                        float centreY = (float)simplifiedAperture.Parameters[(int)MoireParameters.CentreY];
-                        float diameter = (float)simplifiedAperture.Parameters[(int)MoireParameters.OutsideDiameter];
-                        float gapWidth = (float)simplifiedAperture.Parameters[(int)MoireParameters.GapWidth];
-                        float rotation = (float)simplifiedAperture.Parameters[(int)MoireParameters.Rotation];
-                        float crossHairLength = (float)(simplifiedAperture.Parameters[(int)MoireParameters.CrosshairLength]);
-                        float circleLineWidth = (float)simplifiedAperture.Parameters[(int)MoireParameters.CircleLineWidth];
-                        int numberOfCircles = (int)simplifiedAperture.Parameters[(int)MoireParameters.NumberOfCircles];
-
-                        // Get crosshair points.
-                        float halfCrossHairLength = crossHairLength / 2;
-                        PointF[] points = new PointF[] { new PointF(centreX - halfCrossHairLength, centreY), new PointF(centreX + halfCrossHairLength, centreY),
-                                                         new PointF(centreX, centreY - halfCrossHairLength), new PointF(centreX, centreY + halfCrossHairLength) };
-
-                        TransformPoints(points, rotation);
-                        using (Pen pen = new Pen(layerColor))
+                        if (simplifiedAperture.ApertureType == GerberApertureType.MacroCircle)
                         {
+                            exposure = (float)simplifiedAperture.Parameters[(int)CircleParameters.Exposure];
+                            centreX = (float)simplifiedAperture.Parameters[(int)CircleParameters.CentreX];
+                            centreY = (float)simplifiedAperture.Parameters[(int)CircleParameters.CentreY];
+                            diameter = (float)simplifiedAperture.Parameters[(int)CircleParameters.Diameter];
+
+                            RectangleF objectRectangle = new RectangleF(centreX - (diameter / 2.0f), centreY - (diameter / 2.0f), diameter, diameter);
+                            if (exposure > 0)
+                                graphicsPath.FillMode = FillMode.Winding;
+
+                            graphicsPath.AddEllipse(objectRectangle);
+                        }
+
+                        else if (simplifiedAperture.ApertureType == GerberApertureType.MacroMoire)
+                        {
+                            float gapWidth = (float)simplifiedAperture.Parameters[(int)MoireParameters.GapWidth];
+                            float crossHairLength = (float)(simplifiedAperture.Parameters[(int)MoireParameters.CrosshairLength]);
+                            float circleLineWidth = (float)simplifiedAperture.Parameters[(int)MoireParameters.CircleLineWidth];
+                            int numberOfCircles = (int)simplifiedAperture.Parameters[(int)MoireParameters.NumberOfCircles];
+                            rotation = (float)simplifiedAperture.Parameters[(int)MoireParameters.Rotation];
+                            centreX = (float)simplifiedAperture.Parameters[(int)MoireParameters.CentreX];
+                            centreY = (float)simplifiedAperture.Parameters[(int)MoireParameters.CentreY];
+                            diameter = (float)simplifiedAperture.Parameters[(int)MoireParameters.OutsideDiameter];
+
+                            // Get crosshair points.
+                            points = new PointF[] { new PointF(centreX - (crossHairLength / 2), centreY),
+                                                    new PointF(centreX + (crossHairLength / 2), centreY),
+                                                    new PointF(centreX, centreY - (crossHairLength / 2)),
+                                                    new PointF(centreX, centreY + (crossHairLength / 2)) };
+
+                            TransformPoints(points, rotation);
+
                             // Draw target.
                             pen.Width = circleLineWidth;
                             pen.Alignment = PenAlignment.Inset;
@@ -402,36 +405,33 @@ namespace GerberVS
                             graphics.DrawLine(pen, points[0], points[1]);
                             graphics.DrawLine(pen, points[2], points[3]);
                         }
-                    }
 
-                    else if (simplifiedAperture.ApertureType == GerberApertureType.MacroThermal)
-                    {
-                        float centreX = (float)simplifiedAperture.Parameters[(int)ThermalParameters.CentreX];
-                        float centreY = (float)simplifiedAperture.Parameters[(int)ThermalParameters.CentreY];
-                        float innerDiameter = (float)simplifiedAperture.Parameters[(int)ThermalParameters.InsideDiameter];
-                        float outerDiameter = (float)simplifiedAperture.Parameters[(int)ThermalParameters.OutsideDiameter];
-                        float crossHairWidth = (float)simplifiedAperture.Parameters[(int)ThermalParameters.CrosshairLineWidth];
-                        float rotation = (float)simplifiedAperture.Parameters[(int)ThermalParameters.Rotation];
-                        float gap = outerDiameter - innerDiameter;
-
-                        // Draw the pad.
-                        RectangleF objectRectangle = new RectangleF(centreX - (outerDiameter / 2), centreY - (outerDiameter / 2), outerDiameter, outerDiameter);
-                        using (Pen pen = new Pen(layerColor))
+                        else if (simplifiedAperture.ApertureType == GerberApertureType.MacroThermal)
                         {
+                            float innerDiameter = (float)simplifiedAperture.Parameters[(int)ThermalParameters.InsideDiameter];
+                            float outerDiameter = (float)simplifiedAperture.Parameters[(int)ThermalParameters.OutsideDiameter];
+                            float crossHairWidth = (float)simplifiedAperture.Parameters[(int)ThermalParameters.CrosshairLineWidth];
+                            float gap = outerDiameter - innerDiameter;
+                            rotation = (float)simplifiedAperture.Parameters[(int)ThermalParameters.Rotation];
+                            centreX = (float)simplifiedAperture.Parameters[(int)ThermalParameters.CentreX];
+                            centreY = (float)simplifiedAperture.Parameters[(int)ThermalParameters.CentreY];
+
+                            // Draw the pad.
+                            RectangleF objectRectangle = new RectangleF(centreX - (outerDiameter / 2), centreY - (outerDiameter / 2), outerDiameter, outerDiameter);
+
                             pen.Width = gap;
                             pen.Alignment = PenAlignment.Inset;
                             graphics.DrawEllipse(pen, objectRectangle);
-                        }
 
-                        // Draw thermal relief through the pad area.
-                        PointF[] points = new PointF[] { new PointF(centreX - gap, centreY), new PointF(centreX - (innerDiameter / 2), centreY),
-                                                         new PointF(centreX + (innerDiameter / 2), centreY), new PointF(centreX + gap, centreY),
-                                                         new PointF(centreX, centreY - gap), new PointF(centreX, centreY - (innerDiameter / 2)),
-                                                         new PointF(centreX, centreY + (innerDiameter / 2)), new PointF(centreX, centreY + gap)};
+                            // Draw thermal relief through the pad area.
+                            points = new PointF[] { new PointF(centreX - gap, centreY), new PointF(centreX - (innerDiameter / 2), centreY),
+                                                    new PointF(centreX + (innerDiameter / 2), centreY), new PointF(centreX + gap, centreY),
+                                                    new PointF(centreX, centreY - gap), new PointF(centreX, centreY - (innerDiameter / 2)),
+                                                    new PointF(centreX, centreY + (innerDiameter / 2)), new PointF(centreX, centreY + gap)};
 
-                        TransformPoints(points, rotation);
-                        using (Pen pen = new Pen(backColor))
-                        {
+                            TransformPoints(points, rotation);
+
+                            pen.Color = backColor;
                             pen.Width = crossHairWidth;
                             pen.Alignment = PenAlignment.Center;
                             pen.StartCap = LineCap.Square;
@@ -441,109 +441,106 @@ namespace GerberVS
                             graphics.DrawLine(pen, points[4], points[5]);
                             graphics.DrawLine(pen, points[6], points[7]);
                         }
-                    }
 
-                    else if (simplifiedAperture.ApertureType == GerberApertureType.MacroOutline)
-                    {
-                        float exposure = (float)simplifiedAperture.Parameters[(int)OutlineParameters.Exposure];
-                        int numberOfPoints = (int)simplifiedAperture.Parameters[(int)OutlineParameters.NumberOfPoints];
-                        int outlineFirstX = (int)OutlineParameters.FirstX;
-                        int outlineFirstY = (int)OutlineParameters.FirstY;
-                        float rotation = (float)simplifiedAperture.Parameters[(numberOfPoints * 2) + (int)OutlineParameters.Rotation];
-
-                        //numberOfPoints += 1;
-                        PointF[] points = new PointF[numberOfPoints + 1];
-                        for (int p = 0; p <= numberOfPoints; p++)
+                        else if (simplifiedAperture.ApertureType == GerberApertureType.MacroOutline)
                         {
-                            points[p] = new PointF((float)(simplifiedAperture.Parameters[(p * 2) + outlineFirstX]),
-                                                   (float)(simplifiedAperture.Parameters[(p * 2) + outlineFirstY]));
+                            int numberOfPoints = (int)simplifiedAperture.Parameters[(int)OutlineParameters.NumberOfPoints];
+                            int outlineFirstX = (int)OutlineParameters.FirstX;
+                            int outlineFirstY = (int)OutlineParameters.FirstY;
+                            exposure = (float)simplifiedAperture.Parameters[(int)OutlineParameters.Exposure];
+                            rotation = (float)simplifiedAperture.Parameters[(numberOfPoints * 2) + (int)OutlineParameters.Rotation];
+
+                            points = new PointF[numberOfPoints + 1];
+                            for (int p = 0; p <= numberOfPoints; p++)
+                            {
+                                points[p] = new PointF((float)(simplifiedAperture.Parameters[(p * 2) + outlineFirstX]),
+                                                       (float)(simplifiedAperture.Parameters[(p * 2) + outlineFirstY]));
+                            }
+
+                            TransformPoints(points, rotation);
+                            if (exposure > 0)
+                                graphicsPath.FillMode = FillMode.Winding;
+
+                            graphicsPath.AddPolygon(points);
                         }
 
-                        TransformPoints(points, rotation);
-                        if (exposure > 0)
-                            graphicsPath.FillMode = FillMode.Winding;
-
-                        graphicsPath.AddPolygon(points);
-                    }
-
-                    else if (simplifiedAperture.ApertureType == GerberApertureType.MacroPolygon)
-                    {
-                        float exposure = (float)simplifiedAperture.Parameters[(int)PolygonParameters.Exposure];
-                        int numberOfSides = (int)simplifiedAperture.Parameters[(int)PolygonParameters.NumberOfSides];
-                        float diameter = (float)simplifiedAperture.Parameters[(int)PolygonParameters.Diameter];
-                        float rotation = (float)simplifiedAperture.Parameters[(int)PolygonParameters.Rotation];
-
-                        if (exposure > 0)
-                            graphicsPath.FillMode = FillMode.Winding;
-
-                        CreatePolygonPath(graphicsPath, diameter, numberOfSides, rotation);
-                    }
-
-                    else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine20)
-                    {
-                        float exposure = (float)simplifiedAperture.Parameters[(int)Line20Parameters.Exposure];
-                        float startX = (float)simplifiedAperture.Parameters[(int)Line20Parameters.StartX];
-                        float startY = (float)simplifiedAperture.Parameters[(int)Line20Parameters.StartY];
-                        float endX = (float)simplifiedAperture.Parameters[(int)Line20Parameters.EndX];
-                        float endY = (float)simplifiedAperture.Parameters[(int)Line20Parameters.EndY];
-                        float lineWidth = (float)simplifiedAperture.Parameters[(int)Line20Parameters.LineWidth];
-                        float rotation = (float)simplifiedAperture.Parameters[(int)Line20Parameters.Rotation];
-
-                        PointF[] points = new PointF[] { new PointF(startX, startY), new PointF(endX, endY) };
-                        TransformPoints(points, rotation);
-                        using (Pen pen = new Pen(layerColor))
+                        else if (simplifiedAperture.ApertureType == GerberApertureType.MacroPolygon)
                         {
+                            int numberOfSides = (int)simplifiedAperture.Parameters[(int)PolygonParameters.NumberOfSides];
+                            exposure = (float)simplifiedAperture.Parameters[(int)PolygonParameters.Exposure];
+                            rotation = (float)simplifiedAperture.Parameters[(int)PolygonParameters.Rotation];
+                            diameter = (float)simplifiedAperture.Parameters[(int)PolygonParameters.Diameter];
+
+                            if (exposure > 0)
+                                graphicsPath.FillMode = FillMode.Winding;
+
+                            CreatePolygonPath(graphicsPath, diameter, numberOfSides, rotation);
+                        }
+
+                        else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine20)
+                        {
+                            float startX = (float)simplifiedAperture.Parameters[(int)Line20Parameters.StartX];
+                            float startY = (float)simplifiedAperture.Parameters[(int)Line20Parameters.StartY];
+                            float endX = (float)simplifiedAperture.Parameters[(int)Line20Parameters.EndX];
+                            float endY = (float)simplifiedAperture.Parameters[(int)Line20Parameters.EndY];
+                            float lineWidth = (float)simplifiedAperture.Parameters[(int)Line20Parameters.LineWidth];
+                            exposure = (float)simplifiedAperture.Parameters[(int)Line20Parameters.Exposure];
+                            rotation = (float)simplifiedAperture.Parameters[(int)Line20Parameters.Rotation];
+
+                            points = new PointF[] { new PointF(startX, startY), new PointF(endX, endY) };
+                            TransformPoints(points, rotation);
+
                             pen.Width = lineWidth;
                             pen.StartCap = LineCap.Square;
                             pen.EndCap = LineCap.Square;
                             graphics.DrawLine(pen, points[0], points[1]);
                         }
+
+                        else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine21)
+                        {
+                            float halfWidth = (float)(simplifiedAperture.Parameters[(int)Line21Parameters.LineWidth]) / 2.0f;
+                            float halfHeight = (float)(simplifiedAperture.Parameters[(int)Line21Parameters.LineHeight]) / 2.0f;
+                            exposure = (float)simplifiedAperture.Parameters[(int)Line21Parameters.Exposure];
+                            centreX = (float)simplifiedAperture.Parameters[(int)Line21Parameters.CentreX];
+                            centreY = (float)simplifiedAperture.Parameters[(int)Line21Parameters.CentreY];
+                            rotation = (float)simplifiedAperture.Parameters[(int)Line21Parameters.Rotation];
+
+                            points = new PointF[] { new PointF(centreX - halfWidth, centreY - halfHeight),
+                                                    new PointF(centreX + halfWidth, centreY - halfHeight),
+                                                    new PointF(centreX + halfWidth, centreY + halfHeight),
+                                                    new PointF(centreX - halfWidth, centreY + halfHeight) };
+
+                            TransformPoints(points, rotation);
+                            if (exposure > 0)
+                                graphicsPath.FillMode = FillMode.Winding;
+
+                            graphicsPath.AddPolygon(points);
+                        }
+
+                        else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine22)
+                        {
+                            float width = (float)(simplifiedAperture.Parameters[(int)Line22Parameters.LineWidth]);
+                            float height = (float)(simplifiedAperture.Parameters[(int)Line22Parameters.LineHeight]);
+                            float lowerLeftX = (float)simplifiedAperture.Parameters[(int)Line22Parameters.LowerLeftX];
+                            float lowerLeftY = (float)simplifiedAperture.Parameters[(int)Line22Parameters.LowerLeftY];
+                            exposure = (float)simplifiedAperture.Parameters[(int)Line22Parameters.Exposure];
+                            rotation = (float)simplifiedAperture.Parameters[(int)Line22Parameters.Rotation];
+
+                            points = new PointF[] { new PointF(lowerLeftX, lowerLeftY),
+                                                    new PointF(width, lowerLeftY),
+                                                    new PointF(width, height),
+                                                    new PointF(lowerLeftX, height) };
+
+                            TransformPoints(points, rotation);
+                            if (exposure > 0)
+                                graphicsPath.FillMode = FillMode.Winding;
+
+                            graphicsPath.AddPolygon(points);
+                        }
+
+                        else
+                            success = false;
                     }
-
-                    else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine21)
-                    {
-                        float exposure = (float)simplifiedAperture.Parameters[(int)Line21Parameters.Exposure];
-                        float halfWidth = (float)(simplifiedAperture.Parameters[(int)Line21Parameters.LineWidth]) / 2.0f;
-                        float halfHeight = (float)(simplifiedAperture.Parameters[(int)Line21Parameters.LineHeight]) / 2.0f;
-                        float centreX = (float)simplifiedAperture.Parameters[(int)Line21Parameters.CentreX];
-                        float centreY = (float)simplifiedAperture.Parameters[(int)Line21Parameters.CentreY];
-                        float rotation = (float)simplifiedAperture.Parameters[(int)Line21Parameters.Rotation];
-
-                        PointF[] points = new PointF[] { new PointF(centreX - halfWidth, centreY - halfHeight),
-                                                         new PointF(centreX + halfWidth, centreY - halfHeight),
-                                                         new PointF(centreX + halfWidth, centreY + halfHeight),
-                                                         new PointF(centreX - halfWidth, centreY + halfHeight) };
-
-                        TransformPoints(points, rotation);
-                        if (exposure > 0)
-                            graphicsPath.FillMode = FillMode.Winding;
-
-                        graphicsPath.AddPolygon(points);
-                    }
-
-                    else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine22)
-                    {
-                        float exposure = (float)simplifiedAperture.Parameters[(int)Line22Parameters.Exposure];
-                        float width = (float)(simplifiedAperture.Parameters[(int)Line22Parameters.LineWidth]);
-                        float height = (float)(simplifiedAperture.Parameters[(int)Line22Parameters.LineHeight]);
-                        float lowerLeftX = (float)simplifiedAperture.Parameters[(int)Line22Parameters.LowerLeftX];
-                        float lowerLeftY = (float)simplifiedAperture.Parameters[(int)Line22Parameters.LowerLeftY];
-                        float rotation = (float)simplifiedAperture.Parameters[(int)Line22Parameters.Rotation];
-
-                        PointF[] points = new PointF[] { new PointF(lowerLeftX, lowerLeftY),
-                                                         new PointF(width, lowerLeftY),
-                                                         new PointF(width, height),
-                                                         new PointF(lowerLeftX, height) };
-
-                        TransformPoints(points, rotation);
-                        if (exposure > 0)
-                            graphicsPath.FillMode = FillMode.Winding;
-
-                        graphicsPath.AddPolygon(points);
-                    }
-
-                    else
-                        success = false;
                 }
 
                 if (graphicsPath.PointCount > 0)
@@ -593,7 +590,7 @@ namespace GerberVS
         /// Creates a path for flashed polygons.
         /// </summary>
         /// <param name="path">path for PathData</param>
-        /// <param name="diameter">polygon diameter/param>
+        /// <param name="diameter">polygon diameter</param>
         /// <param name="numberOfSides">numer of sides in the polygon</param>
         /// <param name="rotation">rotation to apply</param>
         internal static void CreatePolygonPath(GraphicsPath path, float diameter, float numberOfSides, float rotation)
@@ -614,7 +611,7 @@ namespace GerberVS
             path.AddPolygon(points);
         }
 
-        // Creates a polgon path to fill from a series of connecting nets.
+        // Creates a region path to fill from a series of connecting nets.
         internal static void FillRegionPath(GraphicsPath path, Collection<GerberNet> gerberNetList, int netListIndex, float srX, float srY)
         {
             float stopX, stopY, startX, startY;
@@ -649,17 +646,14 @@ namespace GerberVS
 
                 switch (currentNet.Interpolation)
                 {
-                    case GerberInterpolation.LinearX10:
-                    case GerberInterpolation.LinearX01:
-                    case GerberInterpolation.LinearX001:
-                    case GerberInterpolation.LinearX1:
+                    case GerberInterpolation.Linear:
                         if (currentNet.ApertureState == GerberApertureState.On)
                             path.AddLine(startX, startY, stopX, stopY);
 
                         break;
 
                     case GerberInterpolation.ClockwiseCircular:
-                    case GerberInterpolation.CounterClockwiseCircular:
+                    case GerberInterpolation.CounterclockwiseCircular:
                         if (arcRectangle != RectangleF.Empty)
                             path.AddArc(arcRectangle, startAngle, sweepAngle);
 

@@ -72,21 +72,32 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Read the next character in the line or start on the next line if at the end of the current line.
+        /// Reads the next character in the line without consuming it.
+        /// </summary>
+        /// <returns></returns>
+        public char Peek()
+        {
+            if (Position < LineLength - 1)
+                return CurrentLine[Position];
+
+            else
+                return '\n';
+        }
+
+        /// <summary>
+        /// Reads the next character or the first character of the next line if at the end of the current line.
         /// </summary>
         /// <returns>the character read</returns>
         public char Read()
         {
-            if (Position < 0)
-                Position = 1;
-
             if (Position >= LineLength)      // At the end of the line, read the next one.
             {
                 CurrentLine = streamReader.ReadLine();
-                LineNumber++;
-                if (String.IsNullOrEmpty(CurrentLine))  // Empty line, return new line character.
-                    return '\n';
+                if (CurrentLine == null)    // EOF
+                    return '\0';
 
+                CurrentLine += '\n';
+                LineNumber++;
                 Position = 0;
                 LineLength = CurrentLine.Length;
             }
@@ -95,28 +106,66 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Reads from the current line position to the end of line, consumes carriage return and linefeed characters and points to the start on the next line.
+        /// Reads from the current line position to end of line and points to the start of the next line.
         /// </summary>
         public string ReadLineToEnd()
         {
-            string line = String.Empty;
+            StringBuilder line = new StringBuilder();
             int i = Position;
 
             for (; i < LineLength; i++)
-                line += Read();
+                line.Append(Read());
 
-            return line;
+            return line.ToString();
         }
 
         /// <summary>
-        /// Reads in digits from the current file position and converts them to an integer.
+        /// Reads a specified number of characters into the return string.
+        /// </summary>
+        /// <param name="count">number of characters to read</param>
+        /// <returns>the resultant string</returns>
+        public string ReadLine(int count)
+        {
+            StringBuilder line = new StringBuilder();
+
+            if (count < (LineLength - Position))
+            {
+                for (int i = 0; i < count; i++)
+                    line.Append(Read());
+            }
+
+            return line.ToString();
+        }
+
+        /// <summary>
+        /// Reads the current line up to but not including the first occurance of a specified character.
+        /// </summary>
+        /// <param name="value">character to read to</param>
+        /// <returns>the resulting string</returns>
+        public string ReadLine(char value)
+        {
+            StringBuilder line = new StringBuilder();
+
+            char charValue = Read();
+            while (charValue != value)
+            {
+                line.Append(charValue);
+                charValue = Read();
+            }
+
+            Position--;
+            return line.ToString();
+        }
+
+        /// <summary>
+        /// Reads the line data and converts a series of digits to an integer.
         /// </summary>
         /// <param name="length">number of digit in the integer</param>
         /// <returns>the value as an integer</returns>
         public int GetIntegerValue(ref int length)
         {
-            string numberString = String.Empty;
-            int rtnValue = int.MaxValue;
+            StringBuilder numberString = new StringBuilder();
+            int rtnValue = 0;
 
             SkipWhiteSpaces();
             isFirst = true;
@@ -126,25 +175,26 @@ namespace GerberVS
                 if(Char.IsDigit(nextCharacter))
                     length++;   // Exclude any prefixed sign.
 
-                numberString += nextCharacter;
+                numberString.Append(nextCharacter);
                 isFirst = false;
                 nextCharacter = Read();
             }
 
             Position--;
-            if (!String.IsNullOrEmpty(numberString))
-                result = int.TryParse(numberString, out rtnValue);
+            result = int.TryParse(numberString.ToString(), out rtnValue);
+            if (!result)
+                rtnValue = int.MaxValue;
 
             return rtnValue;
         }
 
         /// <summary>
-        /// Reads the line data and converts a series of digits to a double precision number if found.
+        /// Reads the line data and converts a series of digits to a double precision number.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>double precision value</returns>
         public double GetDoubleValue()
         {
-            string doubleString = string.Empty;
+            StringBuilder doubleString = new StringBuilder();
             double rtnValue = double.MaxValue;
 
             SkipWhiteSpaces();
@@ -152,26 +202,27 @@ namespace GerberVS
             char nextCharacter = Read();
             while ((Char.IsDigit(nextCharacter) || nextCharacter == '.') || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
             {
-                doubleString += nextCharacter;
+                doubleString.Append(nextCharacter);
                 nextCharacter = Read();
                 isFirst = false;
             }
 
             Position--;
-            if (!string.IsNullOrEmpty(doubleString))
-                result = double.TryParse(doubleString, out rtnValue);
+            result = double.TryParse(doubleString.ToString(), out rtnValue);
+            if (!result)
+                rtnValue = double.MaxValue;
 
             return rtnValue;
         }
 
         /// <summary>
-        /// Reads the line data and converts a series of digits to a double precision number if found.
+        /// Reads the line data and converts a series of digits to a double precision number.
         /// </summary>
         /// <param name="length">number of digits including the decimal point but excluding any prefixed sign</param>
-        /// <returns>double precision number</returns>
+        /// <returns>double precision value</returns>
         public double GetDoubleValue(ref int length)
         {
-            string doubleString = String.Empty;
+            StringBuilder doubleString = new StringBuilder();
             double rtnValue = double.MaxValue;
 
             SkipWhiteSpaces();
@@ -179,59 +230,20 @@ namespace GerberVS
             char nextCharacter = Read();
             while ((Char.IsDigit(nextCharacter) || nextCharacter == '.') || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
             {
-                if (Char.IsDigit(nextCharacter) || nextCharacter == '.')
+                if (nextCharacter != '-' && nextCharacter != '+')    // Don't count + or - prefix.
                     length++;
 
-                doubleString += nextCharacter;
+                doubleString.Append(nextCharacter);
                 isFirst = false;
                 nextCharacter = Read();
             }
 
-            if(nextCharacter != '\n')
-                Position--;
-
-            if (!string.IsNullOrEmpty(doubleString))
-                result = double.TryParse(doubleString, out rtnValue);
+            Position--;
+            result = double.TryParse(doubleString.ToString(), out rtnValue);
+            if (!result)
+                rtnValue = double.MaxValue;
 
             return rtnValue;
-        }
-
-        /// <summary>
-        /// Reads a specified number of characters into the return string.
-        /// </summary>
-        /// <param name="count">number of characters to read</param>
-        /// <returns>the resultant string</returns>
-        public string GetStringValue(int count)
-        {
-            string dataString = String.Empty;
-
-            if (count < (LineLength - Position))
-            {
-                for (int i = 0; i < count; i++)
-                    dataString += Read();
-            }
-
-            return dataString;
-        }
-
-        /// <summary>
-        /// Reads the stream up to but not including the first occurance of a specified character.
-        /// </summary>
-        /// <param name="value">character to read to</param>
-        /// <returns>the resulting string</returns>
-        public string GetStringValue(char value)
-        {
-            string dataString = String.Empty;
-
-            char charValue = Read();
-            while (charValue != value)
-            {
-                dataString += charValue;
-                charValue = Read();
-            }
-
-            Position--;
-            return dataString;
         }
 
         /// <summary>

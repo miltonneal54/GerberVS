@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FileListBox</name>
+    </assembly>
+    <members>
+        <member name="T:FileListBox.FileListBoxControl">
+            <summary>
+            Custom File Listbox control.
+            </summary>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.#ctor">
+            <summary>
+            Created a new instance of the listbox control.
+            </summary>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.AddItem(System.Boolean,System.Drawing.Color,System.String)">
+            <summary>
+            Adds a new item to the list.
+            </summary>
+            <param name="isChecked">checkbox state</param>
+            <param name="fillColor">colorbox color</param>
+            <param name="text">display text</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.RemoveAt(System.Int32)">
+            <summary>
+            Removes an item from the list at the specified index.
+            </summary>
+            <param name="index">index of the item to be removed</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.Clear">
+            <summary>
+            Removes all item from the list.
+            </summary>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnCheckBoxClick(System.EventArgs)">
+            <summary>
+            Raises the CheckBoxClick event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnColorBoxClick(System.EventArgs)">
+            <summary>
+            Raises the ColorBoxClick event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnSelectedIndexChanged(System.EventArgs)">
+            <summary>
+            Raises the SelectedIndexChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnItemHeightChanged(System.EventArgs)">
+            <summary>
+            Raises the ItemHeightChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnSelectedBackColorChanged(System.EventArgs)">
+            <summary>
+            Raises the SelectionBackColorChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnSelectedForeColorChanged(System.EventArgs)">
+            <summary>
+            Raises the SelectionForeColorChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnForeColorChanged(System.EventArgs)">
+            <summary>
+            Overrides the base OnForeColorChanged event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnResize(System.EventArgs)">
+            <summary>
+            Overrides the base Resize event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnMouseDown(System.Windows.Forms.MouseEventArgs)">
+            <summary>
+            Overrides the base MouseDown event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.IsInputKey(System.Windows.Forms.Keys)">
+            <summary>
+            Determines whether the specified key is a regular input key or a special key that requires preprocessing.
+            </summary>
+            <param name="keyData">key data to test</param>
+            <returns>true if a regular key else false</returns>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnKeyDown(System.Windows.Forms.KeyEventArgs)">
+            <summary>
+            Overrides the base key pressed event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnPaint(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Overrides the base Paint event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnDragEnter(System.Windows.Forms.DragEventArgs)">
+            <summary>
+            Overrides the base OnDragEnter event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.OnDragDrop(System.Windows.Forms.DragEventArgs)">
+            <summary>
+            Overrides the base OnDragDrop event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="F:FileListBox.FileListBoxControl.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:FileListBox.FileListBoxControl.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.CheckBoxClick">
+            <summary>
+            Occurs on mouse down on the check box.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.ColorBoxClick">
+            <summary>
+            Occurs on mouse down on the color box.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.SelectedIndexChanged">
+            <summary>
+             Occurs when the selected index has been changed.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.ItemHeightChanged">
+            <summary>
+             Occurs when the item's height has been changed.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.SelectedBackColorChanged">
+            <summary>
+             Occurs when the item's selected backcolor has been changed.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.SelectedForeColorChanged">
+            <summary>
+             Occurs when the item's selected forecolor has been changed.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.SelectedIndex">
+            <summary>
+            Sets or gets the selected item.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemCount">
+            <summary>
+            Gets the number of items in the list.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemColor">
+            <summary>
+            Determines the color of the item layer.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemChecked">
+            <summary>
+            Determines the visibity state of the item layer.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.Text">
+            <summary>
+            The text associated with the item layer.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.SelectedBackColor">
+            <summary>
+            The background color of the selected item.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.SelectedForeColor">
+            <summary>
+            The foreground color of the selected item.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.UncheckedForeColor">
+            <summary>
+            The foreground color of the selected item when the the checkbox is unchecked.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemHeight">
+            <summary>
+            Determines the height in pixels of an item row.
+            </summary>
+            <remarks> valid values 20 to 26</remarks>
+        </member>
+        <member name="T:FileListBox.FileListBoxControl.CheckBoxClickEvent">
+            <summary>
+            Handles the checkbox click event
+            </summary>
+            <param name="sender">event sender</param>
+        </member>
+        <member name="T:FileListBox.FileListBoxControl.ColorBoxClickEvent">
+            <summary>
+            Handles the colorbox click event
+            </summary>
+            <param name="sender">event sender</param>
+        </member>
+        <member name="T:FileListBox.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:FileListBox.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:FileListBox.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:FileListBox.Properties.Resources.tick">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+    </members>
+</doc>

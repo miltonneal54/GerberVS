@@ -16,16 +16,18 @@ namespace GerberVS
     /// </summary>
     public static class WriteExcellonDrill
     {
+        const double DecimalCoeffient = 1e4;
+
         /// <summary>
         /// Export a gerber image to NC drill file format.
         /// </summary>
         /// <param name="fullPathName">Full path name to write file to</param>
         /// <param name="inputImage">gerber image to export</param>
         /// <returns></returns>
-        public static bool RS274xFromImage(string fullPathName, GerberImage inputImage)
+        public static void RS274XFromImage(string fullPathName, GerberImage inputImage)
         {
             UserTransform transform = new UserTransform(0, 0, 1, 1, 0, false, false, false);
-            return DrillFileFromImage(fullPathName, inputImage, transform);
+            DrillFileFromImage(fullPathName, inputImage, transform);
         }
 
         /// <summary>
@@ -35,9 +37,9 @@ namespace GerberVS
         /// <param name="inputImage">gerber image to export</param>
         /// <param name="transform">apply the user transformations</param>
         /// <returns></returns>
-        public static bool DrillFileFromImage(string fullPathName, GerberImage inputImage, UserTransform transform)
+        public static void DrillFileFromImage(string fullPathName, GerberImage inputImage, UserTransform transform)
         {
-            List<int> apertureTable = new List<int>();
+            List<int> apertureList = new List<int>();
             GerberNet currentNet;
             try
             {
@@ -54,16 +56,16 @@ namespace GerberVS
                     Aperture currentAperture;
                     for (int i = 0; i < Gerber.MaximumApertures; i++)
                     {
-                        currentAperture = newImage.ApertureArray[i];
+                        currentAperture = newImage.ApertureArray()[i];
                         if (currentAperture == null)
                             continue;
 
                         switch (currentAperture.ApertureType)
                         {
                             case GerberApertureType.Circle:
-                                streamWriter.WriteLine("T{0:00}C{1:0.000}", i, currentAperture.Parameters[0]);
+                                streamWriter.WriteLine("T{0:00}C{1:0.0000}", i, currentAperture.Parameters()[0]);
                                 // Add the "approved" aperture to our valid list.
-                                apertureTable.Add(i);
+                                apertureList.Add(i);
                                 break;
                             default:
                                 break;
@@ -72,9 +74,9 @@ namespace GerberVS
 
                     streamWriter.WriteLine("M95");    // End of header.
                     // Write rest of image
-                    for (int i = 0; i < apertureTable.Count; i++)
+                    for (int i = 0; i < apertureList.Count; i++)
                     {
-                        int apertureIndex = apertureTable[i];
+                        int apertureIndex = apertureList[i];
 
                         // Write tool change.
                         streamWriter.WriteLine("T{0:00}", apertureIndex);
@@ -89,15 +91,18 @@ namespace GerberVS
                             switch (currentNet.ApertureState)
                             {
                                 case GerberApertureState.Flash:
-                                    streamWriter.WriteLine("X{0:000000}Y{1:000000}", Math.Round(currentNet.EndX * 10000.0), Math.Round(currentNet.EndY * 10000.0));
+                                    streamWriter.WriteLine("X{0:000000}Y{1:000000}", Math.Round(currentNet.EndX * DecimalCoeffient), Math.Round(currentNet.EndY * DecimalCoeffient));
                                     break;
 
-                                case GerberApertureState.On:	// Cut slot.
-                                    streamWriter.WriteLine("X{0:000000}Y{1:000000}G85X{2:000000}Y{3:000000}",
-                                                           Math.Round(currentNet.StartX * 10000.0),
-                                                           Math.Round(currentNet.StartY * 10000.0),
-                                                           Math.Round(currentNet.EndX * 10000.0),
-                                                           Math.Round(currentNet.EndY * 10000.0));
+                               case GerberApertureState.On:	// Cut slot.
+                                    if (currentNet.Interpolation == GerberInterpolation.Linear)
+                                    {
+                                        streamWriter.WriteLine("X{0:000000}Y{1:000000}G85X{2:000000}Y{3:000000}",
+                                                               Math.Round(currentNet.StartX * DecimalCoeffient),
+                                                               Math.Round(currentNet.StartY * DecimalCoeffient),
+                                                               Math.Round(currentNet.EndX * DecimalCoeffient),
+                                                               Math.Round(currentNet.EndY * DecimalCoeffient));
+                                    }
                                     break;
 
                                 default:
@@ -108,7 +113,6 @@ namespace GerberVS
 
                     // Write footer.
                     streamWriter.WriteLine("M30");
-                    return true;
                 }
             }
 

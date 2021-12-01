@@ -30,16 +30,19 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 
 namespace GerberVS
 {
     /// <summary>
-    /// Type class containing information on an aperture.
+    /// Type class containing information on an aperture for stats report.
     /// </summary>
     public class GerberApertureInfo
     {
+        private readonly double[] parameters;
+
         /// <summary>
         /// Aperture number.
         /// </summary>
@@ -61,16 +64,19 @@ namespace GerberVS
         public GerberApertureType ApertureType { get; set; }
 
         /// <summary>
-        /// Aperture parameter list.
-        /// </summary>
-        public double[] Parameters { get; set; }
-
-        /// <summary>
         /// Creates a new instance of the aperture information type class.
         /// </summary>
         public GerberApertureInfo()
         {
-            Parameters = new double[5];
+            parameters = new double[5];
+        }
+
+        /// <summary>
+        /// Aperture parameter list.
+        /// </summary>
+        public double[] Parameters()
+        {
+            return parameters;
         }
     }
 
@@ -79,10 +85,26 @@ namespace GerberVS
     /// </summary>
     public class Aperture
     {
+        private readonly double[] parameters;
+
+        /// <summary>
+        /// Aperture type.
+        /// </summary>
         public GerberApertureType ApertureType { get; set; }
+
+        /// <summary>
+        /// Aperture macro.
+        /// </summary>
         public ApertureMacro ApertureMacro { get; set; }
-        public double[] Parameters { get; set; }
+
+        /// <summary>
+        /// Actual number of parameters.
+        /// </summary>
         public int ParameterCount { get; set; }
+
+        /// <summary>
+        /// Scale units of the parameters.
+        /// </summary>
         public GerberUnit Unit { get; set; }
 
         /// <summary>
@@ -96,7 +118,15 @@ namespace GerberVS
         public Aperture()
         {
             SimplifiedMacroList = new Collection<SimplifiedApertureMacro>();
-            Parameters = new double[Gerber.MaximumApertureParameters];
+            parameters = new double[Gerber.MaximumApertureParameters];
+        }
+
+        /// <summary>
+        /// Aperture parameters.
+        /// </summary>
+        public double[] Parameters()
+        {
+            return parameters;
         }
     }
 
@@ -105,38 +135,42 @@ namespace GerberVS
     /// </summary>
     public class ApertureMacro
     {
-        private Collection<GerberInstruction> instructionList;
-        public string Name { get; set; }
-        public int NufPushes { get; set; }                  // Nuf pushes in program to estimate stack size.
-
         /// <summary>
         /// Gets the macro instruction list.
         /// </summary>
-        internal Collection<GerberInstruction> InstructionList
-        {
-            get { return instructionList; }
-        }
+        internal List<GerberInstruction> InstructionList { get; }
+
+        /// <summary>
+        /// Aperture name.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Nuf pushes in program to estimate stack size.
+        /// </summary>
+        public int NufPushes { get; set; }
 
         /// <summary>
         /// Creates a new instance of the Aperture Macro class.
         /// </summary>
         public ApertureMacro()
         {
-            instructionList = new Collection<GerberInstruction>();
+            InstructionList = new List<GerberInstruction>();
         }
 
         /// <summary>
         /// Read in and resolve the aperture macro data.
         /// </summary>
-        /// <param name="reader">reader hold the macro data</param>
-        /// <returns></returns>
+        /// <param name="reader">line holding the macro data</param>
+        /// <returns>the resolved apertur macro</returns>
         internal static ApertureMacro ParseApertureMacro(GerberLineReader reader)
         {
             const int MathOperationStackSize = 2;
-            ApertureMacro apertureMacro = new ApertureMacro();
-            GerberInstruction instruction;
 
+            ApertureMacro apertureMacro = new ApertureMacro();
             GerberOpCode[] mathOperations = new GerberOpCode[MathOperationStackSize];
+            GerberInstruction instruction;
+            
             char characterRead;
             int primitive = 0;
             int mathOperationIndex = 0;
@@ -148,7 +182,7 @@ namespace GerberVS
             int length = 0;
 
             // Get macro name
-            apertureMacro.Name = reader.GetStringValue('*');
+            apertureMacro.Name = reader.ReadLine('*');
             characterRead = reader.Read();	    // Skip '*'
 
             // The first instruction in all programs will be NOP.
@@ -311,7 +345,7 @@ namespace GerberVS
                         if ((characterRead == '0') && (!foundPrimitive) && (primitive == 0))
                         {
                             // Comment continues until next '*', just throw it away.
-                            reader.GetStringValue('*');
+                            reader.ReadLine('*');
                             characterRead = reader.Read(); // Read the '*'.
                             break;
                         }
@@ -375,18 +409,36 @@ namespace GerberVS
         }
     }
 
-
     /// <summary>
-    /// Type class for defining a simplified aperture macro.
+    /// Type class for simplifing and defining an aperture macro.
     /// </summary>
     public class SimplifiedApertureMacro
     {
+        /// <summary>
+        /// Aperture type.
+        /// </summary>
         public GerberApertureType ApertureType { get; set; }
-        public double[] Parameters { get; set; }
 
+        /// <summary>
+        /// Parameters that define the aperture.
+        /// </summary>
+        public Collection<double> Parameters { get; }
+
+        /// <summary>
+        /// Creates a new instance of a aperture macro.
+        /// </summary>
         public SimplifiedApertureMacro()
         {
-            Parameters = new double[Gerber.MaximumApertureParameters];
+            Parameters = new Collection<double>();
+        }
+
+        /// <summary>
+        /// Creates a new instance of a aperture macro with predefined parameters.
+        /// </summary>
+        /// <param name="parameters"></param>
+        public SimplifiedApertureMacro(Collection<double> parameters)
+        {
+            Parameters = parameters;
         }
 
         /// <summary>
@@ -394,7 +446,7 @@ namespace GerberVS
         /// </summary>
         /// <param name="aperture">aperture to be simplified</param>
         /// <param name="scale">scale to use when simplifing</param>
-        /// <returns></returns>
+        /// <returns> true on success</returns>
         public static bool SimplifyApertureMacro(Aperture aperture, double scale)
         {
             const int extraStackSize = 10;
@@ -402,9 +454,7 @@ namespace GerberVS
             bool success = true;
             int numberOfParameters = 0;
             bool clearOperatorUsed = false;
-            double[] localParameters = new double[Gerber.MaximumApertureParameters]; // Local copy of parameters.
             double[] temp = { 0.0, 0.0 };
-            int index = 0;
             GerberApertureType type = GerberApertureType.None;
             SimplifiedApertureMacro macro;
 
@@ -413,11 +463,6 @@ namespace GerberVS
 
             // Allocate stack.
             MacroStack.InitializeStack(aperture.ApertureMacro.NufPushes + extraStackSize);
-
-            // Make a copy of the parameter list that we can rewrite if necessary.
-            localParameters = new double[Gerber.MaximumApertureParameters];
-            foreach (double p in aperture.Parameters)
-                localParameters[index++] = p;
 
             foreach (GerberInstruction instruction in aperture.ApertureMacro.InstructionList)
             {
@@ -431,12 +476,12 @@ namespace GerberVS
                         break;
 
                     case GerberOpCode.PushParameter:
-                        MacroStack.Push(localParameters[instruction.Data.IntValue - 1]);
+                        MacroStack.Push(aperture.Parameters()[instruction.Data.IntValue - 1]);
                         break;
 
                     case GerberOpCode.PopParameter:
                         temp[0] = MacroStack.Pop();
-                        localParameters[instruction.Data.IntValue - 1] = temp[0];
+                        aperture.Parameters()[instruction.Data.IntValue - 1] = temp[0];
                         break;
 
                     case GerberOpCode.Add:
@@ -485,6 +530,11 @@ namespace GerberVS
                                 // Number of points defined in entry 1 of the stack + start point. Times two since it is both X and Y.
                                 // Then three more; exposure, nuf points and rotation.
                                 numberOfParameters = ((int)MacroStack.Values[1] + 1) * 2 + 3;
+                                if(numberOfParameters < 0 || numberOfParameters >= int.MaxValue / 4)
+                                {
+                                    throw new GerberApertureException("Invalid number of parameters for an Outline aperture macro.");
+                                }
+
                                 break;
 
                             case 5:
@@ -540,9 +590,10 @@ namespace GerberVS
                             // Create a new simplified aperture macro and start filling in the blanks.
                             macro = new SimplifiedApertureMacro();
                             macro.ApertureType = type;
-                            index = 0;
                             for (int i = 0; i < numberOfParameters; i++)
-                                macro.Parameters[i] = MacroStack.Values[i];
+                            {
+                                macro.Parameters.Add(MacroStack.Values[i]);
+                            }
 
                             // Convert any mm values to inches.
                             switch (type)
@@ -634,7 +685,7 @@ namespace GerberVS
             }
 
             // Store a flag to let the renderer know if it should expect any "clear" primatives.
-            aperture.Parameters[0] = clearOperatorUsed ? 1.0f : 0.0f;
+            aperture.Parameters()[0] = clearOperatorUsed ? 1.0f : 0.0f;
 
             return success;
         }
@@ -642,19 +693,19 @@ namespace GerberVS
         // Stack declarations and operations to be used by the simplify engine that executes the parsed aperture macros.
         private static class MacroStack
         {
-            public static double[] Values { get; set; }
-            public static int Count { get; set; }
+            internal static double[] Values { get; set; }
+            internal static int Count { get; set; }
 
-            public static void InitializeStack(int stackSize)
+            internal static void InitializeStack(int stackSize)
             {
                 Values = new double[stackSize];
                 Count = 0;
             }
 
             // Pushes a value onto the stack.
-            public static void Push(double value)
+            internal static void Push(double value)
             {
-                if(Count == Values.Length)
+                if (Count == Values.Length)
                     throw new MacroStackOverflowException("Attempt to push a full stack.");
 
                 Values[Count++] = value;
@@ -662,18 +713,7 @@ namespace GerberVS
             }
 
             // Pops a value off the stack.
-           /* public static bool Pop(ref double value)
-            {
-                // Check if we try to pop an empty stack.
-                if (Count == 0)
-                    throw new MacroStackOverflowException("Attempt to pop an empty stack.");
-
-                value = Values[--Count];
-                return true;
-            }*/
-
-            // Pops a value off the stack.
-            public static double Pop()
+            internal static double Pop()
             {
                 if (Count == 0)
                     throw new MacroStackOverflowException("Attempt to pop an empty stack.");
@@ -682,7 +722,7 @@ namespace GerberVS
             }
 
             // Reset the stack.
-            public static void Clear()
+            internal static void Clear()
             {
                 for (int i = 0; i < Values.Length; i++)
                     Values[i] = 0.0;
@@ -711,7 +751,7 @@ namespace GerberVS
             public double DoubleValue;
             [FieldOffset(0)]
             public int IntValue;
-        }  
+        }
 
     }
 }

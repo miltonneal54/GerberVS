@@ -18,19 +18,19 @@ namespace GerberVS
     /// </summary>
     public static class WriteGerberRS274X
     {
-        const double GERBV_PRECISION_ANGLE_RAD = 1e-6;
-        const double GERBV_PRECISION_LINEAR_INCH = 1e-6;
+        //const double GERBV_PRECISION_ANGLE_RAD = 1e-6;
+        const double LinearInchPrecision = 1e-6;
+        const double DecimalCoeffient = 1e4;
 
         /// <summary>
         /// Export a gerber image to RS274X file format.
         /// </summary>
         /// <param name="fullPathName">Full path name to write file to</param>
         /// <param name="inputImage">gerber image to export</param>
-        /// <returns></returns>
-        public static bool RS274XFromImage(string fullPathName, GerberImage inputImage)
+        public static void RS274XFromImage(string fullPathName, GerberImage inputImage)
         {
             UserTransform transform = new UserTransform(0, 0, 1, 1, 0, false, false, false);
-            return RS274XFromImage(fullPathName, inputImage, transform);
+            RS274XFromImage(fullPathName, inputImage, transform);
         }
 
         /// <summary>
@@ -39,10 +39,8 @@ namespace GerberVS
         /// <param name="fullPathName">Full path name to write file to</param>
         /// <param name="inputImage">gerber image to export</param>
         /// <param name="transform">apply the user transformations</param>
-        /// <returns></returns>
-        public static bool RS274XFromImage(string fullPathName, GerberImage inputImage, UserTransform transform)
+        public static void RS274XFromImage(string fullPathName, GerberImage inputImage, UserTransform transform)
         {
-            const double decimalCoeff = 1e4;
             GerberLevel oldLevel = null;
             GerberNetState oldState = null;
             bool insidePolygon = false;
@@ -58,58 +56,84 @@ namespace GerberVS
                     streamWriter.WriteLine("G04 GerberView Version {0} *", Assembly.GetEntryAssembly().GetName().Version);
                     streamWriter.WriteLine("G04 --End of header info--*");
                     streamWriter.WriteLine("%MOIN*%");
-                    streamWriter.WriteLine("%FSLAX34Y34*%");
+                    streamWriter.WriteLine("%FSLAX24Y24*%");    // Recommended minimum by Ucamco.
 
                     // Check the image info struct for any non-default settings.
                     // Image offset.
                     if ((imageCopy.ImageInfo.OffsetA > 0.0) || (imageCopy.ImageInfo.OffsetB > 0.0))
+                    {
                         streamWriter.WriteLine("%IOA{0}B{1}*%\n", imageCopy.ImageInfo.OffsetA, imageCopy.ImageInfo.OffsetB);
+                    }
 
                     // Image polarity.
                     if (imageCopy.ImageInfo.Polarity == GerberPolarity.Clear)
+                    {
                         streamWriter.WriteLine("%IPNEG*%\n");
+                    }
 
                     else
+                    {
                         streamWriter.Write("%IPPOS*%\n");
+                    }
 
                     // Image name.
                     if (!String.IsNullOrEmpty(imageCopy.ImageInfo.ImageName))
+                    {
                         streamWriter.Write("%IN{0}*%", imageCopy.ImageInfo.ImageName);
+                    }
 
                     // Plotter film.
                     if (!String.IsNullOrEmpty(imageCopy.ImageInfo.PlotterFilm))
+                    {
                         streamWriter.Write("%PF{0}*%", imageCopy.ImageInfo.PlotterFilm);
+                    }
 
                     // Image rotation.
                     if ((imageCopy.ImageInfo.ImageRotation != 0.0) || (transform.Rotation != 0.0))
+                    {
                         streamWriter.Write("%IR{0}*%", (int)((imageCopy.ImageInfo.ImageRotation + transform.Rotation)) % 360);
+                    }
 
-                    if ((imageCopy.ImageInfo.ImageJustifyTypeA != GerberImageJustifyType.None) || (imageCopy.ImageInfo.ImageJustifyTypeB != GerberImageJustifyType.None))
+                    if ((imageCopy.ImageInfo.ImageJustifyTypeA != GerberImageJustifyType.None) 
+                        || (imageCopy.ImageInfo.ImageJustifyTypeB != GerberImageJustifyType.None))
                     {
                         streamWriter.Write("%IJA");
                         if (imageCopy.ImageInfo.ImageJustifyTypeA == GerberImageJustifyType.Centre)
+                        {
                             streamWriter.Write("C");
+                        }
 
                         else
+                        {
                             streamWriter.Write("%{0:0000}", imageCopy.ImageInfo.ImageJustifyOffsetA);
+                        }
 
                         streamWriter.Write("B");
                         if (imageCopy.ImageInfo.ImageJustifyTypeB == GerberImageJustifyType.Centre)
+                        {
                             streamWriter.Write("C");
+                        }
 
                         else
+                        {
                             streamWriter.Write("%{0:0000}", imageCopy.ImageInfo.ImageJustifyOffsetB);
+                        }
 
                         streamWriter.WriteLine("*%");
 
                     }
-                    // Handle scale user orientation transforms.
-                    if (Math.Abs(transform.ScaleX - 1) > GERBV_PRECISION_LINEAR_INCH || Math.Abs(transform.ScaleY - 1) > GERBV_PRECISION_LINEAR_INCH)
+
+                    // Handle user scale orientation transforms.
+                    if (Math.Abs(transform.ScaleX - 1) > LinearInchPrecision || Math.Abs(transform.ScaleY - 1) > LinearInchPrecision)
+                    {
                         streamWriter.WriteLine("%SFA{0:0.0000}B{1:0.0000}*%", transform.ScaleX, transform.ScaleY);
+                    }
 
                     // Handle mirror image user orientation transform.
                     if ((transform.MirrorAroundX) || (transform.MirrorAroundY))
+                    {
                         streamWriter.WriteLine("%MIA{0}dB{1}*%", transform.MirrorAroundY, transform.MirrorAroundX);
+                    }
 
                     // Define all apertures.
                     streamWriter.Write("G04 --Define apertures--*\n");
@@ -130,11 +154,11 @@ namespace GerberVS
 
                         // Check for new "netstate" (more RS274X commands)
                         if (currentNet.NetState != oldState)
-                            WriteStateChange(streamWriter, oldState, currentNet.NetState);
+                            ;// WriteStateChange(streamWriter, oldState, currentNet.NetState);
 
                         // Check for "tool" changes.
                         // Also, make sure the aperture number is a valid one, since sometimes the loaded file may refer to invalid apertures.
-                        if ((currentNet.Aperture != currentAperture) && (imageCopy.ApertureArray[currentNet.Aperture] != null))
+                        if ((currentNet.Aperture != currentAperture) && (imageCopy.ApertureArray()[currentNet.Aperture] != null))
                         {
                             streamWriter.WriteLine("G54D{0}*", currentNet.Aperture);
                             currentAperture = currentNet.Aperture;
@@ -146,21 +170,19 @@ namespace GerberVS
                         int xVal, yVal, endX, endY, centreX, centreY;
                         switch (currentNet.Interpolation)
                         {
-                            case GerberInterpolation.LinearX1:
-                            case GerberInterpolation.LinearX10:
-                            case GerberInterpolation.LinearX01:
-                            case GerberInterpolation.LinearX001:
+                            case GerberInterpolation.Linear:
+                            //case GerberInterpolation.DrillSlot:
                                 // See if we need to write an "aperture off" line to get the pen to the right start point.
                                 if ((!insidePolygon) && (currentNet.ApertureState == GerberApertureState.On))
                                 {
-                                    xVal = (int)Math.Round(currentNet.StartX * decimalCoeff);
-                                    yVal = (int)Math.Round(currentNet.StartY * decimalCoeff);
-                                    streamWriter.WriteLine("G01X{0:0000000}Y{1:0000000}D02*", xVal, yVal);
+                                    xVal = (int)Math.Round(currentNet.StartX * DecimalCoeffient);
+                                    yVal = (int)Math.Round(currentNet.StartY * DecimalCoeffient);
+                                    streamWriter.WriteLine("G01X{0:000000}Y{1:000000}D02*", xVal, yVal);
                                 }
 
-                                xVal = (int)Math.Round(currentNet.EndX * decimalCoeff);
-                                yVal = (int)Math.Round(currentNet.EndY * decimalCoeff);
-                                streamWriter.Write("G01X{0:0000000}Y{1:0000000}", xVal, yVal);
+                                xVal = (int)Math.Round(currentNet.EndX * DecimalCoeffient);
+                                yVal = (int)Math.Round(currentNet.EndY * DecimalCoeffient);
+                                streamWriter.Write("G01X{0:000000}Y{1:000000}", xVal, yVal);
                                 // and finally, write the esposure value.
                                 if (currentNet.ApertureState == GerberApertureState.Off)
                                     streamWriter.WriteLine("D02*");
@@ -173,43 +195,59 @@ namespace GerberVS
                                 break;
 
                             case GerberInterpolation.ClockwiseCircular:
-                            case GerberInterpolation.CounterClockwiseCircular:
+                            case GerberInterpolation.CounterclockwiseCircular:
                                 // See if we need to write an "aperture off" line to get the pen to the right start point.
                                 if ((!insidePolygon) && (currentNet.ApertureState == GerberApertureState.On))
                                 {
-                                    xVal = (int)Math.Round(currentNet.StartX * decimalCoeff);
-                                    yVal = (int)Math.Round(currentNet.StartY * decimalCoeff);
-                                    streamWriter.WriteLine("G01X{0:0000000}Y{1:0000000}D02*", xVal, yVal);
+                                    xVal = (int)Math.Round(currentNet.StartX * DecimalCoeffient);
+                                    yVal = (int)Math.Round(currentNet.StartY * DecimalCoeffient);
+                                    streamWriter.WriteLine("G01X{0:000000}Y{1:000000}D02*", xVal, yVal);
                                 }
 
-                                centreX = (int)Math.Round((currentNet.CircleSegment.CenterX - currentNet.StartX) * decimalCoeff);
-                                centreY = (int)Math.Round((currentNet.CircleSegment.CenterY - currentNet.StartY) * decimalCoeff);
-                                endX = (int)Math.Round(currentNet.EndX * decimalCoeff);
-                                endY = (int)Math.Round(currentNet.EndY * decimalCoeff);
+                                centreX = (int)Math.Round((currentNet.CircleSegment.CenterX - currentNet.StartX) * DecimalCoeffient);
+                                centreY = (int)Math.Round((currentNet.CircleSegment.CenterY - currentNet.StartY) * DecimalCoeffient);
+                                endX = (int)Math.Round(currentNet.EndX * DecimalCoeffient);
+                                endY = (int)Math.Round(currentNet.EndY * DecimalCoeffient);
 
                                 // Always use multi-quadrant, since it's much easier to export and most all software should support it.
                                 streamWriter.WriteLine("G75*");
 
                                 if (currentNet.Interpolation == GerberInterpolation.ClockwiseCircular)
-                                    streamWriter.Write("G02");	// Clockwise.
+                                {
+                                    streamWriter.Write("G02"); // Clockwise.
+                                }
 
                                 else
-                                    streamWriter.Write("G03");	// Counter clockwise.
+                                {
+                                    streamWriter.Write("G03"); // Counter clockwise.
+                                }
 
                                 // Don't write the I and J values if the exposure is off.
                                 if (currentNet.ApertureState == GerberApertureState.On)
-                                    streamWriter.Write("X{0:000000}Y{1:0000000}I{2:0000000}J{3:0000000}", endX, endY, centreX, centreY);
+                                {
+                                    streamWriter.Write("X{0:00000}Y{1:000000}I{2:000000}J{3:000000}", endX, endY, centreX, centreY);
+                                }
+
                                 else
-                                    streamWriter.Write("X{0:0000000}Y{1:0000000}", endX, endY);
+                                {
+                                    streamWriter.Write("X{0:000000}Y{1:000000}", endX, endY);
+                                }
+
                                 // And finally, write the esposure value.
                                 if (currentNet.ApertureState == GerberApertureState.Off)
+                                {
                                     streamWriter.WriteLine("D02*");
+                                }
 
                                 else if (currentNet.ApertureState == GerberApertureState.On)
+                                {
                                     streamWriter.WriteLine("D01*");
+                                }
 
                                 else
+                                {
                                     streamWriter.WriteLine("D03*");
+                                }
 
                                 break;
 
@@ -229,7 +267,6 @@ namespace GerberVS
                     }
 
                     streamWriter.WriteLine("M02*");
-                    return true;
                 }
             }
 
@@ -267,7 +304,7 @@ namespace GerberVS
                         break;
 
                     case GerberApertureType.MacroPolygon:
-                        streamWriter.WriteLine("5,{0},{1},{2:0.0000000},{3:0.0000000},{4:0.0000000},{5:0.0000000}*",
+                        streamWriter.WriteLine("5,{0},{1},{2:0.000000},{3:0.000000},{4:0.000000},{5:0.000000}*",
                                        sam.Parameters[(int)PolygonParameters.Exposure],
                                        sam.Parameters[(int)PolygonParameters.NumberOfSides],
                                        sam.Parameters[(int)PolygonParameters.CentreY],
@@ -345,9 +382,11 @@ namespace GerberVS
             for (int i = Gerber.MinimumAperture; i < Gerber.MaximumApertures; i++)
             {
                 writeAperture = true;
-                currentAperture = image.ApertureArray[i];
+                currentAperture = image.ApertureArray()[i];
                 if (currentAperture == null)
+                {
                     continue;
+                }
 
                 switch (currentAperture.ApertureType)
                 {
@@ -393,13 +432,15 @@ namespace GerberVS
                     // Write the parameter list.
                     for (int j = 0; j < (numberOfRequiredParameters + numberOfOptionalParameters); j++)
                     {
-                        if ((j < numberOfRequiredParameters) || (currentAperture.Parameters[j] != 0))
+                        if ((j < numberOfRequiredParameters) || (currentAperture.Parameters()[j] != 0))
                         {
                             // Print the "X" character to separate the parameters.
                             if (j > 0)
+                            {
                                 streamWriter.Write("X");
+                            }
 
-                            streamWriter.Write("{0:0.000}", currentAperture.Parameters[j]);
+                            streamWriter.Write("{0:0.0000}", currentAperture.Parameters()[j]);
                         }
                     }
 
@@ -417,16 +458,20 @@ namespace GerberVS
             {
                 // Polarity changed.
                 if ((newLevel.Polarity == GerberPolarity.Clear))
+                {
                     file.WriteLine("%LPC*%");
+                }
 
                 else
+                {
                     file.WriteLine("%LPD*%");
+                }
             }
         }
 
-        private static void WriteStateChange(StreamWriter file, GerberNetState oldState, GerberNetState newState)
+        /*private static void WriteStateChange(StreamWriter file, GerberNetState oldState, GerberNetState newState)
         {
-        }
+        }*/
     }
 }
 

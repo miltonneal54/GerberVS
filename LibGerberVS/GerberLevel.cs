@@ -23,11 +23,6 @@ namespace GerberVS
         internal GerberStepAndRepeat StepAndRepeat { get; set; }
 
         /// <summary>
-        /// The current rotation around the origin.
-        /// </summary>
-        internal double Rotation { get; set; } 
-
-        /// <summary>
         /// Dark or clear polarity for this level.
         /// </summary>
         internal GerberPolarity Polarity { get; set; }
@@ -44,7 +39,6 @@ namespace GerberVS
         {
             Knockout = new GerberKnockout();
             StepAndRepeat = new GerberStepAndRepeat();
-            Rotation = 0.0;
             Polarity = GerberPolarity.Dark;
             LevelName = String.Empty;
 
@@ -58,7 +52,6 @@ namespace GerberVS
                 StepAndRepeat.Y = gerberImage.LevelList[previous].StepAndRepeat.Y;
                 StepAndRepeat.DistanceX = gerberImage.LevelList[previous].StepAndRepeat.DistanceX;
                 StepAndRepeat.DistanceY = gerberImage.LevelList[previous].StepAndRepeat.DistanceY;
-                Rotation = gerberImage.LevelList[previous].Rotation;
                 Polarity = gerberImage.LevelList[previous].Polarity;
                 Knockout = gerberImage.LevelList[previous].Knockout;
                 // Clear this boolean so we only draw the knockout once.

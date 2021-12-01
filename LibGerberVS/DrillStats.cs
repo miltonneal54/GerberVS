@@ -30,11 +30,7 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GerberVS
 {
@@ -44,11 +40,29 @@ namespace GerberVS
     /// <remarks>Used in reporting statistics.</remarks>
     public class DrillInfo
     {
+        /// <summary>
+        /// Number of drill holes of this size (tool number)
+        /// </summary>
         public int DrillCount { get; set; }
+
+        /// <summary>
+        /// Drill number (tool number)
+        /// </summary>
         public int DrillNumber { get; set; }
+
+        /// <summary>
+        /// Drill hole size.
+        /// </summary>
         public double DrillSize { get; set; }
+
+        /// <summary>
+        /// Drill size units.
+        /// </summary>
         public string DrillUnit { get; set; }
 
+        /// <summary>
+        /// Information pertaining to a tool (drill) number.
+        /// </summary>
         public DrillInfo()
         {
             DrillCount = 0;
@@ -106,11 +120,17 @@ namespace GerberVS
             drillInfoList = new Collection<DrillInfo>();
         }
 
+        /// <summary>
+        /// Errors found during parsing of a drill file.
+        /// </summary>
         public Collection<GerberError> ErrorList
         {
             get { return errorList; }
         }
 
+        /// <summary>
+        /// Drill information for each tool in the drill file.
+        /// </summary>
         public Collection<DrillInfo> DrillInfoList
         {
             get { return drillInfoList; }
@@ -120,9 +140,11 @@ namespace GerberVS
         /// <summary>
         /// Adds a new error to the error list;
         /// </summary>
-        /// <param name="level"></param>
-        /// <param name="errorMessage"></param>
-        /// <param name="errorType"></param>
+        /// <param name="level">level</param>
+        /// <param name="errorMessage">error message</param>
+        /// <param name="errorType">type of error</param>
+        /// <param name="lineNumber">line number in the file where the error occurred</param>
+        /// <param name="fileName"> file in which the error occurred</param>
         /// <remarks>
         /// Only unique errors are added to the list.
         /// </remarks>

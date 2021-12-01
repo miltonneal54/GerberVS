@@ -127,7 +127,7 @@ namespace GerberVS
         /// <returns>coordinates as a string value</returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{X = {0}, Y = {1}} }", X, Y);
+            return string.Format(CultureInfo.CurrentCulture, "X = {0}, Y = {1}", X, Y);
         } 
     }
 
@@ -244,7 +244,7 @@ namespace GerberVS
         /// <returns>coordinates as a string value</returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{Width = {0}, Height = {1}} }", Width, Height);
+            return string.Format(CultureInfo.CurrentCulture, "Width = {0}, Height = {1}", Width, Height);
         } 
     }
 }
