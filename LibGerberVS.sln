@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1340
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GerberView", "GerberView\GerberView.csproj", "{02F62474-F2DD-4637-B909-57DA5BC81999}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87382E7B-8D32-4DD7-8878-AE625F314695} = {87382E7B-8D32-4DD7-8878-AE625F314695}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GerberVS", "LibGerberVS\GerberVS.csproj", "{87382E7B-8D32-4DD7-8878-AE625F314695}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02F62474-F2DD-4637-B909-57DA5BC81999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F62474-F2DD-4637-B909-57DA5BC81999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02F62474-F2DD-4637-B909-57DA5BC81999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02F62474-F2DD-4637-B909-57DA5BC81999}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87382E7B-8D32-4DD7-8878-AE625F314695}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87382E7B-8D32-4DD7-8878-AE625F314695}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87382E7B-8D32-4DD7-8878-AE625F314695}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87382E7B-8D32-4DD7-8878-AE625F314695}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6B40394-78B6-41F3-BEF3-FC0F5133DEE7}
+	EndGlobalSection
+EndGlobal

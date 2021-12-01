@@ -81,3 +81,11 @@ GerberView 1.3.4.0
 	1. Ruler Control
 	2. FileList Control.
 	3. Color Dialog with transparecy support.
+
+27/11/2021
+Migrate project to VS2017 Net 4.6.1
+GerberView 1.3.5.0
+LibGerberVS 1.2.0.0
+	GUI updates.
+	Code audits and refactoring.
+	Some bug fixes.
