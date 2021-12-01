@@ -109,16 +109,16 @@
             Event arguments for the HoverValueChanged event.
             </summary>
         </member>
+        <member name="P:Ruler.HoverValueChangedEventArgs.Value">
+            <summary>
+            Hover value
+            </summary>
+        </member>
         <member name="M:Ruler.HoverValueChangedEventArgs.#ctor(System.Double)">
             <summary>
             Arguements for HoverValueChanged.
             </summary>
             <param name="value">arguement value (double)</param>
-        </member>
-        <member name="P:Ruler.HoverValueChangedEventArgs.Value">
-            <summary>
-            Hover value
-            </summary>
         </member>
         <member name="T:Ruler.Properties.Resources">
             <summary>
@@ -166,120 +166,6 @@
             Creates a new instance of the Ruler control.
             </summary>
         </member>
-        <member name="M:Ruler.RulerControl.PreFilterMessage(System.Windows.Forms.Message@)">
-            <summary>
-            Hook into the windows message system.
-            </summary>
-            <param name="m">windows message</param>
-            <returns>false if the message is not comsumed</returns>
-        </member>
-        <member name="M:Ruler.RulerControl.OnResize(System.EventArgs)">
-            <summary>
-            Overrides the base OnResize event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnPaint(System.Windows.Forms.PaintEventArgs)">
-            <summary>
-            Overrides the base OnPaint event.
-            </summary>
-            <param name="e">EventArgs that contains the event data.</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnHandleDestroyed(System.EventArgs)">
-            <summary>
-            Overrides the base OnHandleDestroyed event.
-            </summary>
-            <param name="e">EventArgs that contains the event data.</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnControlRemoved(System.Windows.Forms.ControlEventArgs)">
-            <summary>
-            Overrides the base OnControlRemoved event.
-            </summary>
-            <param name="e">EventArgs that contains the event data.</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnEnter(System.EventArgs)">
-            <summary>
-            Overrides the base OnEnter event.
-            </summary>
-            <param name="e">EventArgs that contains the event data.</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnLeave(System.EventArgs)">
-            <summary>
-            Overrides the base OnLeave event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnHoverValueChanged(Ruler.HoverValueChangedEventArgs)">
-            <summary>
-            Raises the HoverValue event
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnOrientationChanged(System.EventArgs)">
-            <summary>
-            Raises the OrientationChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnBorderStyleChanged(System.EventArgs)">
-            <summary>
-            Raises the BorderStyleChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnScaleDirectionChanged(System.EventArgs)">
-            <summary>
-            Raises the ScaleDirectionChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnScaleModeChanged(System.EventArgs)">
-            <summary>
-            Raises the ScaleModeChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnStartValueChanged(System.EventArgs)">
-            <summary>
-            Raises the StartValueChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnMajorIntervalChanged(System.EventArgs)">
-            <summary>
-            Raises the MajorIntervalChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnMouseTrackingChanged(System.EventArgs)">
-            <summary>
-            Raises the MouseTrackingChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="M:Ruler.RulerControl.OnZoomFactorChanged(System.EventArgs)">
-            <summary>
-            Raises the ZoomChanged event.
-            </summary>
-            <param name="e">EventArgs that contains the event data</param>
-        </member>
-        <member name="F:Ruler.RulerControl.components">
-            <summary>
-            Required designer variable.
-            </summary>
-        </member>
-        <member name="M:Ruler.RulerControl.Dispose(System.Boolean)">
-            <summary>
-            Clean up any resources being used.
-            </summary>
-            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        </member>
-        <member name="M:Ruler.RulerControl.InitializeComponent">
-            <summary>
-            Required method for Designer support - do not modify 
-            the contents of this method with the code editor.
-            </summary>
-        </member>
         <member name="E:Ruler.RulerControl.HoverValueChanged">
             <summary>
             Occurs when the mouse hover value has changed.
@@ -324,6 +210,103 @@
             <summary>
             Occurs when the mouse zoom value has changed.
             </summary>
+        </member>
+        <member name="M:Ruler.RulerControl.PreFilterMessage(System.Windows.Forms.Message@)">
+            <summary>
+            Hook into the windows message system.
+            </summary>
+            <param name="m">windows message</param>
+            <returns>false if the message is not comsumed</returns>
+        </member>
+        <member name="M:Ruler.RulerControl.OnResize(System.EventArgs)">
+            <summary>
+            Overrides the base OnResize event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnPaint(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Overrides the base OnPaint event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnHandleDestroyed(System.EventArgs)">
+            <summary>
+            Overrides the base OnHandleDestroyed event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnControlRemoved(System.Windows.Forms.ControlEventArgs)">
+            <summary>
+            Overrides the base OnControlRemoved event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnEnter(System.EventArgs)">
+            <summary>
+            Overrides the base OnEnter event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnLeave(System.EventArgs)">
+            <summary>
+            Overrides the base OnLeave event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnHoverValueChanged(Ruler.HoverValueChangedEventArgs)">
+            <summary>
+            Raises the HoverValue event
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnOrientationChanged(System.EventArgs)">
+            <summary>
+            Raises the OrientationChanged event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnBorderStyleChanged(System.EventArgs)">
+            <summary>
+            Raises the BorderStyleChanged event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnScaleDirectionChanged(System.EventArgs)">
+            <summary>
+            Raises the ScaleDirectionChanged event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnScaleModeChanged(System.EventArgs)">
+            <summary>
+            Raises the ScaleModeChanged event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnStartValueChanged(System.EventArgs)">
+            <summary>
+            Raises the StartValueChanged event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnMajorIntervalChanged(System.EventArgs)">
+            <summary>
+            Raises the MajorIntervalChanged event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnMouseTrackingChanged(System.EventArgs)">
+            <summary>
+            Raises the MouseTrackingChanged event.
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Ruler.RulerControl.OnZoomFactorChanged(System.EventArgs)">
+            <summary>
+            Raises the ZoomChanged event.
+            </summary>
+            <param name="e"></param>
         </member>
         <member name="P:Ruler.RulerControl.BorderStyle">
             <summary>
@@ -412,7 +395,7 @@
         </member>
         <member name="P:Ruler.RulerControl.MouseLocation">
             <summary>
-            Returns the position of the mouse in pixels. Returns -1 the mouse is out of the tracking area.
+            Gets the position of the mouse in pixels. Returns -1 if the mouse is out of the tracking area.
             </summary>
             <remarks>
             X position for horizonal ruler and Y position for a verticle ruler.
@@ -441,6 +424,23 @@
         <member name="P:Ruler.RulerControl.RightToLeft">
             <summary>
             Hide RightLeft as not to confuse with the scale direction.
+            </summary>
+        </member>
+        <member name="F:Ruler.RulerControl.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Ruler.RulerControl.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Ruler.RulerControl.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
             </summary>
         </member>
     </members>

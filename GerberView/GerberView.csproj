@@ -43,15 +43,15 @@
     </Reference>
     <Reference Include="FileListBox, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Visual Studio 2013\Projects\CSharp Projects\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
+      <HintPath>..\..\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
     </Reference>
     <Reference Include="LibGerberVS">
       <HintPath>..\LibGerberVS\bin\Debug\LibGerberVS.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualC" />
-    <Reference Include="Ruler, Version=2.3.7877.28652, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Ruler, Version=2.3.7913.38202, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Visual Studio 2013\Projects\CSharp Projects\Controls\Ruler\Ruler\bin\Release\Ruler.dll</HintPath>
+      <HintPath>..\..\Controls\Ruler\Ruler\bin\Release\Ruler.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -77,11 +77,11 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GerberStatsFrm.cs">
+    <Compile Include="GerberStatsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GerberStatsFrm.Designer.cs">
-      <DependentUpon>GerberStatsFrm.cs</DependentUpon>
+    <Compile Include="GerberStatsForm.Designer.cs">
+      <DependentUpon>GerberStatsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GerberViewEnums.cs" />
     <Compile Include="LayerEditForm.cs">
@@ -98,11 +98,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SelectionPropertiesFrm.cs">
+    <Compile Include="SelectionPropertiesForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SelectionPropertiesFrm.Designer.cs">
-      <DependentUpon>SelectionPropertiesFrm.cs</DependentUpon>
+    <Compile Include="SelectionPropertiesForm.Designer.cs">
+      <DependentUpon>SelectionPropertiesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
     <EmbeddedResource Include="DrillStatsFrm.resx">
@@ -111,8 +111,8 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GerberStatsFrm.resx">
-      <DependentUpon>GerberStatsFrm.cs</DependentUpon>
+    <EmbeddedResource Include="GerberStatsForm.resx">
+      <DependentUpon>GerberStatsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LayerEditForm.resx">
       <DependentUpon>LayerEditForm.cs</DependentUpon>
@@ -122,8 +122,8 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="SelectionPropertiesFrm.resx">
-      <DependentUpon>SelectionPropertiesFrm.cs</DependentUpon>
+    <EmbeddedResource Include="SelectionPropertiesForm.resx">
+      <DependentUpon>SelectionPropertiesForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

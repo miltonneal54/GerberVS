@@ -6,21 +6,16 @@ using System.Threading.Tasks;
 
 namespace GerberView
 {
-    public enum GerberRenderMode
+    public enum ImageTranslateMode
     {
         /// <summary>
-        /// Render with translation to centre of display area.
+        /// Translate the displayed image to the center of the display area.
         /// </summary>
-        TranslateToCentre = 0,
+        TranslateToCenter,
 
         /// <summary>
-        /// Render with translation to fit display area.
+        /// Translate the displayed image to the origin of the display area.
         /// </summary>
         TranslateToFit,
-
-        /// <summary>
-        /// Scale maximised to fit display area.
-        /// </summary>
-        ScaleToFit
     }
 }

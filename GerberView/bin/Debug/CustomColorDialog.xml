@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CustomColorDialog</name>
+    </assembly>
+    <members>
+        <member name="T:AlphaSlider.AlphaSliderControl">
+            <summary>
+            Alpha level slider control.
+            </summary>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.#ctor">
+            <summary>
+            Creates a new instance of the AlphaSlider control.
+            </summary>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.OnScroll(System.EventArgs)">
+            <summary>
+            Raises the Scroll changed event
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.SetParentHandle(System.IntPtr)">
+            <summary>
+            Handle of the control's parent.
+            </summary>
+            <param name="hWnd">handle of the parent control</param>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.OnResize(System.EventArgs)">
+            <summary>
+            Overrides the base OnResize event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.OnMouseDown(System.Windows.Forms.MouseEventArgs)">
+            <summary>
+            Overrides the OnMouseDown event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.OnMouseMove(System.Windows.Forms.MouseEventArgs)">
+            <summary>
+            Overrides the OnMouseMove event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.OnMouseUp(System.Windows.Forms.MouseEventArgs)">
+            <summary>
+            Overrides the OnMouseUp event.
+            </summary>
+            <param name="e">EventArgs that contains the event data</param>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.OnPaint(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Overrides the base OnPaint event.
+            </summary>
+            <param name="e">EventArgs that contains the event data.</param>
+        </member>
+        <member name="F:AlphaSlider.AlphaSliderControl.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:AlphaSlider.AlphaSliderControl.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="E:AlphaSlider.AlphaSliderControl.Scroll">
+            <summary>
+            Occurs when the slider scoll value has changed.
+            </summary>
+        </member>
+        <member name="P:AlphaSlider.AlphaSliderControl.Minimum">
+            <summary>
+            Gets or sets the slider minimum value.
+            </summary>
+        </member>
+        <member name="P:AlphaSlider.AlphaSliderControl.Maximum">
+            <summary>
+            Gets or sets the slider maximum value.
+            </summary>
+        </member>
+        <member name="P:AlphaSlider.AlphaSliderControl.Value">
+            <summary>
+            Gets or sets the slider current value.
+            </summary>
+        </member>
+        <member name="P:AlphaSlider.AlphaSliderControl.ScaleColor">
+            <summary>
+            Gets or sets the color to adjust alpha level.
+            </summary>
+        </member>
+        <member name="P:AlphaSlider.AlphaSliderControl.BorderStyle">
+            <summary>
+            Gets or sets the ruler border style.
+            </summary>
+        </member>
+        <member name="T:AlphaSlider.AlphaSliderControl.SliderScrollEvent">
+            <summary>
+            Delegate for handling HoverValueChange.
+            </summary>
+            <param name="sender">event sender</param>
+            <param name="e">event arguements</param>
+        </member>
+        <member name="T:CustomCommonDialog.CustomColorDialog">
+            <summary>
+            Custom color dialog with alpha level control.
+            </summary>
+        </member>
+        <member name="M:CustomCommonDialog.CustomColorDialog.#ctor(System.IntPtr)">
+            <summary>
+            Sets up the data structures necessary to display the CustomColorDialog
+            </summary>
+        </member>
+        <member name="M:CustomCommonDialog.CustomColorDialog.Finalize">
+            <summary>
+            The finalizer will release the unmanaged memory, if I should forget to call Dispose().
+            </summary>
+        </member>
+        <member name="M:CustomCommonDialog.CustomColorDialog.Dispose">
+            <summary>
+            Public implementation of Dispose method for the CustomColorDialog object.
+            </summary>
+        </member>
+        <member name="M:CustomCommonDialog.CustomColorDialog.Dispose(System.Boolean)">
+            <summary>
+            Protected implementation of Dispose method for the CustomColorDialog object. 
+            </summary>
+            <param name="disposing">true if disposing</param>
+        </member>
+        <member name="M:CustomCommonDialog.CustomColorDialog.ShowDialog">
+            <summary>
+            Display the ChooseColor dialog and allow user interaction.
+            </summary>
+            <returns>true if the user clicked OK, false if they clicked cancel (or close)</returns>
+        </member>
+        <member name="M:CustomCommonDialog.CustomColorDialog.MyHookProc(System.IntPtr,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            The hook procedure for window messages generated by the ColorDialog
+            </summary>
+            <param name="hWnd">the handle of the window at which this message is targeted</param>
+            <param name="msg">the message identifier</param>
+            <param name="wParam">message w parameter data</param>
+            <param name="lParam">message l parameter data</param>
+            <returns></returns>
+        </member>
+        <member name="P:CustomCommonDialog.CustomColorDialog.Color">
+            <summary>
+            The color as set by the user. 
+            </summary>
+        </member>
+        <member name="P:CustomCommonDialog.CustomColorDialog.CustomColors">
+            <summary>
+            Custom colors shown in the dialog box.
+            </summary>
+        </member>
+        <member name="T:CustomCommonDialog.CCHookProc">
+            <summary>
+            Defines the shape of hook procedures that can be called by the ChooseColorDialog
+            </summary>
+        </member>
+        <member name="T:CustomCommonDialog.ChooseColorFlags">
+            <summary>
+            Values that can be placed in the CHOOSECOLOR structure, we don't use all of them
+            </summary>
+        </member>
+        <member name="T:CustomCommonDialog.WindowMessage">
+            <summary>
+            A small subset of the window messages that can be sent to the ChooseColorDialog
+            These are just the ones that this implementation is interested in
+            </summary>
+        </member>
+        <member name="T:CustomCommonDialog.ChooseColor">
+            <summary>
+            See the documentation for CHOOSECOLOR
+            </summary>
+        </member>
+        <member name="T:CustomCommonDialog.RECT">
+            <summary>
+            The rectangle structure used in Win32 API calls
+            </summary>
+        </member>
+        <member name="T:CustomCommonDialog.POINT">
+            <summary>
+            The point structure used in Win32 API calls
+            </summary>
+        </member>
+        <member name="T:CustomCommonDialog.Win32API">
+            <summary>
+            Contains all of the p/invoke declarations for the Win32 APIs used in this sample
+            </summary>
+        </member>
+    </members>
+</doc>
