@@ -156,11 +156,11 @@ namespace GerberVS
                         if (currentNet.NetState != oldState)
                             ;// WriteStateChange(streamWriter, oldState, currentNet.NetState);
 
-                        // Check for "tool" changes.
+                        // Check for aperture changes.
                         // Also, make sure the aperture number is a valid one, since sometimes the loaded file may refer to invalid apertures.
                         if ((currentNet.Aperture != currentAperture) && (imageCopy.ApertureArray()[currentNet.Aperture] != null))
                         {
-                            streamWriter.WriteLine("G54D{0}*", currentNet.Aperture);
+                            streamWriter.WriteLine("D{0}*", currentNet.Aperture);
                             currentAperture = currentNet.Aperture;
                         }
 

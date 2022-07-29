@@ -93,15 +93,15 @@ namespace GerberVS
         /// <summary>
         /// Adds a new error to the error list;
         /// </summary>
-        /// <param name="level"></param>
-        /// <param name="errorMessage"></param>
-        /// <param name="errorType"></param>
-        /// <param name="fileName"></param>
-        /// <param name="lineNumber"></param>
+        /// <param name="level">level</param>
+        /// <param name="errorMessage">error message</param>
+        /// <param name="errorType">type of error</param>
+        /// <param name="fileName"> file in which the error occurred</param>
+        /// <param name="lineNumber">line number in the file where the error occurred</param>
         /// <remarks>
         /// Only unique errors are added to the list.
         /// </remarks>
-       internal void AddNewError(int level, string errorMessage, GerberErrorType errorType, string fileName = "", int lineNumber = 0)
+        internal void AddNewError(int level, string errorMessage, GerberErrorType errorType, string fileName, int lineNumber)
         {
             //errorList.Add(new GerberError(level, errorMessage, errorType, fileName, lineNumber));
 
@@ -120,6 +120,17 @@ namespace GerberVS
 
             if (!exists)
                 errorList.Add(new GerberError(level, errorMessage, errorType, fileName, lineNumber));
+        }
+
+        /// <summary>
+        /// Adds a new error to the error list;
+        /// </summary>
+        /// <param name="level">level</param>
+        /// <param name="errorMessage">error message</param>
+        /// <param name="errorType">type of error</param>
+        internal void AddNewError(int level, string errorMessage, GerberErrorType errorType)
+        {
+            AddNewError(level, errorMessage, errorType, String.Empty, 0);
         }
 
         internal void AddNewAperture(int level, int number, GerberApertureType type, double[] parameter)

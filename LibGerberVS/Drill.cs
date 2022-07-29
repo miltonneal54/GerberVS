@@ -170,7 +170,7 @@ namespace GerberVS
 
             if (!foundEOF)
             {
-                errorMessage = String.Format(CultureInfo.CurrentCulture, "File {0} is missing Excellon Drill EOF code./n", drillFileName);
+                errorMessage = String.Format(CultureInfo.CurrentCulture, "File {0} is missing Excellon Drill EOF code.", drillFileName);
                 drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError);
             }
 
@@ -198,8 +198,8 @@ namespace GerberVS
                 {
                     case ';':   // Comment.
                         line = lineReader.ReadLineToEnd();
-                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Comment: {0}.\n", line);
-                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                        errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}.", line);
+                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberComment, lineReader.FileName, lineReader.LineNumber);
                         drillStats.Comment++;
                         break;
 
@@ -225,8 +225,8 @@ namespace GerberVS
 
                         else
                         {
-                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string {0} in header.\n", line);
-                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
+                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string '{0}' in header.", line);
+                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                         }
                         break;
 
@@ -241,8 +241,8 @@ namespace GerberVS
 
                         if (line != "FMAT,1")
                         {
-                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Unsupported format: {0}.\n", line);
-                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
+                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Unsupported format: {0}.", line);
+                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                         }
                         break;
 
@@ -294,16 +294,16 @@ namespace GerberVS
                             case DrillGCode.Unknown:
                                 line = lineReader.ReadLineToEnd();
                                 {
-                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string {0} found in.\n", line);
-                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
+                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string {0} found in.", line);
+                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                                 }
                                 break;
 
                             default:
                                 line = lineReader.ReadLineToEnd();
                                 {
-                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Unsupported G code: {0}.\n", line);
-                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Unsupported G code: {0}.", line);
+                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.FileName, lineReader.LineNumber);
                                 }
                                 break;
 
@@ -320,15 +320,15 @@ namespace GerberVS
                             break;
 
                         line = lineReader.ReadLineToEnd();
-                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string {0} found in.\n", line);
-                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
+                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string '{0}' found.", line);
+                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                         break;
 
                     case 'M':   // M code or metric
                         // Peek at the next character and if 'E, then it maybe the "METRIC" header.
                         if (Char.ToUpper(lineReader.Peek()) == 'E')
                         {
-                            if(HeaderIsMetric(drillState, image))
+                            if (HeaderIsMetric(drillState, image))
                                 break;
                         }
 
@@ -344,7 +344,7 @@ namespace GerberVS
                                 if (image.Format.OmitZeros == GerberOmitZero.OmitZerosUnspecified)
                                 {
                                     errorMessage = "Unspecified format, assuming leading zeros.";
-                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.LineNumber, lineReader.FileName);
+                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
                                 }
 
                                 image.Format.OmitZeros = GerberOmitZero.OmitZerosLeading;
@@ -353,10 +353,10 @@ namespace GerberVS
                             case DrillMCode.Metric:
                                 if (drillState.Unit == GerberUnit.Unspecified && drillState.CurrentSection != DrillFileSection.Header)
                                 {
-                                    errorMessage = "M71 code found with no METRIC specification in header.\n";
-                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
-                                    errorMessage = "Assuming all tool sizes are in millimeters.\n";
-                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.LineNumber, lineReader.FileName);
+                                    errorMessage = "M71 code found with no METRIC specification in header.";
+                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
+                                    errorMessage = "Assuming all tool sizes are in millimeters.";
+                                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning);
 
                                     for (int toolNumber = ToolMin; toolNumber < ToolMax; toolNumber++)
                                     {
@@ -391,15 +391,15 @@ namespace GerberVS
                             case DrillMCode.CannedTextX:
                             case DrillMCode.CannedTextY:
                                 line = lineReader.ReadLineToEnd();
-                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Canned text {0} found.\n", line);
-                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Canned text {0} found.", line);
+                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.FileName, lineReader.LineNumber);
                                 break;
 
                             case DrillMCode.LongMessage:
                             case DrillMCode.Message:
                                 line = lineReader.ReadLineToEnd();
-                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Embedded message {0} found.\n", line);
-                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Embedded message {0} found.", line);
+                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.FileName, lineReader.LineNumber);
                                 break;
 
                             case DrillMCode.EndPattern:
@@ -421,26 +421,20 @@ namespace GerberVS
 
                                 drillStats.MUnknown++;
                                 line = lineReader.ReadLineToEnd();
-                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string {0} found.\n", line);
-                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised string '{0}' found.", line);
+                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.FileName, lineReader.LineNumber);
                                 break;
 
                             default:
                                 line = lineReader.ReadLineToEnd();
-                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Unsupported M{0} code found.\n", line);
-                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Unsupported M{0} code found.", line);
+                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.FileName, lineReader.LineNumber);
                                 break;
                         }
                         break;
 
                     case 'R':
-                        if (drillState.CurrentSection == DrillFileSection.Header)
-                        {
-                            drillStats.Unknown++;
-                            drillStats.AddNewError(-1, "R code not allowed in the header.", GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
-                        }
-
-                        else
+                        if (drillState.CurrentSection != DrillFileSection.Header)
                         {
                             double stepX = 0.0, stepY = 0.0;
                             int length = 0;
@@ -469,6 +463,13 @@ namespace GerberVS
                                 currentNet = AddDrillHole(image, drillState, currentNet);
                             }
                         }
+
+                        else
+                        {
+                            drillStats.Unknown++;
+                            drillStats.AddNewError(-1, "R code not allowed in the header.", GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
+                            lineReader.ReadLineToEnd();
+                        }
                         break;
 
                     case 'S':
@@ -487,10 +488,6 @@ namespace GerberVS
 
                     case 'X':
                     case 'Y':
-                        if(lineReader.LineNumber == 26)
-                        {
-                            ;
-                        }
                         // Hole coordinate found. Do some parsing.
                         ParseCoordinate(nextCharacter, image, drillState);
 
@@ -499,6 +496,7 @@ namespace GerberVS
                         break;
 
                     case '%':
+                        // End of header.
                         drillState.CurrentSection = DrillFileSection.Data;
                         break;
 
@@ -517,14 +515,14 @@ namespace GerberVS
                             //errorMessage = String.Format(CultureInfo.CurrentCulture, "Undefined code {0} found in header.\n", nextCharacter);
                             //drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
                             line = lineReader.CurrentLine;
-                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised line {0} found in header.\n", '"'+ line + '"');
-                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Unrecognised line {0} found in header.", '"' + line + '"');
+                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.FileName, lineReader.LineNumber);
                         }
 
                         else
                         {
-                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Ignoring undefined character {0}.\n", nextCharacter);
-                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
+                            errorMessage = String.Format(CultureInfo.CurrentCulture, "Ignoring undefined character {0}.", nextCharacter);
+                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                         }
 
                         break;
@@ -661,16 +659,18 @@ namespace GerberVS
             return mCode;
         }
 
+        // Parses T code.
+        // Could be a tool definition or a tool selection.
         static int ParseTCode(DrillState drillState, GerberImage image)
         {
-            Aperture aperture;
-            int drillNumber;
+            Aperture aperture = null;
+            int drillNumber = -1;
             double drillSize = 0.0;
             int length = 0;
-            char nextCharacter;
             bool done = false;
             string line = String.Empty;
             string errorMessage = String.Empty;
+            char nextCharacter;
 
             nextCharacter = lineReader.Read();
             if (!Char.IsDigit(nextCharacter))
@@ -682,7 +682,7 @@ namespace GerberVS
                     if (line == "TCST")
                     {
                         errorMessage = "Tool change stop switch found.";
-                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.LineNumber, lineReader.FileName);
+                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberNote, lineReader.FileName, lineReader.LineNumber);
                     }
 
                     return -1;
@@ -697,16 +697,27 @@ namespace GerberVS
 
             if (drillNumber < ToolMin && drillNumber >= ToolMax)
             {
-                errorMessage = String.Format(CultureInfo.CurrentCulture, "Drill number out of bounds:{0}.\n", drillNumber);
-                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
+                errorMessage = String.Format(CultureInfo.CurrentCulture, "Drill number out of bounds:{0}.", drillNumber);
+                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                 return -1;
             }
 
-            drillState.CurrentTool = drillNumber;
-            aperture = image.ApertureArray()[drillNumber];
+            // Tool selection.
+            if (lineReader.Position == 0)
+            {
+                drillState.CurrentTool = drillNumber;
+                // Check if the tool has been defined.
+                if (image.ApertureArray()[drillNumber] == null)
+                {
+                    // Tool is undefined.
+                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Tool number {0} undefined.", drillNumber);
+                    drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberCritical, lineReader.FileName, lineReader.LineNumber);
+                    return -1;
+                }
+            }
 
-            // Tool definition following tool number.
-            if (lineReader.Position > 0)
+            // Tool definition.
+            else
             {
                 while (!done)
                 {
@@ -724,7 +735,7 @@ namespace GerberVS
                             if (drillSize <= 0 || drillSize >= 10000)
                             {
                                 errorMessage = "Unreasonable drill size found.";
-                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.LineNumber, lineReader.FileName);
+                                drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                             }
 
                             else
@@ -737,7 +748,7 @@ namespace GerberVS
                                         aperture.ParameterCount != 1 ||
                                         aperture.Unit != GerberUnit.Inch)
                                     {
-                                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Found redefinition of drill {0}.\n", drillNumber);
+                                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Found redefinition of drill {0}.", drillNumber);
                                         drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError);
                                     }
                                 }
@@ -810,8 +821,8 @@ namespace GerberVS
 
                     else
                     {
-                        errorMessage = "Invalid zero suppression found after INCH.\n";
-                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.LineNumber, lineReader.FileName);
+                        errorMessage = "Invalid zero suppression found after INCH.";
+                        drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
                     }
                 }
 
@@ -832,7 +843,6 @@ namespace GerberVS
 
         static bool HeaderIsMetric(DrillState drillState, GerberImage image)
         {
-            bool done = false;
             string line;
             string[] command;
             string errorMessage;
@@ -844,14 +854,13 @@ namespace GerberVS
              * METRIC[,{TZ|LZ}][,{000.000|000.00|0000.00}]
              */
 
-
             if (drillState.CurrentSection != DrillFileSection.Header)
                 return false;
 
             lineReader.Position--;
             line = lineReader.ReadLineToEnd();
             command = line.Split(',');
-            if (command[0] == "METRIC")
+            if (command[0].ToUpper() == "METRIC")
             {
                 drillState.Unit = GerberUnit.Millimeter;
                 if (command.Length > 1)
@@ -860,39 +869,17 @@ namespace GerberVS
                     {
                         if (drillState.AutoDetect)
                             image.Format.OmitZeros = GerberOmitZero.OmitZerosLeading;
-
-                        done = false;
                     }
 
                     else if (command[1] == "LZ")
                     {
                         if (drillState.AutoDetect)
                             image.Format.OmitZeros = GerberOmitZero.OmitZerosTrailing;
-
-                        done = false;
                     }
 
-                    else
+                    // Number format specified.
+                    if (command.Length == 3)
                     {
-                        if (drillState.AutoDetect)
-                        {
-                            image.Format.OmitZeros = GerberOmitZero.OmitZerosLeading;
-                            drillState.HeaderNumberFormat = drillState.DataNumberFormat = DrillNumberFormat.Format_000_000;
-                            drillState.DecimalPlaces = 3;
-                        }
-
-                        done = true;
-                    }
-
-                    // Number format may or may not be specified.
-                    if (!done && command.Length == 3)
-                    {
-                        if (drillState.AutoDetect)
-                        {
-                            drillState.HeaderNumberFormat = drillState.DataNumberFormat = DrillNumberFormat.Format_000_000;
-                            drillState.DecimalPlaces = 3;
-                        }
-
                         if (command[2] == "0000.00")
                         {
                             drillState.DataNumberFormat = DrillNumberFormat.Format_0000_00;
@@ -913,8 +900,18 @@ namespace GerberVS
 
                         else
                         {
-                            errorMessage = "Invalid number format found after TZ/LZ.\n";
-                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.LineNumber, lineReader.FileName);
+                            errorMessage = "Invalid number format found after TZ/LZ.";
+                            drillStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
+                        }
+                    }
+
+                    else
+                    {
+                        // Number format not specified.
+                        if (drillState.AutoDetect)
+                        {
+                            drillState.HeaderNumberFormat = drillState.DataNumberFormat = DrillNumberFormat.Format_000_000;
+                            drillState.DecimalPlaces = 3;
                         }
                     }
                 }
@@ -929,9 +926,11 @@ namespace GerberVS
                         drillState.DecimalPlaces = 3;
                     }
                 }
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         static bool HeaderIsIncremental(DrillState drillState, GerberImage image)
@@ -1003,7 +1002,7 @@ namespace GerberVS
             return newDrillNet;
         }
 
-        static void ParseCoordinate(char firstCharacter, GerberImage image, DrillState drillState)
+        static void ParseCoordinate1(char firstCharacter, GerberImage image, DrillState drillState)
         {
             //int currentLine = lineReader.LineNumber;
             if (drillState.CoordinateMode == DrillCoordinateMode.Absolute)
@@ -1012,8 +1011,9 @@ namespace GerberVS
                 {
                     // X coord.
                     drillState.CurrentX = GetDoubleValue(drillState.DataNumberFormat, image.Format.OmitZeros, drillState.DecimalPlaces);
+                    lineReader.SkipWhiteSpaces();
                     // Get the Y coord only if it's in the same line.
-                    if (lineReader.Read() == 'Y' /*&& lineReader.LineNumber == currentLine*/)
+                    if (lineReader.Read() == 'Y')
                         drillState.CurrentY = GetDoubleValue(drillState.DataNumberFormat, image.Format.OmitZeros, drillState.DecimalPlaces);
 
                     else
@@ -1032,7 +1032,8 @@ namespace GerberVS
                 if (firstCharacter == 'X')
                 {
                     drillState.CurrentX += GetDoubleValue(drillState.DataNumberFormat, image.Format.OmitZeros, drillState.DecimalPlaces);
-                    if (lineReader.Read() == 'Y' /*&& lineReader.LineNumber == currentLine*/)
+                    lineReader.SkipWhiteSpaces();
+                    if (lineReader.Read() == 'Y')
                         drillState.CurrentY += GetDoubleValue(drillState.DataNumberFormat, image.Format.OmitZeros, drillState.DecimalPlaces);
 
                     else
@@ -1041,6 +1042,70 @@ namespace GerberVS
 
                 else
                     drillState.CurrentY += GetDoubleValue(drillState.DataNumberFormat, image.Format.OmitZeros, drillState.DecimalPlaces);
+            }
+        }
+
+        static void ParseCoordinate(char firstCharacter, GerberImage image, DrillState drillState)
+        {
+            double x = 0;
+            bool foundX = false;
+            double y = 0;
+            bool foundY = false;
+
+            while (true)
+            {
+                if (firstCharacter == 'X')
+                {
+                    x = GetDoubleValue(drillState.DataNumberFormat, image.Format.OmitZeros, drillState.DecimalPlaces);
+                    foundX = true;
+                }
+
+                else if (firstCharacter == 'Y')
+                {
+                    y = GetDoubleValue(drillState.DataNumberFormat, image.Format.OmitZeros, drillState.DecimalPlaces);
+                    foundY = true;
+                }
+
+                else
+                {
+                    lineReader.Position--;
+                    break;
+                }
+
+                lineReader.SkipWhiteSpaces();
+                if (lineReader.Position == 0)
+                {
+                    // At the end of the current line.
+                    break;
+                }
+
+                firstCharacter = lineReader.Read();
+            }
+
+            if (drillState.CoordinateMode == DrillCoordinateMode.Absolute)
+            {
+                if (foundX)
+                {
+                    drillState.CurrentX = x;
+                }
+
+                if (foundY)
+                {
+                    drillState.CurrentY = y;
+                }
+            }
+
+            else if (drillState.CoordinateMode == DrillCoordinateMode.Incremental)
+            {
+                if (foundX)
+                {
+                    drillState.CurrentX += x;
+                }
+
+                if (foundY)
+                {
+                    drillState.CurrentY += y;
+                }
             }
         }
 

@@ -344,6 +344,12 @@
             Creates a new RenderInformation type class.
             </summary>
         </member>
+        <member name="M:GerberVS.GerberRenderInformation.#ctor(GerberVS.GerberRenderInformation)">
+            <summary>
+            Creates a new RenderInformation type class from supplied data.
+            </summary>
+            <param name="info">date to fill the render information</param>
+        </member>
         <member name="T:GerberVS.GerberFileInformation">
             <summary>
             Holds information related to an individual layer that is part of a project.
@@ -498,7 +504,7 @@
             Drill information for each tool in the drill file.
             </summary>
         </member>
-        <member name="M:GerberVS.DrillFileStats.AddNewError(System.Int32,System.String,GerberVS.GerberErrorType,System.Int32,System.String)">
+        <member name="M:GerberVS.DrillFileStats.AddNewError(System.Int32,System.String,GerberVS.GerberErrorType,System.String,System.Int32)">
             <summary>
             Adds a new error to the error list;
             </summary>
@@ -513,11 +519,11 @@
         </member>
         <member name="M:GerberVS.DrillFileStats.AddNewError(System.Int32,System.String,GerberVS.GerberErrorType)">
             <summary>
-            Adds a new error to the list.
+            Adds a new error to the error list;
             </summary>
-            <param name="level"></param>
-            <param name="errorMessage"></param>
-            <param name="errorType"></param>
+            <param name="level">level</param>
+            <param name="errorMessage">error message</param>
+            <param name="errorType">type of error</param>
         </member>
         <member name="M:GerberVS.DrillFileStats.IncrementDrillCounter(System.Int32)">
             <summary>
@@ -1161,7 +1167,7 @@
         </member>
         <member name="T:GerberVS.GerberLineReader">
             <summary>
-            Manage reading of the Gerber file
+            Manage the reading of the Gerber file.
             </summary>
         </member>
         <member name="M:GerberVS.GerberLineReader.#ctor(System.IO.StreamReader)">
@@ -1184,7 +1190,7 @@
         </member>
         <member name="M:GerberVS.GerberLineReader.ReadLineToEnd">
             <summary>
-            Reads from the current line position to end of line and points to the start of the next line.
+            Reads from the current line position to end of line removing new line characters.
             </summary>
         </member>
         <member name="M:GerberVS.GerberLineReader.ReadLine(System.Int32)">
@@ -1552,14 +1558,22 @@
             <summary>
             Adds a new error to the error list;
             </summary>
-            <param name="level"></param>
-            <param name="errorMessage"></param>
-            <param name="errorType"></param>
-            <param name="fileName"></param>
-            <param name="lineNumber"></param>
+            <param name="level">level</param>
+            <param name="errorMessage">error message</param>
+            <param name="errorType">type of error</param>
+            <param name="fileName"> file in which the error occurred</param>
+            <param name="lineNumber">line number in the file where the error occurred</param>
             <remarks>
             Only unique errors are added to the list.
             </remarks>
+        </member>
+        <member name="M:GerberVS.GerberFileStats.AddNewError(System.Int32,System.String,GerberVS.GerberErrorType)">
+            <summary>
+            Adds a new error to the error list;
+            </summary>
+            <param name="level">level</param>
+            <param name="errorMessage">error message</param>
+            <param name="errorType">type of error</param>
         </member>
         <member name="M:GerberVS.GerberFileStats.AddNewDList(System.Int32)">
             <summary>
@@ -1764,6 +1778,11 @@
             An irregularity was encountered, but needs no intervention.
             </summary>
         </member>
+        <member name="F:GerberVS.GerberErrorType.GerberComment">
+            <summary>
+            Comment line found.
+            </summary>
+        </member>
         <member name="T:GerberVS.GerberApertureType">
             <summary>
             Enumeration of aperture types.
@@ -1782,6 +1801,46 @@
         <member name="F:GerberVS.GerberApertureType.Rectangle">
             <summary>
             Rectangular aperture.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberApertureType.Oval">
+            <summary>
+            Ovular aperture.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberApertureType.Polygon">
+            <summary>
+            Polygon aperture.
+            </summary>
+        </member>
+        <member name="T:GerberVS.GerberApertureState">
+            <summary>
+            The current state of the aperture drawing tool.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberApertureState.Off">
+            <summary>
+            Drawing tool is off and nothing will be drawn.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberApertureState.On">
+            <summary>
+            Drawing tool is on and something will be drawn.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberApertureState.Flash">
+            <summary>
+            Flash tool is on and will draw a single aperture.
+            </summary>
+        </member>
+        <member name="F:GerberVS.GerberApertureState.Deleted">
+            <summary>
+            Net is marked as deleted, skip and draw nothing.
+            </summary>
+        </member>
+        <member name="T:GerberVS.GerberUnit">
+            <summary>
+            The current unit used, inch or millimeter.
             </summary>
         </member>
         <member name="F:GerberVS.GerberUnit.Inch">
@@ -1897,6 +1956,11 @@
         <member name="T:GerberVS.OutlineParameters">
             <summary>
             Enumerates the outline aperture parameter indexes.
+            </summary>
+        </member>
+        <member name="T:GerberVS.GerberVerifyErrors">
+            <summary>
+            Error flags when verifing a gerber image is complete.
             </summary>
         </member>
         <member name="F:GerberVS.GerberVerifyErrors.None">

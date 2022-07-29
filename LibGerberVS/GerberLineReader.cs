@@ -39,7 +39,7 @@ using System.IO;
 namespace GerberVS
 {
     /// <summary>
-    /// Manage reading of the Gerber file
+    /// Manage the reading of the Gerber file.
     /// </summary>
     internal class GerberLineReader
     {
@@ -92,29 +92,37 @@ namespace GerberVS
         {
             if (Position >= LineLength)      // At the end of the line, read the next one.
             {
-                CurrentLine = streamReader.ReadLine();
-                if (CurrentLine == null)    // EOF
-                    return '\0';
+                do
+                {
+                    CurrentLine = streamReader.ReadLine();
+                    if (CurrentLine == null)    // Error reading line or end of stream.
+                        return '\0';
 
-                CurrentLine += '\n';
-                LineNumber++;
-                Position = 0;
-                LineLength = CurrentLine.Length;
+                    LineNumber++;
+                    Position = 0;
+                    LineLength = CurrentLine.Length;
+                }
+                while (CurrentLine == String.Empty);  // Skip over empty lines.
             }
 
             return CurrentLine[Position++];
         }
 
         /// <summary>
-        /// Reads from the current line position to end of line and points to the start of the next line.
+        /// Reads from the current line position to end of line removing new line characters.
         /// </summary>
         public string ReadLineToEnd()
         {
             StringBuilder line = new StringBuilder();
-            int i = Position;
 
-            for (; i < LineLength; i++)
-                line.Append(Read());
+            for (int i = Position; i < LineLength; i++)
+            {
+                char next = Read();
+                if (next != '\n' && next != '\r')
+                {
+                    line.Append(next);
+                }
+            }
 
             return line.ToString();
         }
@@ -126,12 +134,14 @@ namespace GerberVS
         /// <returns>the resultant string</returns>
         public string ReadLine(int count)
         {
-            StringBuilder line = new StringBuilder();
+           StringBuilder line = new StringBuilder();
 
             if (count < (LineLength - Position))
             {
                 for (int i = 0; i < count; i++)
+                {
                     line.Append(Read());
+                }
             }
 
             return line.ToString();
@@ -172,8 +182,10 @@ namespace GerberVS
             char nextCharacter = Read();
             while (Char.IsDigit(nextCharacter) || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
             {
-                if(Char.IsDigit(nextCharacter))
-                    length++;   // Exclude any prefixed sign.
+                if (Char.IsDigit(nextCharacter))    // Exclude prefix signs in length.
+                { 
+                    length++;
+                }
 
                 numberString.Append(nextCharacter);
                 isFirst = false;
@@ -183,7 +195,9 @@ namespace GerberVS
             Position--;
             result = int.TryParse(numberString.ToString(), out rtnValue);
             if (!result)
+            {
                 rtnValue = int.MaxValue;
+            }
 
             return rtnValue;
         }
@@ -210,7 +224,9 @@ namespace GerberVS
             Position--;
             result = double.TryParse(doubleString.ToString(), out rtnValue);
             if (!result)
+            {
                 rtnValue = double.MaxValue;
+            }
 
             return rtnValue;
         }
@@ -230,8 +246,10 @@ namespace GerberVS
             char nextCharacter = Read();
             while ((Char.IsDigit(nextCharacter) || nextCharacter == '.') || (nextCharacter == '-' && isFirst) || (nextCharacter == '+' && isFirst))
             {
-                if (nextCharacter != '-' && nextCharacter != '+')    // Don't count + or - prefix.
+                if (Char.IsDigit(nextCharacter) || nextCharacter == '.')   // Exclude prefix signs in length.
+                {
                     length++;
+                }
 
                 doubleString.Append(nextCharacter);
                 isFirst = false;
@@ -253,7 +271,9 @@ namespace GerberVS
         {
             char nextCharacter = Read();
             while (Char.IsWhiteSpace(nextCharacter))
+            {
                 nextCharacter = Read();
+            }
 
             Position--;
         }

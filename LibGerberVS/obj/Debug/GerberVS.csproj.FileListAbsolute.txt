@@ -29,3 +29,48 @@ C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGer
 C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
 C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\obj\Debug\LibGerberVS.dll
 C:\Users\Samsung\Documents\Visual Studio 2017\Projects\C Sharp\GerberView\LibGerberVS\obj\Debug\LibGerberVS.pdb
+F:\GerberView_241021\GerberView\LibGerberVS\bin\Debug\LibGerberVS.xml
+F:\GerberView_241021\GerberView\LibGerberVS\bin\Debug\LibGerberVS.dll
+F:\GerberView_241021\GerberView\LibGerberVS\bin\Debug\LibGerberVS.pdb
+F:\GerberView_241021\GerberView\LibGerberVS\obj\Debug\GerberVS.csprojAssemblyReference.cache
+F:\GerberView_241021\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
+F:\GerberView_241021\GerberView\LibGerberVS\obj\Debug\LibGerberVS.dll
+F:\GerberView_241021\GerberView\LibGerberVS\obj\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\CustomColorDialog.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\CustomColorDialog.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\FileListBox.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\FileListBox.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\Ruler.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Debug\Ruler.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CopyComplete
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\LibGerberVS.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\CustomColorDialog.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\FileListBox.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\Ruler.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\CustomColorDialog.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\CustomColorDialog.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\FileListBox.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\FileListBox.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\Ruler.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Debug\Ruler.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CopyComplete
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Debug\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Debug\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Debug\GerberVS.csprojAssemblyReference.cache
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\LibGerberVS.xml
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\LibGerberVS.dll
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\LibGerberVS.pdb
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\CustomColorDialog.pdb
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\CustomColorDialog.xml
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\FileListBox.pdb
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\FileListBox.xml
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\Ruler.pdb
+F:\GerberView_040322\GerberView\LibGerberVS\bin\Debug\Ruler.xml
+F:\GerberView_040322\GerberView\LibGerberVS\obj\Debug\GerberVS.csprojAssemblyReference.cache
+F:\GerberView_040322\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CoreCompileInputs.cache
+F:\GerberView_040322\GerberView\LibGerberVS\obj\Debug\GerberVS.csproj.CopyComplete
+F:\GerberView_040322\GerberView\LibGerberVS\obj\Debug\LibGerberVS.dll
+F:\GerberView_040322\GerberView\LibGerberVS\obj\Debug\LibGerberVS.pdb

@@ -114,7 +114,7 @@ namespace GerberVS
         public int TotalCount { get; set; }  // Used to total up the drill count across all levels/sizes.
         public string Detect { get; set; }
 
-        public DrillFileStats()
+        internal DrillFileStats()
         {
             errorList = new Collection<GerberError>();
             drillInfoList = new Collection<DrillInfo>();
@@ -136,7 +136,6 @@ namespace GerberVS
             get { return drillInfoList; }
         }
 
-
         /// <summary>
         /// Adds a new error to the error list;
         /// </summary>
@@ -148,7 +147,7 @@ namespace GerberVS
         /// <remarks>
         /// Only unique errors are added to the list.
         /// </remarks>
-        public void AddNewError(int level, string errorMessage, GerberErrorType errorType, int lineNumber, string fileName)
+        internal void AddNewError(int level, string errorMessage, GerberErrorType errorType, string fileName, int lineNumber)
         {
             bool exists = false;
 
@@ -167,21 +166,21 @@ namespace GerberVS
         }
 
         /// <summary>
-        /// Adds a new error to the list.
+        /// Adds a new error to the error list;
         /// </summary>
-        /// <param name="level"></param>
-        /// <param name="errorMessage"></param>
-        /// <param name="errorType"></param>
-        public void AddNewError(int level, string errorMessage, GerberErrorType errorType)
+        /// <param name="level">level</param>
+        /// <param name="errorMessage">error message</param>
+        /// <param name="errorType">type of error</param>
+        internal void AddNewError(int level, string errorMessage, GerberErrorType errorType)
         {
-            AddNewError(level, errorMessage, errorType, 0, String.Empty);
+            AddNewError(level, errorMessage, errorType, String.Empty, 0);
         }
 
         /// <summary>
         /// Update the count of an existing drill.
         /// </summary>
         /// <param name="drillNumber"></param>
-        public void IncrementDrillCounter(int drillNumber)
+        internal void IncrementDrillCounter(int drillNumber)
         {
             // First check to see if this drill is already in the list.
             foreach (DrillInfo drillInfo in drillInfoList)
@@ -200,7 +199,7 @@ namespace GerberVS
         /// <param name="drillNumber"></param>
         /// <param name="drillSize"></param>
         /// <param name="drillUnit"></param>
-        public void ModifyDrillList(int drillNumber, double drillSize, string drillUnit)
+        internal void ModifyDrillList(int drillNumber, double drillSize, string drillUnit)
         {
 
             // Look for this drill number in drill list.
@@ -223,7 +222,7 @@ namespace GerberVS
         /// <param name="drillNumber"></param>
         /// <param name="drillSize"></param>
         /// <param name="drillUnit"></param>
-        public void AddToDrillList(int drillNumber, double drillSize, string drillUnit)
+        internal void AddToDrillList(int drillNumber, double drillSize, string drillUnit)
         {
             bool exists = false;
             // First check to see if this drill is already in the list.

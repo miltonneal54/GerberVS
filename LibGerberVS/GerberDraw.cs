@@ -160,6 +160,8 @@ namespace GerberVS
                     oldNetState = currentNet.NetState;
                 }
 
+
+
                 for (int rx = 0; rx < repeatX; rx++)
                 {
                     for (int ry = 0; ry < repeatY; ry++)
@@ -188,142 +190,146 @@ namespace GerberVS
                                 continue;
                         }
 
-                        switch (currentNet.ApertureState)
+                        if (apertures[currentNet.Aperture] != null)
                         {
-                            case GerberApertureState.On:
-                                switch (currentNet.Interpolation)
-                                {
-                                    case GerberInterpolation.Linear:
-                                    //case GerberInterpolation.DrillSlot:
-                                        pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
-                                        switch (apertures[currentNet.Aperture].ApertureType)
-                                        {
-                                            case GerberApertureType.Circle:
-                                                pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
-                                                startPoint = new PointF(startX, startY);
-                                                endPoint = new PointF(stopX, stopY);
-                                                graphics.DrawLine(pen, startPoint, endPoint);
-                                                break;
-
-                                            case GerberApertureType.Rectangle:
-                                                dx = (float)(apertures[currentNet.Aperture].Parameters()[0] / 2);
-                                                dy = (float)(apertures[currentNet.Aperture].Parameters()[1] / 2);
-                                                if (startX > stopX)
-                                                    dx = -dx;
-
-                                                if (startY > stopY)
-                                                    dy = -dy;
-
-                                                using (GraphicsPath path = new GraphicsPath())
-                                                {
-                                                    path.AddLine(startX - dx, startY - dy, startX - dx, startY + dy);
-                                                    path.AddLine(startX - dx, startY + dy, stopX - dx, stopY + dy);
-                                                    path.AddLine(stopX - dx, stopY + dy, stopX + dx, stopY + dy);
-                                                    path.AddLine(stopX + dx, stopY + dy, stopX + dx, stopY - dy);
-                                                    path.AddLine(stopX + dx, stopY - dy, startX + dx, startY - dy);
-                                                    graphics.FillPath(brush, path);
-                                                }
-                                                break;
-
-                                            // For now, just render ovals and polygons like a circle.
-                                            case GerberApertureType.Oval:
-                                            case GerberApertureType.Polygon:
-                                                pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
-                                                startPoint = new PointF(startX, startY);
-                                                endPoint = new PointF(stopX, stopY);
-                                                graphics.DrawLine(pen, startPoint, endPoint);
-                                                break;
-
-                                            // Macros can only be flashed, so ignore any that might be here.
-                                            default:
-                                                break;
-                                        }
-                                        break;
-
-                                    case GerberInterpolation.ClockwiseCircular:
-                                    case GerberInterpolation.CounterclockwiseCircular:
-                                        float centreX = (float)currentNet.CircleSegment.CenterX;
-                                        float centreY = (float)currentNet.CircleSegment.CenterY;
-                                        float width = (float)currentNet.CircleSegment.Width;
-                                        float height = (float)currentNet.CircleSegment.Height;
-                                        float startAngle = (float)currentNet.CircleSegment.StartAngle;
-                                        float sweepAngle = (float)currentNet.CircleSegment.SweepAngle;
-                                        if (apertures[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
-                                            pen.SetLineCap(LineCap.Square, LineCap.Square, DashCap.Flat);
-
-                                        else
-                                            pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
-
-                                        RectangleF arcRectangle = new RectangleF(centreX - (width / 2), centreY - (height / 2), width, height);
-                                        pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
-                                        //pen.Alignment = PenAlignment.Inset;
-                                        if (arcRectangle != RectangleF.Empty)
-                                            graphics.DrawArc(pen, arcRectangle, startAngle, sweepAngle);
-
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                                break;
-
-                            case GerberApertureState.Flash:
-                                p0 = (float)apertures[currentNet.Aperture].Parameters()[0];
-                                p1 = (float)apertures[currentNet.Aperture].Parameters()[1];
-                                p2 = (float)apertures[currentNet.Aperture].Parameters()[2];
-                                p3 = (float)apertures[currentNet.Aperture].Parameters()[3];
-                                p4 = (float)apertures[currentNet.Aperture].Parameters()[4];
-                                RectangleF apertureRectangle;
-
-                                GraphicsState state = graphics.Save();
-                                graphics.TranslateTransform(stopX, stopY);
-                                using (GraphicsPath path = new GraphicsPath())
-                                {
-                                    switch (apertures[currentNet.Aperture].ApertureType)
+                            switch (currentNet.ApertureState)
+                            {
+                                case GerberApertureState.On:
+                                    switch (currentNet.Interpolation)
                                     {
-                                        case GerberApertureType.Circle:
-                                            apertureRectangle = new RectangleF(-(p0 / 2), -(p0 / 2), p0, p0);
-                                            path.AddEllipse(apertureRectangle);
-                                            DrawAperatureHole(path, p1, p2);
+                                        case GerberInterpolation.Linear:
+                                            //case GerberInterpolation.DrillSlot:
+                                            pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
+                                            switch (apertures[currentNet.Aperture].ApertureType)
+                                            {
+                                                case GerberApertureType.Circle:
+                                                    pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
+                                                    startPoint = new PointF(startX, startY);
+                                                    endPoint = new PointF(stopX, stopY);
+                                                    graphics.DrawLine(pen, startPoint, endPoint);
+                                                    break;
+
+                                                case GerberApertureType.Rectangle:
+                                                    dx = (float)(apertures[currentNet.Aperture].Parameters()[0] / 2);
+                                                    dy = (float)(apertures[currentNet.Aperture].Parameters()[1] / 2);
+                                                    if (startX > stopX)
+                                                        dx = -dx;
+
+                                                    if (startY > stopY)
+                                                        dy = -dy;
+
+                                                    using (GraphicsPath path = new GraphicsPath())
+                                                    {
+                                                        path.AddLine(startX - dx, startY - dy, startX - dx, startY + dy);
+                                                        path.AddLine(startX - dx, startY + dy, stopX - dx, stopY + dy);
+                                                        path.AddLine(stopX - dx, stopY + dy, stopX + dx, stopY + dy);
+                                                        path.AddLine(stopX + dx, stopY + dy, stopX + dx, stopY - dy);
+                                                        path.AddLine(stopX + dx, stopY - dy, startX + dx, startY - dy);
+                                                        graphics.FillPath(brush, path);
+                                                    }
+                                                    break;
+
+                                                // For now, just render ovals and polygons like a circle.
+                                                case GerberApertureType.Oval:
+                                                case GerberApertureType.Polygon:
+                                                    pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
+                                                    startPoint = new PointF(startX, startY);
+                                                    endPoint = new PointF(stopX, stopY);
+                                                    graphics.DrawLine(pen, startPoint, endPoint);
+                                                    break;
+
+                                                // Macros can only be flashed, so ignore any that might be here.
+                                                default:
+                                                    break;
+                                            }
                                             break;
 
-                                        case GerberApertureType.Rectangle:
-                                            apertureRectangle = new RectangleF(-(p0 / 2), -(p1 / 2), p0, p1);
-                                            path.AddRectangle(apertureRectangle);
-                                            DrawAperatureHole(path, p2, p3);
-                                            break;
+                                        case GerberInterpolation.ClockwiseCircular:
+                                        case GerberInterpolation.CounterclockwiseCircular:
+                                            float centreX = (float)currentNet.CircleSegment.CenterX;
+                                            float centreY = (float)currentNet.CircleSegment.CenterY;
+                                            float width = (float)currentNet.CircleSegment.Width;
+                                            float height = (float)currentNet.CircleSegment.Height;
+                                            float startAngle = (float)currentNet.CircleSegment.StartAngle;
+                                            float sweepAngle = (float)currentNet.CircleSegment.SweepAngle;
+                                            if (apertures[currentNet.Aperture].ApertureType == GerberApertureType.Rectangle)
+                                                pen.SetLineCap(LineCap.Square, LineCap.Square, DashCap.Flat);
 
-                                        case GerberApertureType.Oval:
-                                            apertureRectangle = new RectangleF(-(p0 / 2), -(p1 / 2), p0, p1);
-                                            CreateOblongPath(path, p0, p1);
-                                            DrawAperatureHole(path, p2, p3);
-                                            break;
+                                            else
+                                                pen.SetLineCap(LineCap.Round, LineCap.Round, DashCap.Round);
 
-                                        case GerberApertureType.Polygon:
-                                            CreatePolygonPath(path, p0, p1, p2);
-                                            DrawAperatureHole(path, p3, p4);
-                                            break;
+                                            RectangleF arcRectangle = new RectangleF(centreX - (width / 2), centreY - (height / 2), width, height);
+                                            pen.Width = (float)apertures[currentNet.Aperture].Parameters()[0];
+                                            //pen.Alignment = PenAlignment.Inset;
+                                            if (arcRectangle != RectangleF.Empty)
+                                                graphics.DrawArc(pen, arcRectangle, startAngle, sweepAngle);
 
-                                        case GerberApertureType.Macro:
-                                            simplifiedMacroList = apertures[currentNet.Aperture].SimplifiedMacroList;
-                                            DrawApertureMacro(graphics, simplifiedMacroList, brush.Color, backGroundColor);
                                             break;
 
                                         default:
                                             break;
                                     }
+                                    break;
 
-                                    graphics.FillPath(brush, path); // Fill the path.
-                                }
 
-                                graphics.Restore(state);
-                                break;
+                                case GerberApertureState.Flash:
+                                    p0 = (float)apertures[currentNet.Aperture].Parameters()[0];
+                                    p1 = (float)apertures[currentNet.Aperture].Parameters()[1];
+                                    p2 = (float)apertures[currentNet.Aperture].Parameters()[2];
+                                    p3 = (float)apertures[currentNet.Aperture].Parameters()[3];
+                                    p4 = (float)apertures[currentNet.Aperture].Parameters()[4];
+                                    RectangleF apertureRectangle;
 
-                            case GerberApertureState.Deleted:
-                                continue;
+                                    GraphicsState state = graphics.Save();
+                                    graphics.TranslateTransform(stopX, stopY);
+                                    using (GraphicsPath path = new GraphicsPath())
+                                    {
+                                        switch (apertures[currentNet.Aperture].ApertureType)
+                                        {
+                                            case GerberApertureType.Circle:
+                                                apertureRectangle = new RectangleF(-(p0 / 2), -(p0 / 2), p0, p0);
+                                                path.AddEllipse(apertureRectangle);
+                                                DrawAperatureHole(path, p1, p2);
+                                                break;
 
-                            default:
-                                break;
+                                            case GerberApertureType.Rectangle:
+                                                apertureRectangle = new RectangleF(-(p0 / 2), -(p1 / 2), p0, p1);
+                                                path.AddRectangle(apertureRectangle);
+                                                DrawAperatureHole(path, p2, p3);
+                                                break;
+
+                                            case GerberApertureType.Oval:
+                                                apertureRectangle = new RectangleF(-(p0 / 2), -(p1 / 2), p0, p1);
+                                                CreateOblongPath(path, p0, p1);
+                                                DrawAperatureHole(path, p2, p3);
+                                                break;
+
+                                            case GerberApertureType.Polygon:
+                                                CreatePolygonPath(path, p0, p1, p2);
+                                                DrawAperatureHole(path, p3, p4);
+                                                break;
+
+                                            case GerberApertureType.Macro:
+                                                simplifiedMacroList = apertures[currentNet.Aperture].SimplifiedMacroList;
+                                                DrawApertureMacro(graphics, simplifiedMacroList, brush.Color, backGroundColor);
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+
+                                        graphics.FillPath(brush, path); // Fill the path.
+                                    }
+
+                                    graphics.Restore(state);
+                                    break;
+
+                                case GerberApertureState.Deleted:
+                                    continue;
+
+                                default:
+                                    break;
+                            }
                         }
                     }
                 }

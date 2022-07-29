@@ -519,7 +519,7 @@ namespace GerberVS
                                 if (!gerberStats.IncrementDListCount(currentNet.Aperture, 1, lineReader.LineNumber))
                                 {
                                     currentNet.ApertureState = GerberApertureState.Off; // Undefined aperture, turn it off.
-                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Found use of undefined D code D{0}.\n", currentNet.Aperture);
+                                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Found use of undefined D code D{0}.", currentNet.Aperture);
                                     gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                                     gerberStats.UnknownDCodes++;
                                 }
@@ -765,7 +765,7 @@ namespace GerberVS
                     {
                         int apartureNumber = lineReader.GetIntegerValue(ref length);
 
-                        if ((apartureNumber >= 0) && (apartureNumber <= MaximumApertures))
+                        if ((apartureNumber >= 10) && (apartureNumber <= MaximumApertures))
                             gerberState.CurrentAperture = apartureNumber;
 
                         else
@@ -830,7 +830,7 @@ namespace GerberVS
                     errorMessage = String.Format(CultureInfo.CurrentCulture, "Found unknown G code G{0}.", intValue);
                     gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                     errorMessage = String.Format(CultureInfo.CurrentCulture, "Ignoring unknown G code.");
-                    gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
+                    gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning);
                     gerberStats.UnknowGCodes++;
                     break;
             }
@@ -878,7 +878,7 @@ namespace GerberVS
                     break;
 
                 default: // Aperture id in use.
-                    if ((intValue >= 0) && (intValue <= MaximumApertures))
+                    if ((intValue >= 10) && (intValue <= MaximumApertures))
                         gerberState.CurrentAperture = intValue;
 
                     else
@@ -932,7 +932,7 @@ namespace GerberVS
                     errorMessage = String.Format(CultureInfo.CurrentCulture, "Found unknown M code M{0}.", intValue);
                     gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                     errorMessage = String.Format(CultureInfo.CurrentCulture, "Ignoring unknown M code.");
-                    gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
+                    gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError);
                     gerberStats.UnknownMCodes++;
                     break;
             }
@@ -957,7 +957,7 @@ namespace GerberVS
 
             if (lineReader.EndOfFile)
             {
-                errorMessage = string.Format(CultureInfo.CurrentCulture, "Unexpected EOF in file {0}", lineReader.FileName);
+                errorMessage = string.Format(CultureInfo.CurrentCulture, "Unexpected EOF in file {0}.", lineReader.FileName);
                 gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError);
             }
 
@@ -1005,7 +1005,7 @@ namespace GerberVS
                             errorMessage = "Undefined handling of zeros in format code.";
                             gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                             errorMessage = "Defaulting to omit leading zeros.";
-                            gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
+                            gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning);
                             gerberImage.Format.OmitZeros = GerberOmitZero.OmitZerosLeading;
                             lineReader.Position--;
                             break;
@@ -1099,7 +1099,7 @@ namespace GerberVS
                                 errorMessage = String.Format(CultureInfo.CurrentCulture, "Illegal format size {0}.", nextCharacter);
                                 gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                                 errorMessage = String.Format(CultureInfo.CurrentCulture, "Ignoring invalid format statement.");
-                                gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
+                                gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning);
                                 break;
                         }
 
@@ -1140,7 +1140,7 @@ namespace GerberVS
                                 break;
 
                             default:
-                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Invalid character in mirror:{0}", nextCharacter);
+                                errorMessage = String.Format(CultureInfo.CurrentCulture, "Invalid character in mirror:{0}.", nextCharacter);
                                 gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                                 break;
                         }
@@ -1231,7 +1231,7 @@ namespace GerberVS
 
                         else
                         {
-                            errorMessage = "More than 10 levels of include file recursion";
+                            errorMessage = "More than 10 levels of include file recursion.";
                             gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberCritical, lineReader.FileName, lineReader.LineNumber);
                         }
                     }
@@ -1571,7 +1571,7 @@ namespace GerberVS
                     break;
 
                 default:
-                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Unknown or unsupported command {0}.", command);
+                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Unknown or unsupported command '{0}'.", command);
                     gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
                     break;
             }
@@ -1662,7 +1662,7 @@ namespace GerberVS
             {
                 if (parameterIndex == MaximumApertureParameters)
                 {
-                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Maximum allowed parameters exceeded in aperture {0}", apertureNumber);
+                    errorMessage = String.Format(CultureInfo.CurrentCulture, "Maximum allowed parameters exceeded in aperture {0}.", apertureNumber);
                     gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                     break;
                 }
@@ -1672,7 +1672,7 @@ namespace GerberVS
                 {
                     if (!double.TryParse(token, out double parameterValue))
                     {
-                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Failed to read all parameters in aperture {0}", apertureNumber);
+                        errorMessage = String.Format(CultureInfo.CurrentCulture, "Failed to read all parameters in aperture {0}.", apertureNumber);
                         gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
                         aperture.Parameters()[parameterIndex] = 0.0;
                     }
@@ -1907,7 +1907,7 @@ namespace GerberVS
 
             if (!validArc)
             {
-                errorMessage = String.Format(CultureInfo.CurrentCulture, "Invalid arc definition, deviation =  {0}", bestDeviation);
+                errorMessage = String.Format(CultureInfo.CurrentCulture, "Invalid arc definition, deviation =  {0}.", bestDeviation);
                 gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberError, lineReader.FileName, lineReader.LineNumber);
             }
         }
@@ -2017,7 +2017,7 @@ namespace GerberVS
             deviation = Math.Abs(width - height);
             if (deviation > .001)
             {
-                errorMessage = String.Format(CultureInfo.CurrentCulture, "Invalid arc definition, deviation =  {0}", deviation);
+                errorMessage = String.Format(CultureInfo.CurrentCulture, "Invalid arc definition, deviation =  {0}.", deviation);
                 gerberStats.AddNewError(-1, errorMessage, GerberErrorType.GerberWarning, lineReader.FileName, lineReader.LineNumber);
             }
 

@@ -146,6 +146,23 @@ namespace GerberVS
             ScaleFactorY = 1.0f;
             RenderQuality = GerberRenderQuality.Default;
         }
+
+        /// <summary>
+        /// Creates a new RenderInformation type class from supplied data.
+        /// </summary>
+        /// <param name="info">date to fill the render information</param>
+        public GerberRenderInformation(GerberRenderInformation info)
+        {
+            ImageWidth = info.ImageWidth;
+            ImageHeight = info.ImageHeight;
+            DisplayWidth = info.DisplayWidth;
+            DisplayHeight = info.DisplayHeight;
+            ScaleFactorX = info.ScaleFactorX;
+            ScaleFactorY = info.ScaleFactorY;
+            LowerLeftX = info.LowerLeftX;
+            LowerLeftY = info.LowerLeftY;
+            RenderQuality = info.RenderQuality;
+        }
     }
 
     /// <summary>

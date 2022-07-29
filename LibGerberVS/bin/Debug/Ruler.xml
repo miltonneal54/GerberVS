@@ -218,6 +218,16 @@
             <param name="m">windows message</param>
             <returns>false if the message is not comsumed</returns>
         </member>
+        <member name="M:Ruler.RulerControl.BeginUpdate">
+            <summary>
+              Disables any redrawing of the image box
+            </summary>
+        </member>
+        <member name="M:Ruler.RulerControl.EndUpdate">
+            <summary>
+              Enables the redrawing of the image box
+            </summary>
+        </member>
         <member name="M:Ruler.RulerControl.OnResize(System.EventArgs)">
             <summary>
             Overrides the base OnResize event.
@@ -315,7 +325,7 @@
         </member>
         <member name="P:Ruler.RulerControl.Orientation">
             <summary>
-            Gets or sets ruler layout to horizonal or vertical.
+            Gets or sets ruler layout to horizontal or vertical.
             </summary>
         </member>
         <member name="P:Ruler.RulerControl.ScaleDirection">
@@ -365,6 +375,11 @@
             Gets or sets the mouse tracking flag.
             </summary>
         </member>
+        <member name="P:Ruler.RulerControl.MouseTrackingRegion">
+            <summary>
+            Gets or sets the mouse tracking region.
+            </summary>
+        </member>
         <member name="P:Ruler.RulerControl.TrackLineColor">
             <summary>
             Gets or sets the color of the track marker.
@@ -395,16 +410,29 @@
         </member>
         <member name="P:Ruler.RulerControl.MouseLocation">
             <summary>
-            Gets the position of the mouse in pixels. Returns -1 if the mouse is out of the tracking area.
+            Returns the position of the mouse in pixels. Returns -1 if the mouse is outside of the tracking area.
             </summary>
             <remarks>
-            X position for horizonal ruler and Y position for a verticle ruler.
+            X position for horizontal ruler and Y position for a vertical ruler.
             </remarks>
+        </member>
+        <member name="P:Ruler.RulerControl.MousePoint">
+            <summary>
+            Returns the position of the mouse in pixels within the user supplied mouse tracking region.
+            </summary>
         </member>
         <member name="P:Ruler.RulerControl.ScaleValue">
             <summary>
             Gets the value at the current mouse position expressed in units of the current ruler scale.
             </summary>
+        </member>
+        <member name="P:Ruler.RulerControl.AllowPainting">
+            <summary>
+              Gets a value indicating whether painting of the control is allowed.
+            </summary>
+            <value>
+              <c>true</c> if painting of the control is allowed; otherwise, <c>false</c>.
+            </value>
         </member>
         <member name="P:Ruler.RulerControl.Font">
             <summary>

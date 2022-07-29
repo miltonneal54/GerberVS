@@ -13,5 +13,30 @@ F:\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.pdb
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.XML
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.dll
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\bin\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Release\GerberVS.csprojResolveAssemblyReference.cache
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.dll
 C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\LibGerberVS\obj\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Release\LibGerberVS.XML
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\bin\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Release\GerberVS.csprojAssemblyReference.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Release\GerberVS.csproj.CoreCompileInputs.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\LibGerberVS\obj\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\LibGerberVS.XML
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\CustomColorDialog.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\FileListBox.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\Ruler.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\CustomColorDialog.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\CustomColorDialog.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\FileListBox.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\FileListBox.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\Ruler.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\bin\Release\Ruler.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Release\GerberVS.csproj.CoreCompileInputs.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Release\GerberVS.csproj.CopyComplete
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\LibGerberVS\obj\Release\GerberVS.csprojAssemblyReference.cache

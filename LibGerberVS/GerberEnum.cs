@@ -29,10 +29,6 @@
     SUCH DAMAGE.
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GerberVS
 {
@@ -75,7 +71,12 @@ namespace GerberVS
         /// <summary>
         /// An irregularity was encountered, but needs no intervention.
         /// </summary>
-        GerberNote
+        GerberNote,
+
+        /// <summary>
+        /// Comment line found.
+        /// </summary>
+        GerberComment
     }
 
     /// <summary>
@@ -98,8 +99,16 @@ namespace GerberVS
         /// </summary>
         Rectangle,
 
-        Oval,             // an ovular (obround) aperture.
-        Polygon,          // a polygon aperture.
+        /// <summary>
+        /// Ovular aperture.
+        /// </summary>
+        Oval,
+
+        /// <summary>
+        /// Polygon aperture.
+        /// </summary>
+        Polygon,
+
         Macro,            // a RS274X macro.
         MacroCircle,     // a RS274X circle macro.
         MacroOutline,    // a RS274X outline macro.
@@ -111,16 +120,35 @@ namespace GerberVS
         MacroLine22      // a RS274X line (code 22) macro.
     }
 
-    // The current state of the aperture drawing tool.
+    /// <summary>
+    /// The current state of the aperture drawing tool.
+    /// </summary>
     public enum GerberApertureState
     {
-        Off,   // tool drawing is off, and nothing will be drawn.
-        On,    // tool drawing is on, and something will be drawn.
-        Flash,  // tool is flashing, and will draw a single aperture.
+        /// <summary>
+        /// Drawing tool is off and nothing will be drawn.
+        /// </summary>
+        Off,
+
+        /// <summary>
+        /// Drawing tool is on and something will be drawn.
+        /// </summary>
+        On,
+
+        /// <summary>
+        /// Flash tool is on and will draw a single aperture.
+        /// </summary>
+        Flash,
+
+        /// <summary>
+        /// Net is marked as deleted, skip and draw nothing.
+        /// </summary>
         Deleted
     }
 
-    // The current unit used.
+    /// <summary>
+    /// The current unit used, inch or millimeter.
+    /// </summary>
     public enum GerberUnit
     {
         /// <summary>
@@ -157,7 +185,7 @@ namespace GerberVS
         /// Omit extra zeros before the decimal point.
         /// </summary>
         OmitZerosLeading,
- 
+
         /// <summary>
         /// Omit extra zeros after the decimal point.
         /// </summary>
@@ -200,10 +228,10 @@ namespace GerberVS
         /// </summary>
         Linear,
 
-       /* /// <summary>
-        /// Draw a slot.
-        /// </summary>
-        DrillSlot,*/
+        /* /// <summary>
+         /// Draw a slot.
+         /// </summary>
+         DrillSlot,*/
 
         /// <summary>
         /// Draw an arc in the clockwise direction.
@@ -231,7 +259,7 @@ namespace GerberVS
         Deleted                     // the net has been deleted by the user, and will not be drawn.
     }
 
-    
+
     /// <summary>
     /// Supported file types.
     /// </summary>
@@ -247,7 +275,7 @@ namespace GerberVS
         /// </summary>
         Drill,
 
-       // PickAndPlace   // the file is a CSV pick and place file.
+        // PickAndPlace   // the file is a CSV pick and place file.
     }
 
     public enum GerberKnockoutType
@@ -384,6 +412,9 @@ namespace GerberVS
      * 8: Missing info
      * It could be any of above or'ed together
      */
+    /// <summary>
+    /// Error flags when verifing a gerber image is complete.
+    /// </summary>
     [Flags]
     public enum GerberVerifyErrors : int
     {
