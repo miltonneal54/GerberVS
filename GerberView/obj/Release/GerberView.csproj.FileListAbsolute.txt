@@ -1,0 +1,119 @@
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\GerberView.exe.config
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.exe
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.pdb
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\GerberView.exe
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\GerberView.pdb
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\LibGerberVS.dll
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\AlphaColorDiolog.pdb
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\LibGerberVS.pdb
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\LibGerberVS.xml
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\MyListBox.pdb
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\bin\Release\RulerControl.pdb
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.csprojResolveAssemblyReference.cache
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.DrillStatsForm.resources
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.Form1.resources
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.GerberStatsForm.resources
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.LayerEditForm.resources
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.Properties.Resources.resources
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.SelectionPropertiesFrm.resources
+C:\Users\Samsung\Documents\Visual Studio 2013\Projects\C Sharp\LibGerberVS\GerberView\obj\Release\GerberView.csproj.GenerateResource.Cache
+F:\LibGerberVS\GerberView\bin\Release\GerberView.exe.config
+F:\LibGerberVS\GerberView\obj\Release\GerberView.exe
+F:\LibGerberVS\GerberView\obj\Release\GerberView.pdb
+F:\LibGerberVS\GerberView\bin\Release\GerberView.exe
+F:\LibGerberVS\GerberView\bin\Release\GerberView.pdb
+F:\LibGerberVS\GerberView\bin\Release\LibGerberVS.dll
+F:\LibGerberVS\GerberView\bin\Release\AlphaColorDiolog.pdb
+F:\LibGerberVS\GerberView\bin\Release\LibGerberVS.pdb
+F:\LibGerberVS\GerberView\bin\Release\LibGerberVS.xml
+F:\LibGerberVS\GerberView\bin\Release\MyListBox.pdb
+F:\LibGerberVS\GerberView\bin\Release\RulerControl.pdb
+F:\LibGerberVS\GerberView\obj\Release\GerberView.csprojResolveAssemblyReference.cache
+F:\LibGerberVS\GerberView\obj\Release\GerberView.DrillStatsForm.resources
+F:\LibGerberVS\GerberView\obj\Release\GerberView.Form1.resources
+F:\LibGerberVS\GerberView\obj\Release\GerberView.GerberStatsForm.resources
+F:\LibGerberVS\GerberView\obj\Release\GerberView.LayerEditForm.resources
+F:\LibGerberVS\GerberView\obj\Release\GerberView.Properties.Resources.resources
+F:\LibGerberVS\GerberView\obj\Release\GerberView.SelectionPropertiesFrm.resources
+F:\LibGerberVS\GerberView\obj\Release\GerberView.csproj.GenerateResource.Cache
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\Backup\LibGerberVS\GerberView\bin\Release\GerberView.exe.config
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\Backup\LibGerberVS\GerberView\obj\Release\GerberView.exe
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\Backup\LibGerberVS\GerberView\obj\Release\GerberView.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\GerberView.exe.config
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\GerberView.exe
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\GerberView.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\CustomColorDialog.dll
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\FileListBox.dll
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\Ruler.dll
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\CustomColorDialog.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\CustomColorDialog.xml
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\FileListBox.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\FileListBox.xml
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\LibGerberVS.xml
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\Ruler.pdb
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\bin\Release\Ruler.xml
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.csprojResolveAssemblyReference.cache
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.DrillStatsForm.resources
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.Form1.resources
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.GerberStatsForm.resources
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.LayerEditForm.resources
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.Properties.Resources.resources
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.SelectionPropertiesFrm.resources
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.csproj.GenerateResource.Cache
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.exe
+C:\Users\Milton\Documents\Visual Studio 2013\Projects\CSharp Projects\LibGerberVS\GerberView\obj\Release\GerberView.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.csprojAssemblyReference.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.DrillStatsForm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.Form1.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.GerberStatsForm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.LayerEditForm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.Properties.Resources.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.SelectionPropertiesFrm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.csproj.GenerateResource.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.csproj.CoreCompileInputs.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.exe
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\GerberView.exe.config
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\GerberView.exe
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\GerberView.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\Ruler.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\CustomColorDialog.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\CustomColorDialog.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\FileListBox.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\FileListBox.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\Ruler.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\Ruler.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\obj\Release\GerberView.csproj.CopyComplete
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\FileListBox.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp\GerberView\GerberView\bin\Release\LibGerberVS.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\GerberView.exe.config
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\GerberView.exe
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\GerberView.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\CustomColorDialog.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\FileListBox.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\LibGerberVS.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\Ruler.dll
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\CustomColorDialog.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\CustomColorDialog.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\FileListBox.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\FileListBox.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\LibGerberVS.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\LibGerberVS.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\Ruler.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\bin\Release\Ruler.xml
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.DrillStatsForm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.Form1.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.GerberStatsForm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.LayerEditForm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.Properties.Resources.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.SelectionPropertiesForm.resources
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.csproj.GenerateResource.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.csproj.CoreCompileInputs.cache
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.csproj.CopyComplete
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.exe
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.pdb
+C:\Users\Milton\Documents\Visual Studio 2017\Projects\CSharp Projects\GerberView\GerberView\obj\Release\GerberView.csprojAssemblyReference.cache
