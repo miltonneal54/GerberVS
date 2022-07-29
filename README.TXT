@@ -89,3 +89,13 @@ LibGerberVS 1.2.0.0
 	GUI updates.
 	Code audits and refactoring.
 	Some bug fixes.
+
+19/07/2022
+GerberView 1.4.0.0
+LibGerberVS 1.2.0.0
+	GUI updates.
+	Move file processing errors from the layer stats
+	to a Log window on the main form.
+	Updates to the Ruler usercontrol.
+	Code audits and refactoring.
+
