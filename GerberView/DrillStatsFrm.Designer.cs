@@ -35,7 +35,6 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.generalTabPage = new System.Windows.Forms.TabPage();
-            this.errorLabel = new System.Windows.Forms.Label();
             this.generalDataGridView = new System.Windows.Forms.DataGridView();
             this.gCodesTabPage = new System.Windows.Forms.TabPage();
             this.gCodeLabel = new System.Windows.Forms.Label();
@@ -78,7 +77,6 @@
             // 
             // generalTabPage
             // 
-            this.generalTabPage.Controls.Add(this.errorLabel);
             this.generalTabPage.Controls.Add(this.generalDataGridView);
             this.generalTabPage.Location = new System.Drawing.Point(4, 22);
             this.generalTabPage.Name = "generalTabPage";
@@ -86,17 +84,6 @@
             this.generalTabPage.TabIndex = 0;
             this.generalTabPage.Text = "Gerneral";
             this.generalTabPage.UseVisualStyleBackColor = true;
-            // 
-            // errorLabel
-            // 
-            this.errorLabel.AutoSize = true;
-            this.errorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.errorLabel.ForeColor = System.Drawing.Color.MediumSeaGreen;
-            this.errorLabel.Location = new System.Drawing.Point(0, 5);
-            this.errorLabel.Name = "errorLabel";
-            this.errorLabel.Size = new System.Drawing.Size(39, 13);
-            this.errorLabel.TabIndex = 5;
-            this.errorLabel.Text = "errors";
             // 
             // generalDataGridView
             // 
@@ -329,7 +316,6 @@
             this.Load += new System.EventHandler(this.DrillStatsForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.generalTabPage.ResumeLayout(false);
-            this.generalTabPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.generalDataGridView)).EndInit();
             this.gCodesTabPage.ResumeLayout(false);
             this.gCodesTabPage.PerformLayout();
@@ -364,6 +350,5 @@
         private System.Windows.Forms.Label mCodeLabel;
         private System.Windows.Forms.Label miscLabel;
         private System.Windows.Forms.Label drillUseLabel;
-        private System.Windows.Forms.Label errorLabel;
     }
 }

@@ -45,7 +45,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
     </Reference>
-    <Reference Include="LibGerberVS">
+    <Reference Include="LibGerberVS, Version=1.2.8029.18501, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\LibGerberVS\bin\Debug\LibGerberVS.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualC" />

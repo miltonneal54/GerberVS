@@ -104,51 +104,16 @@ namespace GerberView
 
             infoTable.Columns.Add("Layer", typeof(Int32));
             infoTable.Columns.Add("Filename", typeof(String));
-            errorLabel.Text = "No message(s) in visible files.";
-
-            // Check if any visible layers have errors and if necessary, add columns to support error reporting.
-            for (int i = 0; i < project.FileInfo.Count; i++)
-            {
-                if (project.FileInfo[i].Image.FileType == GerberFileType.RS274X 
-                    && project.FileInfo[i].IsVisible 
-                    && project.FileInfo[i].Image.GerberStats.ErrorList.Count > 0)
-                        hasErrors = true;
-
-                if(hasErrors)
-                {
-                    errorLabel.Text = "Message(s) exist in visible files.";
-                    infoTable.Columns.Add("Message", typeof(String));
-                    infoTable.Columns.Add("Line", typeof(Int32));
-                    break;
-                }
-            }
 
             for (int i = 0; i < project.FileInfo.Count; i++)
             {
                 if (project.FileInfo[i].Image.FileType == GerberFileType.RS274X && project.FileInfo[i].IsVisible)
                 {
                     IsRS274X.Add(true);
-                    if (project.FileInfo[i].Image.GerberStats.ErrorList.Count == 0)
-                    {
-                        row = infoTable.NewRow();
-                        row["Layer"] = i + 1;
-                        row["Filename"] = project.FileInfo[i].FileName;
-                        infoTable.Rows.Add(row);
-                    }
-
-                    else
-                    {
-                        // Display found gerber errors.
-                        for (int c = 0; c < project.FileInfo[i].Image.GerberStats.ErrorList.Count; c++)
-                        {
-                            row = infoTable.NewRow();
-                            row["Layer"] = i + 1;
-                            row["Filename"] = project.FileInfo[i].FileName;
-                            row["Message"] = project.FileInfo[i].Image.GerberStats.ErrorList[c].ErrorMessage;
-                            row["Line"] = project.FileInfo[i].Image.GerberStats.ErrorList[c].LineNumber;
-                            infoTable.Rows.Add(row);
-                        }
-                    }
+                    row = infoTable.NewRow();
+                    row["Layer"] = i + 1;
+                    row["Filename"] = project.FileInfo[i].FileName;
+                    infoTable.Rows.Add(row);
                 }
 
                 else
@@ -498,7 +463,7 @@ namespace GerberView
             apertureUseTable.Columns.Add("Count", typeof(Int32));
             apUseLabel.Text = "File: " + project.FileInfo[fileIndex].FileName;
             GerberFileInformation fileInfo = project.FileInfo[fileIndex];
-            foreach (GerberApertureInfo apertureInfo  in fileInfo.Image.GerberStats.DCodeList)
+            foreach (GerberApertureInfo apertureInfo in fileInfo.Image.GerberStats.DCodeList)
             {
                 // D codes can be defined but not used, so diplaying only used apertures.
                 if (apertureInfo.Count > 0)

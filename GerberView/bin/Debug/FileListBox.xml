@@ -14,6 +14,94 @@
             Created a new instance of the listbox control.
             </summary>
         </member>
+        <member name="T:FileListBox.FileListBoxControl.CheckBoxClickEvent">
+            <summary>
+            Handles the checkbox click event
+            </summary>
+            <param name="sender">event sender</param>
+        </member>
+        <member name="T:FileListBox.FileListBoxControl.ColorBoxClickEvent">
+            <summary>
+            Handles the colorbox click event
+            </summary>
+            <param name="sender">event sender</param>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.CheckBoxClick">
+            <summary>
+            Occurs on mouse down on the check box.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.ColorBoxClick">
+            <summary>
+            Occurs on mouse down on the color box.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.SelectedIndexChanged">
+            <summary>
+             Occurs when the selected index has been changed.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.ItemHeightChanged">
+            <summary>
+             Occurs when the item's height has been changed.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.SelectedBackColorChanged">
+            <summary>
+             Occurs when the item's selected backcolor has been changed.
+            </summary>
+        </member>
+        <member name="E:FileListBox.FileListBoxControl.SelectedForeColorChanged">
+            <summary>
+             Occurs when the item's selected forecolor has been changed.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.SelectedIndex">
+            <summary>
+            Sets or gets the selected item.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemCount">
+            <summary>
+            Gets the number of items in the list.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemColor">
+            <summary>
+            Determines the color of the item layer.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemChecked">
+            <summary>
+            Determines the visibity state of the item layer.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.Text">
+            <summary>
+            The text associated with the item layer.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.SelectedBackColor">
+            <summary>
+            The background color of the selected item.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.SelectedForeColor">
+            <summary>
+            The foreground color of the selected item.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.UncheckedForeColor">
+            <summary>
+            The foreground color of the selected item when the the checkbox is unchecked.
+            </summary>
+        </member>
+        <member name="P:FileListBox.FileListBoxControl.ItemHeight">
+            <summary>
+            Determines the height in pixels of an item row.
+            </summary>
+            <remarks> valid values 20 to 26</remarks>
+        </member>
         <member name="M:FileListBox.FileListBoxControl.AddItem(System.Boolean,System.Drawing.Color,System.String)">
             <summary>
             Adds a new item to the list.
@@ -134,94 +222,6 @@
             Required method for Designer support - do not modify 
             the contents of this method with the code editor.
             </summary>
-        </member>
-        <member name="E:FileListBox.FileListBoxControl.CheckBoxClick">
-            <summary>
-            Occurs on mouse down on the check box.
-            </summary>
-        </member>
-        <member name="E:FileListBox.FileListBoxControl.ColorBoxClick">
-            <summary>
-            Occurs on mouse down on the color box.
-            </summary>
-        </member>
-        <member name="E:FileListBox.FileListBoxControl.SelectedIndexChanged">
-            <summary>
-             Occurs when the selected index has been changed.
-            </summary>
-        </member>
-        <member name="E:FileListBox.FileListBoxControl.ItemHeightChanged">
-            <summary>
-             Occurs when the item's height has been changed.
-            </summary>
-        </member>
-        <member name="E:FileListBox.FileListBoxControl.SelectedBackColorChanged">
-            <summary>
-             Occurs when the item's selected backcolor has been changed.
-            </summary>
-        </member>
-        <member name="E:FileListBox.FileListBoxControl.SelectedForeColorChanged">
-            <summary>
-             Occurs when the item's selected forecolor has been changed.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.SelectedIndex">
-            <summary>
-            Sets or gets the selected item.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.ItemCount">
-            <summary>
-            Gets the number of items in the list.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.ItemColor">
-            <summary>
-            Determines the color of the item layer.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.ItemChecked">
-            <summary>
-            Determines the visibity state of the item layer.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.Text">
-            <summary>
-            The text associated with the item layer.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.SelectedBackColor">
-            <summary>
-            The background color of the selected item.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.SelectedForeColor">
-            <summary>
-            The foreground color of the selected item.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.UncheckedForeColor">
-            <summary>
-            The foreground color of the selected item when the the checkbox is unchecked.
-            </summary>
-        </member>
-        <member name="P:FileListBox.FileListBoxControl.ItemHeight">
-            <summary>
-            Determines the height in pixels of an item row.
-            </summary>
-            <remarks> valid values 20 to 26</remarks>
-        </member>
-        <member name="T:FileListBox.FileListBoxControl.CheckBoxClickEvent">
-            <summary>
-            Handles the checkbox click event
-            </summary>
-            <param name="sender">event sender</param>
-        </member>
-        <member name="T:FileListBox.FileListBoxControl.ColorBoxClickEvent">
-            <summary>
-            Handles the colorbox click event
-            </summary>
-            <param name="sender">event sender</param>
         </member>
         <member name="T:FileListBox.Properties.Resources">
             <summary>

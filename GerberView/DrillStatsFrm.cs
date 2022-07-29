@@ -30,12 +30,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using GerberVS;
@@ -101,51 +97,17 @@ namespace GerberView
 
             infoTable.Columns.Add("Layer", typeof(Int32));
             infoTable.Columns.Add("Filename", typeof(String));
-            errorLabel.Text = "No message(s) in visible files.";
-
-            // Check if any visible layers have errors and if necessary, add columns to support error reporting.
-            for (int i = 0; i < project.FileInfo.Count; i++)
-            {
-                if (project.FileInfo[i].Image.FileType == GerberFileType.Drill
-                    && project.FileInfo[i].IsVisible
-                    && project.FileInfo[i].Image.DrillStats.ErrorList.Count > 0)
-                    hasErrors = true;
-
-                if (hasErrors)
-                {
-                    errorLabel.Text = "Message(s) exist in visible files.";
-                    infoTable.Columns.Add("Message", typeof(String));
-                    infoTable.Columns.Add("Line", typeof(Int32));
-                    break;
-                }
-            }
 
             for (int i = 0; i < project.FileInfo.Count; i++)
             {
                 if (project.FileInfo[i].Image.FileType == GerberFileType.Drill && project.FileInfo[i].IsVisible)
                 {
                     IsDrill.Add(true);
-                    if (project.FileInfo[i].Image.DrillStats.ErrorList.Count == 0)
-                    {
-                        row = infoTable.NewRow();
-                        row["Layer"] = i + 1;
-                        row["Filename"] = project.FileInfo[i].FileName;
-                        infoTable.Rows.Add(row);
-                    }
 
-                    else
-                    {
-                        // Display found gerber errors.
-                        for (int c = 0; c < project.FileInfo[i].Image.DrillStats.ErrorList.Count; c++)
-                        {
-                            row = infoTable.NewRow();
-                            row["Layer"] = i + 1;
-                            row["Filename"] = project.FileInfo[i].FileName;
-                            row["Message"] = project.FileInfo[i].Image.DrillStats.ErrorList[c].ErrorMessage;
-                            row["Line"] = project.FileInfo[i].Image.DrillStats.ErrorList[c].LineNumber;
-                            infoTable.Rows.Add(row);
-                        }
-                    }
+                    row = infoTable.NewRow();
+                    row["Layer"] = i + 1;
+                    row["Filename"] = project.FileInfo[i].FileName;
+                    infoTable.Rows.Add(row);
                 }
 
                 else
