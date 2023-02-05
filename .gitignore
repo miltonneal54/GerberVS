@@ -1,0 +1,12 @@
+*/obj/
+*/bin/
+.vs/
+packages/
+LibGerberVS/obj/
+LibGerberVS/bin/
+/GerberView/bin/
+/GerberView/obj/
+*.cache
+/GerberView/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+/LibGerberVS/obj/Debug/DesignTimeResolveAssemblyReferences.cache
+/LibGerberVS/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
