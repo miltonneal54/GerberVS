@@ -1,6 +1,8 @@
-﻿// GerberDraw.cs - Handles rendering of gerber and drill images.
+﻿// GerberShapes.cs - Handles rendering of gerber images.
+// 
 
 /*  Copyright (C) 2015-2021 Milton Neal <milton200954@gmail.com>
+ *  Copyright (C) 2022-2023 Patrick H Dussud <phdussud@hotmail.com>
     *** Acknowledgments to Gerbv Authors and Contributors. ***
 
     Redistribution and use in source and binary forms, with or without
@@ -48,7 +50,8 @@ using System.Runtime.DesignerServices;
 namespace GerberVS
 {
     /// <summary>
-    /// Render the gerber image to the target graphics object.
+    /// Render the gerber image to a Topology Geometry object.
+    /// https://nettopologysuite.github.io/NetTopologySuite/api/NetTopologySuite.html
     /// </summary>
     public static class GerberShapes
     {
