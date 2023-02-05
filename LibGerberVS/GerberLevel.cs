@@ -15,17 +15,17 @@ namespace GerberVS
     public class GerberLevel
     {
         // Auto properties.
-        internal GerberKnockout Knockout { get; set; }             // The current knockout group (refer to RS274X specs)
+        public GerberKnockout Knockout { get; set; }             // The current knockout group (refer to RS274X specs)
 
         /// <summary>
         /// The current step and repeat group for this level.
         /// </summary>
-        internal GerberStepAndRepeat StepAndRepeat { get; set; }
+        public GerberStepAndRepeat StepAndRepeat { get; set; }
 
         /// <summary>
         /// Dark or clear polarity for this level.
         /// </summary>
-        internal GerberPolarity Polarity { get; set; }
+        public GerberPolarity Polarity { get; set; }
 
         /// <summary>
         /// The level name.
@@ -63,7 +63,7 @@ namespace GerberVS
     }
 
     
-    internal class GerberKnockout
+    public class GerberKnockout
     {
         public bool FirstInstance { get; set; }
         public GerberKnockoutType KnockoutType { get; set; }
@@ -86,7 +86,7 @@ namespace GerberVS
     /// <summary>
     /// Step and Repeat class.
     /// </summary>
-    internal class GerberStepAndRepeat
+    public class GerberStepAndRepeat
     {
         public int X { get; set; }
         public int Y { get; set; }

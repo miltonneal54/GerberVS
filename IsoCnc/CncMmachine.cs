@@ -5,6 +5,7 @@ using System.IO;
 using Config;
 using static Config.Configuration;
 using IsoCnc;
+using System.Net.Configuration;
 
 namespace Cnc
 {
@@ -65,6 +66,17 @@ namespace Cnc
         private void Scale(ref double scalar)
         {
             scalar = scalar * input_scale * output_scale;
+        }
+        public void SpindleOn(double? speed)
+        {
+            var speed_str = "";
+            if (speed.HasValue)
+                speed_str = string.Format("S{0}", (int)Math.Round(speed.Value));
+            tw.WriteLine("M03 " + speed_str + " (spindle on)");
+        }
+        public void spindleOff()
+        {
+            tw.WriteLine("M05 (spindle off)");
         }
         public void move(double? x_abs = null, double? y_abs = null, double? z_abs = null, double? feed_rate = null)
         {

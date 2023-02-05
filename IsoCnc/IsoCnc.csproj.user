@@ -3,4 +3,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>"C:\Users\Patrick\SkyDrive\electronics\kicad\USB-bridge-cypress\USB-bridge-cypress\USB-bridge-cypress-F_Cu.gbr"  "C:\Users\Patrick\SkyDrive\electronics\kicad\USB-bridge-cypress\USB-bridge-cypress\top.nc" config.ini  false "C:\Users\Patrick\SkyDrive\electronics\kicad\USB-bridge-cypress\USB-bridge-cypress\USB-bridge-cypress-PTH.drl"</StartArguments>
   </PropertyGroup>
+  <PropertyGroup>
+    <PublishUrlHistory>publish\</PublishUrlHistory>
+    <InstallUrlHistory />
+    <SupportUrlHistory />
+    <UpdateUrlHistory />
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
 </Project>

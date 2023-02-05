@@ -28,10 +28,13 @@ namespace IsoCnc
         };
         Machine machine;
         ConfigDictionary config;
+        bool generate_metric = true;
+        bool generate_relative_code = false;
         double iso_cut_depth;
         double iso_feed_rate;
         double iso_plunge_rate;
         double iso_lift = 2.0;
+        double iso_spindle_speed;
         string file_end_code;
         string coordinate_system;
         string coordinate_system_mirror;
@@ -39,10 +42,13 @@ namespace IsoCnc
         public CncIsoWriter(ConfigDictionary config) 
         {
             this.config = config;
+            config.BooleanGetValue("generate_metric", ref generate_metric);
+            config.BooleanGetValue("generate_relative_code", ref generate_relative_code);
             config.DoubleGetValue("iso_cut_depth", ref iso_cut_depth, false);
             config.DoubleGetValue("iso_feed_rate", ref iso_feed_rate, false);
             config.DoubleGetValue("iso_plunge_rate", ref iso_plunge_rate, false);
             config.DoubleGetValue("iso_lift", ref iso_lift, true);
+            config.DoubleGetValue("iso_spindle_speed", ref iso_spindle_speed, false);
             config.string_get_value("file_end_code", ref file_end_code, false);
             config.string_get_value("coordinate_system", ref coordinate_system, false);
             config.string_get_value("coordinate_system_mirror", ref coordinate_system_mirror, false);
@@ -83,8 +89,10 @@ namespace IsoCnc
                     machine.insertCode(coordinate_system_mirror);
                 else
                     machine.insertCode(coordinate_system);
-                machine.metricMode(true);
-                machine.relativeMode(false);
+                machine.metricMode(generate_metric);
+                machine.relativeMode(generate_relative_code);
+                machine.SpindleOn(iso_spindle_speed);
+                machine.rapidMove(null, null, iso_lift / 25.4); //lift Z
             }
             for (int i = 0; i < shape.NumGeometries; i++) 
             {
@@ -116,6 +124,8 @@ namespace IsoCnc
         ConfigDictionary config;
         //settings
         double DecimalCoeffient = 25.4;
+        bool generate_relative_code = false;
+        bool generate_metric = true;
         bool drill_slots = false;
         double drill_depth = -2.5;
         double drill_lift = 3.0;
@@ -125,7 +135,7 @@ namespace IsoCnc
         double tool_change_height = 40;
         double drill_spindle_speed = 26000;
         double slot_drill_overlap = 0.25;
-        string drill_tool_change_code = "M5\nG0 X0 Y0 Z{tool_change_height}\nM6 T{tool_number} ({tool_diameter} mm)\nM0\nM03 S{drill_spindle_speed}\nG0 Z{drill_lift}";
+        string drill_tool_change_code = "M5\nG0 Z{tool_change_height}\nG0 X0 Y0\nM6 T{tool_number} ({tool_diameter} mm)\nM0\nM03 S{drill_spindle_speed}\nG0 Z{drill_lift}";
         Dictionary<string, int> drill_tool_change_map = new Dictionary<string, int>()
         {
             {"tool_number", 0 },
@@ -147,6 +157,8 @@ namespace IsoCnc
 
             if (config != null)
             {
+                config.BooleanGetValue("generate_metric", ref generate_metric);
+                config.BooleanGetValue("generate_relative_code", ref generate_relative_code);
                 config.BooleanGetValue("drill_slots", ref drill_slots, false);
                 config.DoubleGetValue("drill_depth", ref drill_depth, true);
                 config.DoubleGetValue("drill_lift", ref drill_lift, true);
@@ -177,8 +189,8 @@ namespace IsoCnc
             else
                 machine.insertCode(coordinate_system);
 
-            machine.metricMode(true);
-            machine.relativeMode(false);
+            machine.metricMode(generate_metric);
+            machine.relativeMode(generate_relative_code);
 
             StringBuilder tools = new StringBuilder();
             tools.AppendLine("( Tool| Size )");
@@ -206,8 +218,11 @@ namespace IsoCnc
 
             machine.insertCode(tools.ToString());
 
-            machine.insertCode("(end of header)");    // End of header.
-                                                      // Write rest of image
+            machine.insertCode("(end of header)");
+
+            machine.SpindleOn(drill_spindle_speed);
+            machine.rapidMove(null, null, drill_lift / 25.4); //lift Z
+
             for (int i = 0; i < apertureList.Count; i++)
             {
                 int apertureIndex = apertureList[i];

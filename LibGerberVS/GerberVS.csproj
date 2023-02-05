@@ -39,9 +39,6 @@
     <Reference Include="FileListBox">
       <HintPath>..\..\Controls\FileListBox\FileListBox\bin\Release\FileListBox.dll</HintPath>
     </Reference>
-    <Reference Include="NetTopologySuite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.2.5.0\lib\netstandard2.0\NetTopologySuite.dll</HintPath>
-    </Reference>
     <Reference Include="Ruler">
       <HintPath>..\..\Controls\Ruler\Ruler\bin\Release\Ruler.dll</HintPath>
     </Reference>
@@ -90,7 +87,6 @@
     <Compile Include="GerberNetState.cs" />
     <Compile Include="GerberSelection.cs" />
     <Compile Include="GerberSelectRegion.cs" />
-    <Compile Include="GerberShapes.cs" />
     <Compile Include="GerberState.cs" />
     <Compile Include="GerberStats.cs" />
     <Compile Include="LibGerberVS.cs" />
