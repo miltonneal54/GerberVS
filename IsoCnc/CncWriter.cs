@@ -28,7 +28,8 @@ namespace IsoCnc
         };
         Machine machine;
         ConfigDictionary config;
-        bool generate_metric = true;
+        bool metric_mode = true;
+        double unit_factor = 25.4; //becomes 1 if metric_mode is false; 
         bool generate_relative_code = false;
         double iso_cut_depth;
         double iso_feed_rate;
@@ -42,8 +43,7 @@ namespace IsoCnc
         public CncIsoWriter(ConfigDictionary config) 
         {
             this.config = config;
-            config.BooleanGetValue("generate_metric", ref generate_metric);
-            config.BooleanGetValue("generate_relative_code", ref generate_relative_code);
+            config.BooleanGetValue("metric_mode", ref metric_mode);
             config.DoubleGetValue("iso_cut_depth", ref iso_cut_depth, false);
             config.DoubleGetValue("iso_feed_rate", ref iso_feed_rate, false);
             config.DoubleGetValue("iso_plunge_rate", ref iso_plunge_rate, false);
@@ -52,6 +52,8 @@ namespace IsoCnc
             config.string_get_value("file_end_code", ref file_end_code, false);
             config.string_get_value("coordinate_system", ref coordinate_system, false);
             config.string_get_value("coordinate_system_mirror", ref coordinate_system_mirror, false);
+
+            unit_factor = metric_mode ? 25.4 : 1.0;
 
         }
         private void write_ring(Coordinate[] ring, bool ccw)
@@ -68,13 +70,13 @@ namespace IsoCnc
                 {
                     first = false;
                     machine.rapidMove(c.X, c.Y);
-                    machine.move(null, null, iso_cut_depth / 25.4, iso_plunge_rate / 25.4); //plunge
-                    machine.move(null, null, null, iso_feed_rate / 25.4); //set feed rate for cuts
+                    machine.move(null, null, iso_cut_depth / unit_factor, iso_plunge_rate / unit_factor); //plunge
+                    machine.move(null, null, null, iso_feed_rate / unit_factor); //set feed rate for cuts
                     continue;
                 }
                 machine.move(c.X, c.Y);
             }
-            machine.rapidMove(null, null, iso_lift / 25.4); //lift Z
+            machine.rapidMove(null, null, iso_lift / unit_factor); //lift Z
         }
         public void Write(Geometry shape, Options options, TextWriter stream) 
         {
@@ -89,10 +91,10 @@ namespace IsoCnc
                     machine.insertCode(coordinate_system_mirror);
                 else
                     machine.insertCode(coordinate_system);
-                machine.metricMode(generate_metric);
+                machine.metricMode(metric_mode);
                 machine.relativeMode(generate_relative_code);
                 machine.SpindleOn(iso_spindle_speed);
-                machine.rapidMove(null, null, iso_lift / 25.4); //lift Z
+                machine.rapidMove(null, null, iso_lift / unit_factor); //lift Z
             }
             for (int i = 0; i < shape.NumGeometries; i++) 
             {
@@ -123,9 +125,9 @@ namespace IsoCnc
         Machine machine;
         ConfigDictionary config;
         //settings
-        double DecimalCoeffient = 25.4;
-        bool generate_relative_code = false;
-        bool generate_metric = true;
+        double unit_factor = 25.4;
+        bool generate_relative_code = false; //because of insertCode relative mode isn't possible
+        bool metric_mode = true;
         bool drill_slots = false;
         double drill_depth = -2.5;
         double drill_lift = 3.0;
@@ -157,8 +159,7 @@ namespace IsoCnc
 
             if (config != null)
             {
-                config.BooleanGetValue("generate_metric", ref generate_metric);
-                config.BooleanGetValue("generate_relative_code", ref generate_relative_code);
+                config.BooleanGetValue("metric_mode", ref metric_mode);
                 config.BooleanGetValue("drill_slots", ref drill_slots, false);
                 config.DoubleGetValue("drill_depth", ref drill_depth, true);
                 config.DoubleGetValue("drill_lift", ref drill_lift, true);
@@ -173,6 +174,7 @@ namespace IsoCnc
                 config.string_get_value("coordinate_system_mirror", ref coordinate_system_mirror, false);
             }
             tool_change_format = tool_change_template.CreateFormatString(drill_tool_change_code);
+            unit_factor = metric_mode ? 25.4 : 1.0;
         }
         public void Write(GerberImage inputImage, Options options, TextWriter streamWriter)
         {
@@ -183,13 +185,13 @@ namespace IsoCnc
             // Copy the image, cleaning it in the process.
             GerberImage newImage = inputImage; //GerberImage.Copy(inputImage);
                                                // Write header info.
-            machine.setInputUnit(true);
+            machine.setInputUnit(false);
             if (mirrorX)
                 machine.insertCode(coordinate_system_mirror);
             else
                 machine.insertCode(coordinate_system);
 
-            machine.metricMode(generate_metric);
+            machine.metricMode(metric_mode);
             machine.relativeMode(generate_relative_code);
 
             StringBuilder tools = new StringBuilder();
@@ -221,16 +223,16 @@ namespace IsoCnc
             machine.insertCode("(end of header)");
 
             machine.SpindleOn(drill_spindle_speed);
-            machine.rapidMove(null, null, drill_lift / 25.4); //lift Z
+            machine.rapidMove(null, null, drill_lift / unit_factor); //lift Z
 
             for (int i = 0; i < apertureList.Count; i++)
             {
                 int apertureIndex = apertureList[i];
                 var currAperture = newImage.ApertureArray()[apertureIndex];
-                double diameter = currAperture.Parameters()[0] * (currAperture.Unit == GerberUnit.Inch ? 25.4 : 1.0);
+                double diameter_mm = currAperture.Parameters()[0] * (currAperture.Unit == GerberUnit.Inch ? 25.4 : 1.0);
 
                 // Write tool change.
-                machine.insertCode(String.Format(tool_change_format, apertureIndex, diameter, drill_lift, tool_change_height, drill_spindle_speed, drill_pause));
+                machine.insertCode(String.Format(tool_change_format, apertureIndex, diameter_mm / (metric_mode ? 1.0 : 25.4), drill_lift, tool_change_height, drill_spindle_speed, drill_pause));
 
                 // Run through all nets and look for holes using this aperture.
                 for (int netIndex = 0; netIndex < newImage.GerberNetList.Count; netIndex++)
@@ -246,7 +248,7 @@ namespace IsoCnc
                     switch (currentNet.ApertureState)
                     {
                         case GerberApertureState.Flash:
-                            machine.drillMove(currentNet.StartX * DecimalCoeffient, currentNet.StartY * DecimalCoeffient, drill_depth, drill_lift, drill_feed_rate, drill_pause);
+                            machine.drillMove(currentNet.StartX, currentNet.StartY, drill_depth / unit_factor, drill_lift /unit_factor, drill_feed_rate /unit_factor, drill_pause);
                             break;
 
                         case GerberApertureState.On:    // Cut slot.
@@ -254,9 +256,9 @@ namespace IsoCnc
                             {
                                 if (drill_slots)
                                 {
-                                    double slot_drill_length = (1 - slot_drill_overlap) * diameter;
-                                    LineSegment slot = new LineSegment(currentNet.StartX * DecimalCoeffient, currentNet.StartY * DecimalCoeffient,
-                                                                       currentNet.EndX * DecimalCoeffient, currentNet.EndY * DecimalCoeffient);
+                                    double slot_drill_length = (1 - slot_drill_overlap) * diameter_mm / unit_factor;
+                                    LineSegment slot = new LineSegment(currentNet.StartX, currentNet.StartY,
+                                                                       currentNet.EndX, currentNet.EndY);
                                     var s_length = slot.Length;
                                     var n_drills_min = Math.Round(s_length / slot_drill_length);
                                     var n_drills = n_drills_min;
@@ -268,15 +270,15 @@ namespace IsoCnc
                                     for (int d = 0; d <= n_drills; d++)
                                     {
                                         Coordinate a = slot.PointAlong(d * slot_drill_length / s_length);
-                                        machine.drillMove(a.X, a.Y, drill_depth, drill_lift, drill_feed_rate, drill_pause);
+                                        machine.drillMove(a.X, a.Y, drill_depth / unit_factor, drill_lift / unit_factor, drill_feed_rate / unit_factor, drill_pause);
                                     }
                                 }
                                 else
                                 {
-                                    machine.rapidMove(currentNet.StartX * DecimalCoeffient, currentNet.StartY * DecimalCoeffient);
-                                    machine.move(z_abs: drill_depth, feed_rate: drill_feed_rate);
-                                    machine.move(currentNet.EndX * DecimalCoeffient, currentNet.EndY * DecimalCoeffient);
-                                    machine.rapidMove(z_abs: drill_lift);
+                                    machine.rapidMove(currentNet.StartX, currentNet.StartY);
+                                    machine.move(z_abs: drill_depth / unit_factor, feed_rate: drill_feed_rate / unit_factor);
+                                    machine.move(currentNet.EndX, currentNet.EndY);
+                                    machine.rapidMove(z_abs: drill_lift / unit_factor);
                                 }
                             }
                             break;
