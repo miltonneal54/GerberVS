@@ -1,9 +1,34 @@
-﻿using Cnc;
+﻿/*  Copyright (C) 2022-2023 Patrick H Dussud <Patrick.Dussud@outlook.com>
+    *** Acknowledgments to Gerbv Authors and Contributors. ***
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. Neither the name of the project nor the names of its contributors
+       may be used to endorse or promote products derived from this software
+       without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+ */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Web;
 
 namespace Config
 {
@@ -40,54 +65,6 @@ namespace Config
                 }
             }
         }
-        protected static void update_config_lines(TextReader tf, TextWriter uf, ConfigDictionary update)
-        {
-            ReadOnlySpan<char> comment_start_span = comment_start;
-            HashSet<string> keys = new HashSet<string>();
-            while (true)
-            {
-                string line = tf.ReadLine();
-                if (line == null)
-                    break;
-                line = line.Trim();
-                if (line.Length == 0)
-                {
-                    uf.WriteLine();
-                    continue;
-                }
-                if (comment_start_span.IndexOf(line[0]) >= 0)
-                {
-                    uf.WriteLine(line);
-                    continue;
-                }
-                int idx = line.IndexOf(':');
-                if (idx >= 1)
-                {
-
-                    string key = line.Substring(0, idx).Trim().ToString();
-                    if (update.ContainsKey(key))
-                    {
-                        keys.Add(key);
-                        var val = "";
-                        update.get_key(key, ref val, false);
-                        uf.WriteLine(key + " : " + val);
-
-                    }
-                    else
-                        uf.WriteLine(line);
-                }
-                else
-                    uf.WriteLine(line);
-            }
-            //add all remaining keys
-            foreach(var keyvalue in update.dict)
-            {
-                if (!keys.Contains(keyvalue.Key))
-                {
-                    uf.WriteLine (keyvalue.Key + " : " + keyvalue.Value);
-                }
-            }
-        }
         public static ConfigDictionary ReadConfig(string path)
         {
             TextReader config_file = null;
@@ -98,9 +75,6 @@ namespace Config
                 ConfigDictionary config_dict = new ConfigDictionary();
                 read_config_lines(config_file, config_dict);
                 return config_dict;
-
-
-
             }
             catch (FileNotFoundException)
             {
@@ -115,13 +89,55 @@ namespace Config
 
         public static bool UpdateConfig(string path, ConfigDictionary update)
         {
-            TextReader config_file = null;
-            TextWriter update_file = null;
+            TextReader tf = null;
+            TextWriter uf = null;
             try
             {
-                config_file = new StreamReader(path ?? cd + "\\config.ini");
-                update_file = new StreamWriter((path ?? cd + "\\config.ini") + ".update", false, System.Text.Encoding.ASCII);
-                update_config_lines(config_file, update_file, update);
+                tf = File.OpenText(path ?? cd + "\\config.ini");
+                HashSet<string> keys = new HashSet<string>();
+                var lines = new List<string>();
+                ReadOnlySpan<char> comment_start_span = comment_start;
+                while (true)
+                {
+                    string line = tf.ReadLine();
+                    if (line == null)
+                        break;
+                    line = line.Trim();
+                    if ((line.Length != 0) && (comment_start_span.IndexOf(line[0]) < 0))
+                    {
+                        int idx = line.IndexOf(':');
+                        if (idx >= 1)
+                        {
+
+                            string key = line.Substring(0, idx).Trim().ToString();
+                            if (update.ContainsKey(key))
+                            {
+                                keys.Add(key);
+                                var val = "";
+                                update.get_key(key, ref val, false);
+                                line = (key + " : " + val);
+
+                            }
+                        }
+                    }
+                    lines.Add(line);
+                }
+                tf.Close();
+                tf = null;
+                //add all remaining keys
+                foreach (var keyvalue in update.dict)
+                {
+                    if (!keys.Contains(keyvalue.Key))
+                    {
+                        lines.Add(keyvalue.Key + " : " + keyvalue.Value);
+                    }
+                }
+                //rewrite the file 
+                uf = new StreamWriter(new FileStream(path ?? cd + "\\config.ini", FileMode.Truncate, FileAccess.Write, FileShare.None));
+                foreach (var line in lines)
+                {
+                    uf.WriteLine(line);
+                }
             }
             catch (FileNotFoundException)
             {
@@ -129,10 +145,8 @@ namespace Config
             }
             finally
             {
-                if (config_file != null)
-                    config_file.Close();
-                if (update_file != null)
-                    update_file.Close();
+                tf?.Close();
+                uf?.Close();
             }
             return true;
         }

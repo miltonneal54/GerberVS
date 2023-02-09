@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>"C:\Users\Patrick\SkyDrive\electronics\kicad\USB-bridge-cypress\USB-bridge-cypress\USB-bridge-cypress-F_Cu.gbr"  "C:\Users\Patrick\SkyDrive\electronics\kicad\USB-bridge-cypress\USB-bridge-cypress\top.nc" config.ini  false "C:\Users\Patrick\SkyDrive\electronics\kicad\USB-bridge-cypress\USB-bridge-cypress\USB-bridge-cypress-PTH.drl"</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <PublishUrlHistory>publish\</PublishUrlHistory>

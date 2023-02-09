@@ -79,7 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CncMmachine.cs" />
+    <Compile Include="CncMachine.cs" />
     <Compile Include="CncWriter.cs" />
     <Compile Include="CodeTemplate.cs" />
     <Compile Include="Config.cs" />

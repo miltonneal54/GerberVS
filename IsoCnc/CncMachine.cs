@@ -1,11 +1,36 @@
-using NetTopologySuite.Noding;
+/*  Copyright (C) 2022-2023 Patrick H Dussud <Patrick.Dussud@outlook.com>
+    *** Acknowledgments to Gerbv Authors and Contributors. ***
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. Neither the name of the project nor the names of its contributors
+       may be used to endorse or promote products derived from this software
+       without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+ */
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Config;
-using static Config.Configuration;
 using IsoCnc;
-using System.Net.Configuration;
 
 namespace Cnc
 {
@@ -24,6 +49,12 @@ namespace Cnc
             {"drill_lift", 3 },
             {"drill_pause", 5 }
         };
+        static string spindle_start_code = "M03 S{spindle_speed:0.00}";
+        static Dictionary<string, int> spindle_start_code_map = new Dictionary<string, int>()
+        {
+            {"spindle_speed", 0 },
+            {"pause", 1 },
+        };
         bool generate_relative_code = false;
         bool generate_metric = true;
         //end of config variables
@@ -35,7 +66,7 @@ namespace Cnc
         double drill_feed_rate = 100;
         double drill_pause = 0;
         string drill_format;
-        bool input_unit_metric = false;
+        string spindle_start_format;
         double input_scale = 25.4;
         double output_scale = 1.0;
         TextWriter tw;
@@ -48,15 +79,18 @@ namespace Cnc
                 config.string_get_value("linear_move_code", ref linear_move_code, true);
                 config.string_get_value("drill_code", ref drill_code, true);
                 config.BooleanGetValue("generate_relative_code", ref generate_relative_code, true);
+                config.string_get_value("spindle_start_code", ref spindle_start_code, true);
                 config.BooleanGetValue("generate_metric", ref generate_metric, true);
                 config.DoubleGetValue("drill_feed_rate", ref drill_feed_rate, true);
             }
             CodeTemplate drill_template = new CodeTemplate(drill_code_map);
             drill_format = drill_template.CreateFormatString(drill_code);
+            CodeTemplate spindle_start_template = new CodeTemplate(spindle_start_code_map);
+            spindle_start_format = spindle_start_template.CreateFormatString(spindle_start_code);
+            
         }
         public void setInputUnit(bool metric)
         {
-            input_unit_metric = metric;
             input_scale = metric ? 1.0 : 25.4;
         }
         private void Scale (ref double? scalar)
@@ -67,12 +101,9 @@ namespace Cnc
         {
             scalar = scalar * input_scale * output_scale;
         }
-        public void SpindleOn(double? speed)
+        public void SpindleOn(double speed)
         {
-            var speed_str = "";
-            if (speed.HasValue)
-                speed_str = string.Format("S{0}", (int)Math.Round(speed.Value));
-            tw.WriteLine("M03 " + speed_str + " (spindle on)");
+            tw.WriteLine(string.Format(spindle_start_format, speed));
         }
         public void spindleOff()
         {

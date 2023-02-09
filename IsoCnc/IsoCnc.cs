@@ -1,103 +1,171 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*  Copyright (C) 2022-2023 Patrick H Dussud <Patrick.Dussud@outlook.com>
+    *** Acknowledgments to Gerbv Authors and Contributors. ***
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. Neither the name of the project nor the names of its contributors
+       may be used to endorse or promote products derived from this software
+       without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+ */
+using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Cnc;
 using GerberVS;
 using Config;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Geometries.Utilities;
-using NetTopologySuite.IO.GML2;
-using System.Net;
-using System.Diagnostics.Contracts;
-using NetTopologySuite.Algorithm;
-using NetTopologySuite.Operation.Overlay;
+
 
 namespace IsoCnc
 {
     internal class IsoCnc
     {
-        static bool mirrorX = false;
-        static bool metric_mode = true;
-        static double iso_tool_size = 0.189;
-        static double iso_path_overlap = 0.2;
-        static double iso_isolation_min = 0.6;
-        static bool iso_milling_conventional = true;
         static double unit_coefficient = 25.4;
 
         static void Main(string[] args)
         {
-            //arg1 gerber file to load
-            //arg2 output cnc file
-            //arg3 config file specifying Options
-            //arg4 optional boolean for mirrorX
+            //arg0 gerber file to load
+            //arg1 output cnc file
+            //arg2 config file specifying Options
+            //arg3 optional boolean for mirrorX
+
+            bool mirrorX = false;
+
             if (args.Length < 3)
             {
                 Console.WriteLine("Usage: isocnc <gerber input file> <nc output file> <options config file> [mirrorX = false]");
                 System.Environment.Exit(-1);
             }
             var fullPathName = args[0];
+            var outputPathName = args[1];
             var configPath = args[2];
             if (args.Length > 3)
             {
                 if (Boolean.TryParse(args[3], out bool res))
                     mirrorX = res;
             }
+            string borderPathName = null;
+            if (args.Length > 4)
+            {
+                borderPathName = args[4]; //this is experimental and not documented.
+            }
             var config = Configuration.ReadConfig(configPath);
 
             if (Gerber.IsGerberRS427X(fullPathName))
-            {
+            {            
+                bool metric_mode = true;
+                double iso_tool_size = 0.189;
+                double iso_path_overlap = 0.2;
+                double iso_isolation_min = 0.6;
+                double iso_isolation_max = 0;
+                bool iso_milling_conventional = true;
                 double[] mirror_line = null;
+                double iso_tool2_size = 0;
                 if (mirrorX)
-                    mirror_line = new double[4] { 0, 0, 0, 1 };
+                    mirror_line = new double[] { 0, 0, 0, 1 };
                 if (config != null)
                 {
-                    config.BooleanGetValue("metric_mode", ref metric_mode);
+                    config.BooleanGetValue("metric_mode", ref metric_mode, true);
                     config.DoubleGetValue("iso_tool_size", ref iso_tool_size, false);
                     config.DoubleGetValue("iso_path_overlap", ref iso_path_overlap, true);
-                    config.DoubleGetValue("iso_isolation_min", ref iso_isolation_min, true);
+                    config.DoubleGetValue("iso_isolation_min", ref iso_isolation_min, false);
+                    config.DoubleGetValue("iso_isolation_max", ref iso_isolation_max, true);
                     config.BooleanGetValue("iso_milling_conventional", ref iso_milling_conventional, true);
+                    config.DoubleGetValue("iso_tool2_size", ref iso_tool2_size, true);
                     unit_coefficient = metric_mode ? 25.4 : 1.0;
+                    if (iso_isolation_max < iso_isolation_min)
+                        iso_isolation_max = iso_isolation_min;
                 }
                 var parsedImage = Gerber.ParseGerber(fullPathName);
-                var geometries = GerberShapes.CreateGeometry(parsedImage, iso_milling_conventional, mirror_line);
-                /*
-                                GMLWriter writer = new GMLWriter();
-                                Stream file = new FileStream("foo.gml", FileMode.Create);
-                                writer.Write(geometries, file);
-                                file.Close();
-                */
-                using (StreamWriter streamWriter = new StreamWriter(args[1], false, Encoding.ASCII))
+                var geometry = GerberShapes.CreateGeometry(parsedImage, iso_milling_conventional, mirror_line);
+                Geometry border = null;
+                if (borderPathName != null)
                 {
-                    CncIsoWriter cncWriter = new CncIsoWriter(config);
+                    var boder_image = Gerber.ParseGerber(borderPathName);
+                    var border_polygon = GerberShapes.CreateGeometry(boder_image, iso_milling_conventional, mirror_line);
+                    border = make_border_mask(border_polygon);
+                }
+                using (StreamWriter streamWriter = new StreamWriter(outputPathName, false, Encoding.ASCII))
+                {
+                    CncIsoWriter cncWriter = new CncIsoWriter(config, streamWriter);
                     var last_path = false;
+                    var tool_diameter = iso_tool_size;
+                    var dist = tool_diameter / 2;
                     for (int i = 0; !last_path; i++)
                     {
-                        var dist = ((iso_tool_size / 2) + i * (1 - iso_path_overlap) * iso_tool_size);
-                        var path = geometries.Buffer(dist / unit_coefficient);
-                        last_path = (dist + (iso_tool_size / 2)) >= iso_isolation_min;
-                        var options = new CncIsoWriter.Options() { ccw = iso_milling_conventional, path_number = i, tool_diameter = iso_tool_size, mirrorX = mirrorX, last_tool = true, last_path = last_path };
-                        cncWriter.Write(path, options, streamWriter);
+                        var last_tool = !(tool_diameter < iso_tool2_size);
+                        last_path = (dist + (tool_diameter / 2)) >= (last_tool ? (border == null ? iso_isolation_max : 1E6): iso_isolation_min);
+                        var path = geometry.Buffer(dist / unit_coefficient);
+                        if (border != null)
+                        {
+                            var new_path = path.Difference(border);
+                            if ((new_path.NumGeometries == 1) && (new_path.GetGeometryN(1) is Polygon p))
+                            {
+                                if ((p.NumInteriorRings == 0) && path.Intersects(border))
+                                {
+                                    last_path = true;
+                                }
+                            }
+                            path = new_path;
+                        }
+                        var options = new CncIsoWriter.Options() { ccw = iso_milling_conventional, path_number = i, tool_diameter = tool_diameter, mirrorX = mirrorX, last_tool = last_tool, last_path = last_path };
+                        cncWriter.Write(path, options);
+                        if (last_path && (tool_diameter == iso_tool_size) && (iso_tool2_size > iso_tool_size)) //switch to larger tool
+                        {
+                            last_path = false;
+                            var old_tool_diameter = tool_diameter;
+                            tool_diameter = iso_tool2_size;
+                            dist += (tool_diameter / 2) - (1 - iso_path_overlap) * (old_tool_diameter / 2);
+                        }
+                        else
+                        {
+                            dist += (1 - iso_path_overlap) * tool_diameter;
+                        }
                     }
                 }
             }
             else if (Drill.IsDrillFile(fullPathName))
             {
                 var parsedImage = Drill.ParseDrillFile(fullPathName);
-                using (StreamWriter streamWriter = new StreamWriter(args[1], false, Encoding.ASCII))
+                using (StreamWriter streamWriter = new StreamWriter(outputPathName, false, Encoding.ASCII))
                 {
-                    CncDrillWriter cncDrillWriter= new CncDrillWriter(config);
+                    CncDrillWriter cncDrillWriter= new CncDrillWriter(config, streamWriter);
                     var options = new CncDrillWriter.Options() { mirrorX = mirrorX };
-                    cncDrillWriter.Write(parsedImage, options, streamWriter);
+                    cncDrillWriter.Write(parsedImage, options);
                 }
             }
             else
                 throw new GerberFileException("Unknown file type: " + Path.GetFileName(fullPathName));
         }
 
-
+        static private Polygon make_border_mask(Geometry border)
+        {
+            if (border.OgcGeometryType != OgcGeometryType.Polygon)
+                return null;
+            var factory = border.Factory;
+            //inflate the shell of the border to clip the tool trajectories 
+            var outer_ring =((Polygon)((Polygon)border).Shell.Buffer(2)).Shell;
+            var inner_ring = ((Polygon)border).Holes[0];
+            return factory.CreatePolygon(outer_ring, new LinearRing[] { inner_ring });
+        }
 
 
      

@@ -1,4 +1,32 @@
-﻿using System;
+﻿/*  Copyright (C) 2022-2023 Patrick H Dussud <Patrick.Dussud@outlook.com>
+    *** Acknowledgments to Gerbv Authors and Contributors. ***
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. Neither the name of the project nor the names of its contributors
+       may be used to endorse or promote products derived from this software
+       without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+ */
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -27,6 +55,8 @@ namespace IsoCnc
             public bool last_path;
         };
         Machine machine;
+        double current_tool_diameter = 0;
+        bool start_path = true;
         ConfigDictionary config;
         bool metric_mode = true;
         double unit_factor = 25.4; //becomes 1 if metric_mode is false; 
@@ -39,9 +69,23 @@ namespace IsoCnc
         string file_end_code;
         string coordinate_system;
         string coordinate_system_mirror;
-
-        public CncIsoWriter(ConfigDictionary config) 
+        string tool_change_code;
+        double tool_change_height;
+        Dictionary<string, int> tool_change_map = new Dictionary<string, int>()
         {
+            {"tool_number", 0 },
+            {"tool_diameter", 1 },
+            {"tool_lift", 2 },
+            {"tool_change_height", 3 },
+            {"spindle_speed", 4 },
+         };
+        string tool_change_format;
+
+
+        public CncIsoWriter(ConfigDictionary config, StreamWriter stream) 
+        {
+            machine = new Machine(stream, config);
+            CodeTemplate tool_change_template = new CodeTemplate(tool_change_map);
             this.config = config;
             config.BooleanGetValue("metric_mode", ref metric_mode);
             config.DoubleGetValue("iso_cut_depth", ref iso_cut_depth, false);
@@ -52,7 +96,9 @@ namespace IsoCnc
             config.string_get_value("file_end_code", ref file_end_code, false);
             config.string_get_value("coordinate_system", ref coordinate_system, false);
             config.string_get_value("coordinate_system_mirror", ref coordinate_system_mirror, false);
-
+            config.string_get_value("tool_change_code", ref tool_change_code, true);
+            config.DoubleGetValue("tool_change_height", ref tool_change_height);
+            tool_change_format = tool_change_template.CreateFormatString(tool_change_code);
             unit_factor = metric_mode ? 25.4 : 1.0;
 
         }
@@ -78,13 +124,13 @@ namespace IsoCnc
             }
             machine.rapidMove(null, null, iso_lift / unit_factor); //lift Z
         }
-        public void Write(Geometry shape, Options options, TextWriter stream) 
+        public void Write(Geometry shape, Options options) 
         {
             bool ccw = options.ccw;
             bool mirrorX = options.mirrorX;
-            machine = new Machine(stream, config);
-            if (options.path_number == 0)
+            if (start_path)
             {
+                start_path = false;
                 machine.insertCode(string.Format("(  Tool Size)\n({0:0.000} )", options.tool_diameter));
                 machine.setInputUnit(false);
                 if (mirrorX)
@@ -95,7 +141,12 @@ namespace IsoCnc
                 machine.relativeMode(generate_relative_code);
                 machine.SpindleOn(iso_spindle_speed);
                 machine.rapidMove(null, null, iso_lift / unit_factor); //lift Z
+            } else if (Math.Abs(current_tool_diameter - options.tool_diameter) > 0.001)
+            {
+                //change tool 
+                machine.insertCode(String.Format(tool_change_format, 2, options.tool_diameter, iso_lift, tool_change_height, iso_spindle_speed));
             }
+            current_tool_diameter = options.tool_diameter;
             for (int i = 0; i < shape.NumGeometries; i++) 
             {
                 if (shape.GetGeometryN(i) is Polygon)
@@ -137,25 +188,24 @@ namespace IsoCnc
         double tool_change_height = 40;
         double drill_spindle_speed = 26000;
         double slot_drill_overlap = 0.25;
-        string drill_tool_change_code = "M5\nG0 Z{tool_change_height}\nG0 X0 Y0\nM6 T{tool_number} ({tool_diameter} mm)\nM0\nM03 S{drill_spindle_speed}\nG0 Z{drill_lift}";
-        Dictionary<string, int> drill_tool_change_map = new Dictionary<string, int>()
+        string tool_change_code = "M5\nG0 Z{tool_change_height}\nG0 X0 Y0\nM6 T{tool_number} ({tool_diameter} mm)\nM0\nM03 S{spindle_speed}\nG0 Z{tool_lift}";
+        Dictionary<string, int> tool_change_map = new Dictionary<string, int>()
         {
             {"tool_number", 0 },
             {"tool_diameter", 1 },
-            {"drill_lift", 2 },
+            {"tool_lift", 2 },
             {"tool_change_height", 3 },
-            {"drill_spindle_speed", 4 },
-            {"pause", 5 }
+            {"spindle_speed", 4 },
         };
         string tool_change_format;
         string file_end_code;
         string coordinate_system;
         string coordinate_system_mirror;
-        public CncDrillWriter(ConfigDictionary config)
+        public CncDrillWriter(ConfigDictionary config, TextWriter streamWriter)
         {
-
+            machine = new Machine(streamWriter, config);
             this.config = config;
-            CodeTemplate tool_change_template = new CodeTemplate(drill_tool_change_map);
+            CodeTemplate tool_change_template = new CodeTemplate(tool_change_map);
 
             if (config != null)
             {
@@ -168,20 +218,20 @@ namespace IsoCnc
                 config.DoubleGetValue("mill_feed_rate", ref mill_feed_rate, true);
                 config.DoubleGetValue("tool_change_height", ref tool_change_height, true);
                 config.DoubleGetValue("drill_spindle_speed", ref drill_spindle_speed, true);
-                config.string_get_value("drill_tool_change_code", ref drill_tool_change_code, true);
+                config.string_get_value("tool_change_code", ref tool_change_code, true);
                 config.string_get_value("file_end_code", ref file_end_code, false);
                 config.string_get_value("coordinate_system", ref coordinate_system, false);
                 config.string_get_value("coordinate_system_mirror", ref coordinate_system_mirror, false);
             }
-            tool_change_format = tool_change_template.CreateFormatString(drill_tool_change_code);
+            tool_change_format = tool_change_template.CreateFormatString(tool_change_code);
             unit_factor = metric_mode ? 25.4 : 1.0;
         }
-        public void Write(GerberImage inputImage, Options options, TextWriter streamWriter)
+        public void Write(GerberImage inputImage, Options options)
         {
             bool mirrorX = options.mirrorX;
             List<int> apertureList = new List<int>();
             GerberNet currentNet;
-            machine = new Machine(streamWriter, config);
+
             // Copy the image, cleaning it in the process.
             GerberImage newImage = inputImage; //GerberImage.Copy(inputImage);
                                                // Write header info.
@@ -232,7 +282,7 @@ namespace IsoCnc
                 double diameter_mm = currAperture.Parameters()[0] * (currAperture.Unit == GerberUnit.Inch ? 25.4 : 1.0);
 
                 // Write tool change.
-                machine.insertCode(String.Format(tool_change_format, apertureIndex, diameter_mm / (metric_mode ? 1.0 : 25.4), drill_lift, tool_change_height, drill_spindle_speed, drill_pause));
+                machine.insertCode(String.Format(tool_change_format, apertureIndex, diameter_mm / (metric_mode ? 1.0 : 25.4), drill_lift, tool_change_height, drill_spindle_speed));
 
                 // Run through all nets and look for holes using this aperture.
                 for (int netIndex = 0; netIndex < newImage.GerberNetList.Count; netIndex++)

@@ -56,10 +56,18 @@ namespace IsoCnc
     /// </summary>
     public static class GerberShapes
     {
-        static Stack<AffineTransformation> transform_stack = new Stack<AffineTransformation>();
         static GeometryFactoryEx factory;
-        
-        // Renders a gerber image to the specified graphics target.
+
+        /// <summary>
+        /// Process the GerberImage and create a Geometry object
+        /// </summary>
+        /// <param name="gerberImage">An instance of GerberImage</param>
+        /// <param name="ccw_orientation">The Orientation of the boundaries of the objects contained in Geometry is counter clockwise. Defaults to true</param>
+        /// <param name="mirror_line">A line described by {x0, y0, x1, y1} to mirror the geometry around. Default to null (no mirroring)</param>
+        /// <returns>an instance of Geometry</returns>
+        /// <remarks>
+        /// See https://nettopologysuite.github.io/NetTopologySuite/api/NetTopologySuite.html for details about Geometry
+        /// </remarks>
         public static Geometry CreateGeometry(GerberImage gerberImage, bool ccw_orientation = true, double[]mirror_line = null)
         {
             NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices(
@@ -67,9 +75,10 @@ namespace IsoCnc
                 new NetTopologySuite.Geometries.PrecisionModel(),
                 4326, NetTopologySuite.Geometries.GeometryOverlay.NG,
                 new NetTopologySuite.Geometries.CoordinateEqualityComparer());
-            //Collection<Polygon> result = new Collection<Polygon>();
-            factory = new GeometryFactoryEx();
-            factory.OrientationOfExteriorRing = ccw_orientation ? LinearRingOrientation.CCW : LinearRingOrientation.CW;
+            factory = new GeometryFactoryEx
+            {
+                OrientationOfExteriorRing = ccw_orientation ? LinearRingOrientation.CCW : LinearRingOrientation.CW
+            };
             AffineTransformation currentTransformation = new AffineTransformation();
 
             double dx, dy;
@@ -86,7 +95,6 @@ namespace IsoCnc
             GerberNet currentNet = null;
             GerberLevel oldLevel = null;
             GerberNetState oldNetState = null;
-            //Collection<Polygon>[] polygons = { new Collection<Polygon>(), new Collection<Polygon>() };
             Geometry surface = factory.CreateEmpty(Dimension.Surface);
             bool exposure = true; //false for Clear, true for Dark
 
@@ -104,7 +112,6 @@ namespace IsoCnc
 
             for (netListIndex = 0; netListIndex < gerberNetList.Count; GetNextRenderObject(gerberNetList, ref netListIndex))
             {
-                //pen.Alignment = PenAlignment.Center;
                 currentNet = gerberNetList[netListIndex];
                 if (currentNet.Level != oldLevel)
                 {
@@ -133,7 +140,6 @@ namespace IsoCnc
 
                         Coordinate[] points = new Coordinate[] { pf1, pf2, pf3, pf4, pf1 };
                         ExposeGeometry(ref surface, factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(points))), currentNet.Level.Knockout.Polarity != GerberPolarity.Clear);
-                        //polygons[currentNet.Level.Knockout.Polarity == GerberPolarity.Clear ? 0:1].Add(factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(points))));
                     }
 
                     oldLevel = currentNet.Level;
@@ -168,7 +174,6 @@ namespace IsoCnc
                                     var coords = FillRegionPath(currentTransformation, gerberNetList, netListIndex, stepAndRepeatX, stepAndRepeatY);
                                     if (coords[1].Count > 3)
                                         ExposeGeometry(ref surface, factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(coords[1].ToArray())), null), exposure);
-                                        //polygons[exposure].Add(factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(coords[1].ToArray())), null));
                                     if (coords[0].Count > 3)
                                         ExposeGeometry(ref surface, factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(coords[0].ToArray())), null), !exposure);
                                 }
@@ -197,7 +202,6 @@ namespace IsoCnc
                                                         endPoint = new Coordinate(stopX, stopY);
                                                         var line = currentTransformation.Transform(factory.CreateLineString(new Coordinate[] { startPoint, endPoint }));
                                                         ExposeGeometry(ref surface, line.Buffer(lWidth / 2.0), exposure);
-                                                        //polygons[exposure].Add ((Polygon)line.Buffer(lWidth / 2.0));
                                                     }
                                                     break;
 
@@ -221,7 +225,6 @@ namespace IsoCnc
                                                         new Coordinate(startX - dx, startY - dy)
                                                         };
                                                         ExposeGeometry(ref surface, factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(points))), exposure);
-                                                        //polygons[exposure].Add(factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(points))));
                                                     }
 
                                                     break;
@@ -235,7 +238,6 @@ namespace IsoCnc
                                                         endPoint = new Coordinate(stopX, stopY);
                                                         var line = currentTransformation.Transform(factory.CreateLineString(new Coordinate[] { startPoint, endPoint }));
                                                         ExposeGeometry(ref surface, line.Buffer(lWidth / 2.0), exposure);
-                                                        //polygons[exposure].Add((Polygon)line.Buffer(lWidth / 2.0));
                                                     }
                                                     break;
 
@@ -259,14 +261,11 @@ namespace IsoCnc
                                                 endcap = NetTopologySuite.Operation.Buffer.EndCapStyle.Flat;
 
 
-                                            //RectangleF arcRectangle = new RectangleF(centreX - (width / 2), centreY - (height / 2), width, height);
                                             var line_width = (double)apertures[currentNet.Aperture].Parameters()[0];
-                                            //pen.Alignment = PenAlignment.Inset;
                                             if (sweepAngle != 0.0 && width != 0.0)
                                             {
                                                 var arc = CreateArc(currentTransformation, new Coordinate(centreX, centreY), width - line_width/2, startAngle, sweepAngle);
                                                 ExposeGeometry(ref surface, factory.CreateLineString(arc).Buffer(line_width / 2, endcap), exposure);
-                                                //polygons[exposure].Add((Polygon)factory.CreateLineString(arc).Buffer(line_width/2, endcap));
                                             }
 
                                             break;
@@ -286,23 +285,19 @@ namespace IsoCnc
                                     AffineTransformation state = currentTransformation;
                                     currentTransformation = new AffineTransformation(currentTransformation);
                                     currentTransformation.Translate(stopX, stopY);
-                                    //using (GraphicsPath path = new GraphicsPath())
                                     {
                                         switch (apertures[currentNet.Aperture].ApertureType)
                                         {
                                             case GerberApertureType.Circle:
                                                 {
-                                                    //apertureRectangle = new RectangleF(-(p0 / 2), -(p0 / 2), p0, p0);
                                                     var hole = DrawAperatureHole(currentTransformation, p1, p2);
                                                     var circ = CreateCircle(currentTransformation, new Coordinate(0, 0), p0, hole == null ? null : new LinearRing[] { hole });
                                                     ExposeGeometry(ref surface, circ, exposure);
-                                                    //polygons[exposure].Add(circ);
                                                 }
                                                 break;
 
                                             case GerberApertureType.Rectangle:
                                                 {
-                                                    //apertureRectangle = new RectangleF(-(p0 / 2), -(p1 / 2), p0, p1);
                                                     var hole = DrawAperatureHole(currentTransformation, p2, p3);
                                                     var coordinates = new Coordinate[] { new Coordinate(-(p0 / 2), -(p1 / 2)),
                                                                                         new Coordinate(-(p0 / 2), (p1 / 2)),
@@ -312,20 +307,14 @@ namespace IsoCnc
                                                                                         };
                                                     var rec = factory.CreatePolygon((LinearRing)currentTransformation.Transform(factory.CreateLinearRing(coordinates)), hole == null ? null : new LinearRing[] { hole });
                                                     ExposeGeometry(ref surface, rec, exposure);
-                                                    //polygons[exposure].Add(rec);
-                                                    //path.AddRectangle(apertureRectangle);
-                                                    //DrawAperatureHole(path, p2, p3);
                                                 }
                                                 break;
 
                                             case GerberApertureType.Oval:
                                                 {
-                                                    //apertureRectangle = new RectangleF(-(p0 / 2), -(p1 / 2), p0, p1);
                                                     var hole = DrawAperatureHole(currentTransformation, p2, p3);
                                                     var ob = CreateOblong(currentTransformation, p0, p1, hole == null ? null : new LinearRing[] { hole });
                                                     ExposeGeometry(ref surface, ob, exposure);
-                                                    //polygons[exposure].Add(ob);
-                                                    //DrawAperatureHole(path, p2, p3);
                                                 }
                                                 break;
 
@@ -334,8 +323,6 @@ namespace IsoCnc
                                                     var hole = DrawAperatureHole(currentTransformation, p3, p4);
                                                     var pol = CreatePolygon(currentTransformation, p0, p1, p2, hole == null ? null : new LinearRing[] { hole });
                                                     ExposeGeometry(ref surface, pol,exposure);
-                                                    //polygons[exposure].Add(pol);
-                                                    //DrawAperatureHole(path, p3, p4);
                                                 }
                                                 break;
 
@@ -344,10 +331,6 @@ namespace IsoCnc
                                                     simplifiedMacroList = apertures[currentNet.Aperture].SimplifiedMacroList;
                                                     var geo = DrawApertureMacro(currentTransformation, simplifiedMacroList, out bool success);
                                                     ExposeGeometry(ref surface, geo, exposure);
-                                                    //for (int i = 0; i < geo.NumGeometries; i++)
-                                                    //{
-                                                    //    polygons[exposure].Add ((Polygon)geo.GetGeometryN(i));
-                                                    //}
                                                 }
                                                 break;
 
@@ -389,7 +372,6 @@ namespace IsoCnc
             bool exposure = false;
             double diameter = 0.0;
             double centreX, centreY = 0.0;
-            //List<Polygon>[] polygons = { new List<Polygon>(), new List<Polygon>()};
             var surface = factory.CreateEmpty(Dimension.A);
             foreach (SimplifiedApertureMacro simplifiedAperture in simplifiedApertureList)
             {
@@ -400,7 +382,6 @@ namespace IsoCnc
                     centreY = (double)simplifiedAperture.Parameters[(int)CircleParameters.CentreY];
                     diameter = (double)simplifiedAperture.Parameters[(int)CircleParameters.Diameter];
                     var circ = CreateCircle(transform, new Coordinate(centreX, centreY), diameter, null);
-                    //polygons[exposure].Add(circ);
                     ExposeGeometry(ref surface, circ, exposure);
                   
                 }
@@ -431,7 +412,6 @@ namespace IsoCnc
                         double targetSize = diameter - (gapWidth + circleLineWidth/2) * 2 * i;
                         if (targetSize > 0)
                         {
-                            //polygons[1].Add((Polygon)CreateCircleLine(transform, new Coordinate(centreX, centreY), targetSize).Buffer(circleLineWidth/2));
                             ExposeGeometry(ref surface, CreateCircleLine(transform, new Coordinate(centreX, centreY), targetSize).Buffer(circleLineWidth / 2));
                         }
                     }
@@ -439,7 +419,6 @@ namespace IsoCnc
                     // Draw crosshairs.
                     var thickness = simplifiedAperture.Parameters[(int)MoireParameters.CrosshairLineWidth];
                     var cross = transform.Transform(factory.CreateLineString(new Coordinate[] { points[0], points[1] })).Union(transform.Transform(factory.CreateLineString(new Coordinate[] { points[2], points[3] })));
-                    //polygons[1].Add((Polygon)cross.Buffer(thickness / 2));
                     ExposeGeometry(ref surface, cross.Buffer(thickness / 2));
                 }
 
@@ -467,10 +446,6 @@ namespace IsoCnc
                     var cross = transform.Transform (factory.CreateLineString(new Coordinate[] { points[0], points[1] }).Union(factory.CreateLineString(new Coordinate[] { points[2], points[3] }))).Buffer(crossHairWidth / 2);
                     Geometry thermal = pad.Difference(cross);
                     ExposeGeometry(ref surface, thermal);
-                    //for (int i = 0; i < thermal.NumGeometries; i++)
-                    //{
-                    //    polygons[1].Add((Polygon)thermal.GetGeometryN(i));
-                    //}
                 }
 
                 else if (simplifiedAperture.ApertureType == GerberApertureType.MacroOutline)
@@ -489,7 +464,6 @@ namespace IsoCnc
                     }
                     TransformPoints(points, rotation);
                     ExposeGeometry(ref surface, factory.CreatePolygon((LinearRing)transform.Transform(factory.CreateLinearRing(points))), exposure);
-                    //polygons[exposure].Add(factory.CreatePolygon((LinearRing)transform.Transform(factory.CreateLinearRing(points))));
                 }
 
                 else if (simplifiedAperture.ApertureType == GerberApertureType.MacroPolygon)
@@ -499,7 +473,6 @@ namespace IsoCnc
                     rotation = (double)simplifiedAperture.Parameters[(int)PolygonParameters.Rotation];
                     diameter = (double)simplifiedAperture.Parameters[(int)PolygonParameters.Diameter];
                     ExposeGeometry(ref surface, CreatePolygon(transform, diameter, numberOfSides, rotation), exposure);
-                    //polygons[exposure].Add(CreatePolygon(transform, diameter, numberOfSides, rotation));
                 }
 
                 else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine20)
@@ -515,7 +488,6 @@ namespace IsoCnc
                     points = new Coordinate[] { new Coordinate(startX, startY), new Coordinate(endX, endY) };
                     TransformPoints(points, rotation);
                     ExposeGeometry(ref surface, transform.Transform(factory.CreateLineString(points)).Buffer(lineWidth / 2, NetTopologySuite.Operation.Buffer.EndCapStyle.Flat), exposure);
-                    //polygons[exposure].Add((Polygon)transform.Transform(factory.CreateLineString(points)).Buffer(lineWidth/2, NetTopologySuite.Operation.Buffer.EndCapStyle.Flat));
                 }
 
                 else if (simplifiedAperture.ApertureType == GerberApertureType.MacroLine21)
@@ -535,7 +507,6 @@ namespace IsoCnc
 
                     TransformPoints(points, rotation);
                     ExposeGeometry(ref surface, factory.CreatePolygon((LinearRing)transform.Transform(factory.CreateLinearRing(points))), exposure);
-                    //polygons[exposure].Add(factory.CreatePolygon((LinearRing)transform.Transform(factory.CreateLinearRing(points))));
 
                 }
 
@@ -556,7 +527,6 @@ namespace IsoCnc
 
                     TransformPoints(points, rotation);
                     ExposeGeometry(ref surface, factory.CreatePolygon((LinearRing)transform.Transform(factory.CreateLinearRing(points))), exposure);
-                    //polygons[exposure].Add(factory.CreatePolygon((LinearRing)transform.Transform(factory.CreateLinearRing(points))));
 
                 }
 
@@ -569,8 +539,6 @@ namespace IsoCnc
         internal static Polygon CreateOblong(AffineTransformation transform, double width, double height, LinearRing[] hole = null)
         {
             double diameter;
-            double left = -(width / 2);
-            double top = -(height / 2);
             LinearRing polyExt = null;
 
             if (width > height)
@@ -738,8 +706,6 @@ namespace IsoCnc
                 if (done)
                     break;
             }
-            //result[1].Add(result[1][0]); //make it closed
-            //result[0].Add(result[0][0]);
             return result;
         }
 
