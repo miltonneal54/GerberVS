@@ -497,8 +497,8 @@ namespace GerberVS
                             TransformPoints(points, rotation);
 
                             pen.Width = lineWidth;
-                            pen.StartCap = LineCap.Square;
-                            pen.EndCap = LineCap.Square;
+                            pen.StartCap = LineCap.Flat;
+                            pen.EndCap = LineCap.Flat;
                             graphics.DrawLine(pen, points[0], points[1]);
                         }
 
