@@ -32,7 +32,7 @@ using System.Text;
 using GerberVS;
 using Config;
 using NetTopologySuite.Geometries;
-
+using NetTopologySuite.Index;
 
 namespace IsoCnc
 {
@@ -114,6 +114,14 @@ namespace IsoCnc
                         var last_tool = !(tool_diameter < iso_tool2_size);
                         last_path = (dist + (tool_diameter / 2)) >= (last_tool ? (border == null ? iso_isolation_max : 1E6): iso_isolation_min);
                         var path = geometry.Buffer(dist / unit_coefficient);
+                        //check if all of the polygons are isolated by the first pass
+                        if (i == 0)
+                        {
+                            if (path.NumGeometries < geometry.NumGeometries)
+                            {
+                                Console.WriteLine("The tool diam. is too large. Not all of the copper islands are isolated");
+                            }
+                        }
                         if (border != null)
                         {
                             var new_path = path.Difference(border);
@@ -158,16 +166,28 @@ namespace IsoCnc
 
         static private Polygon make_border_mask(Geometry border)
         {
-            if (border.OgcGeometryType != OgcGeometryType.Polygon)
-                return null;
             var factory = border.Factory;
-            //inflate the shell of the border to clip the tool trajectories 
-            var outer_ring =((Polygon)((Polygon)border).Shell.Buffer(2)).Shell;
-            var inner_ring = ((Polygon)border).Holes[0];
-            return factory.CreatePolygon(outer_ring, new LinearRing[] { inner_ring });
+            Geometry inner = factory.CreateEmpty(Dimension.Surface);
+            LinearRing inner_ring;
+            for (int i = 0; i < border.NumGeometries; i++)
+            {
+                if (border.GetGeometryN(i) is Polygon pol)
+                {
+                    foreach (var h in pol.Holes)
+                    {
+                        inner = inner.Union(factory.CreatePolygon(h));
+                    }
+                }
+            }
+            if (inner.OgcGeometryType == OgcGeometryType.Polygon)
+            {
+                inner_ring = ((Polygon)inner).Shell;
+            }
+            else
+                return null;
+            var shell = ((Polygon)inner_ring.Buffer(2)).Shell;
+            return factory.CreatePolygon(shell, new LinearRing[] { inner_ring });
         }
-
-
      
     }
 

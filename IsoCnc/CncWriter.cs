@@ -149,9 +149,8 @@ namespace IsoCnc
             current_tool_diameter = options.tool_diameter;
             for (int i = 0; i < shape.NumGeometries; i++) 
             {
-                if (shape.GetGeometryN(i) is Polygon)
+                if (shape.GetGeometryN(i) is Polygon poly)
                 {
-                    var poly = shape.GetGeometryN(i) as Polygon;
                     write_ring(poly.ExteriorRing.Coordinates, ccw);
                     foreach (var r in poly.InteriorRings)
                     {
