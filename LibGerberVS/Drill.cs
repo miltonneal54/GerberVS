@@ -37,7 +37,7 @@ using System.Globalization;
 
 namespace GerberVS
 {
-    internal static class Drill
+    public static class Drill
     {
         private const int MaxDoubleSize = 32;
         private const int ToolMin = 1;          // T00 code is reserved for unload tool command.

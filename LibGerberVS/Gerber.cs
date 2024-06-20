@@ -41,7 +41,7 @@ using System.Globalization;
 
 namespace GerberVS
 {
-    internal static class Gerber
+    public static class Gerber
     {
         /// <summary>
         /// Lowest allowable aperture number.

@@ -35,7 +35,7 @@ namespace GerberVS
     /// <summary>
     /// Op codes used when parsing aperture macros.
     /// </summary>
-    internal enum GerberOpCode
+    public enum GerberOpCode
     {
         Nop = 0,            // No operation.
         Push,               // Push the instruction onto the stack.
@@ -317,7 +317,7 @@ namespace GerberVS
     /// <summary>
     /// Enumerates the circlular aperture parameter indexes.
     /// </summary>
-    internal enum CircleParameters : int
+    public enum CircleParameters : int
     {
         Exposure,
         Diameter,
@@ -329,7 +329,7 @@ namespace GerberVS
     /// <summary>
     /// Enumerates the outline aperture parameter indexes.
     /// </summary>
-    internal enum OutlineParameters : int
+    public enum OutlineParameters : int
     {
         Exposure,
         NumberOfPoints,
@@ -338,7 +338,7 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum PolygonParameters : int
+    public enum PolygonParameters : int
     {
         Exposure,
         NumberOfSides,
@@ -348,7 +348,7 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum MoireParameters : int
+    public enum MoireParameters : int
     {
         CentreX,
         CentreY,
@@ -361,7 +361,7 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum ThermalParameters : int
+    public enum ThermalParameters : int
     {
         CentreX,
         CentreY,
@@ -371,7 +371,7 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum Line20Parameters : int
+    public enum Line20Parameters : int
     {
         Exposure,
         LineWidth,
@@ -382,7 +382,7 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum Line21Parameters : int
+    public enum Line21Parameters : int
     {
         Exposure,
         LineWidth,
@@ -392,7 +392,7 @@ namespace GerberVS
         Rotation
     }
 
-    internal enum Line22Parameters
+    public enum Line22Parameters
     {
         Exposure,
         LineWidth,
